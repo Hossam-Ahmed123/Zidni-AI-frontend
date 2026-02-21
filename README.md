@@ -54,6 +54,13 @@ Create SSH remote port forwarding:
 ssh -R 5174:127.0.0.1:5174 root@72.61.18.248
 ```
 
+### Troubleshooting
+
+If `http://app-test.72.61.18.248.nip.io/` redirects to the production Zidni URL, do a hard refresh to clear cache/service worker:
+
+- Windows: `Ctrl+Shift+R`
+- macOS: `Cmd+Shift+R`
+
 ## Build
 
 ```bash
