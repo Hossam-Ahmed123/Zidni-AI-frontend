@@ -1045,12 +1045,7 @@ const landing = computed<TeacherLandingPublicResponse>(() => {
   };
 });
 
-const landingSlug = computed(() => {
-  return (
-    ensureString(landing.value.teacher.slug, '') ||
-    ensureString(slug.value, '')
-  );
-});
+const landingSlug = computed(() => ensureString(slug.value, ''));
 
 const perTenantLocaleKey = computed(() => {
   const slugValue = landingSlug.value;
