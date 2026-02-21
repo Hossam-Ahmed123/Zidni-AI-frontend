@@ -1,0 +1,8 @@
+.media-overlay {
+  background: rgba(0, 0, 0, var(--overlay, 0.45));
+}
+
+.text-on-media {
+  color: rgb(var(--on-media, 255 255 255));
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}

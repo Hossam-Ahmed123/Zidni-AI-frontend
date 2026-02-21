@@ -1,0 +1,45 @@
+
+<svg width="320" height="140" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes orbit {
+      0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+    }
+    .orbiting-ball {
+      transform-origin: 18px 10px;
+      animation: orbit 4s linear infinite;
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 2s ease-in forwards;
+      animation-delay: 0.5s;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+  </style>
+
+  <!-- Background -->
+ 
+  <!-- Text: "زدني أيه آي" -->
+  <text x="20" y="80" font-family="Verdana, Geneva, sans-serif" font-size="36" font-weight="bold"
+         class="fade-in">
+        <tspan fill="#1E3A8A">ِAI</tspan>
+
+    <tspan fill="#06B6D4">زدني </tspan>
+  </text>
+
+  <!-- Icon moved closer to text and orbit adjusted -->
+  <g transform="translate(170,40)">
+    <!-- Cap -->
+    <polygon points="18,0 48,10 18,20 -12,10" fill="#1E3A8A"/>
+    <rect x="13" y="20" width="10" height="15" fill="#06B6D4"/>
+    <!-- Tassel -->
+    <line x1="18" y1="20" x2="18" y2="35" stroke="#000" stroke-width="1"/>
+    <circle cx="18" cy="35" r="2" fill="#000"/>
+    <!-- Orbit Path -->
+    <circle cx="18" cy="10" r="22" stroke="#06B6D4" stroke-width="1" fill="none"/>
+    <!-- Orbiting Ball -->
+    <circle cx="18" cy="10" r="4" fill="#06B6D4" class="orbiting-ball"/>
+  </g>
+</svg>

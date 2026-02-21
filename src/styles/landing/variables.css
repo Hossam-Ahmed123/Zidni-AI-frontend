@@ -1,0 +1,8 @@
+:root {
+  --nabta-green: #16a34a;
+  --nabta-green-light: #22c55e;
+  --nabta-dark: #1e293b;
+  --nabta-white: #ffffff;
+  --nabta-gray: #94a3b8;
+  --landing-font-sans: 'Inter', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

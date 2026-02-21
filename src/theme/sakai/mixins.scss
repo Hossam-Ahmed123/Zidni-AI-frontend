@@ -1,0 +1,29 @@
+@mixin sakai-focus-ring {
+  outline: none;
+  box-shadow: var(--sakai-shadow-focus);
+}
+
+@mixin sakai-transition($properties...) {
+  transition-property: $properties;
+  transition-duration: var(--sakai-transition-duration);
+  transition-timing-function: var(--sakai-transition-ease);
+}
+
+@mixin sakai-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sakai-primary-400) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--sakai-primary-300);
+    border-radius: var(--sakai-border-radius-pill);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

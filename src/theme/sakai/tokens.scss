@@ -1,0 +1,227 @@
+:root {
+  --sakai-scale-factor: 0.92;
+
+  /* Typography */
+  --sakai-font-family-base: 'IBM Plex Sans Arabic', sans-serif;
+  --sakai-font-size-root: calc(16px * var(--sakai-scale-factor));
+  --sakai-font-size-sm: 0.875rem;
+  --sakai-font-size-md: 1rem;
+  --sakai-font-size-lg: 1.125rem;
+  --sakai-font-size-xl: 1.5rem;
+  --sakai-font-weight-regular: 400;
+  --sakai-font-weight-medium: 500;
+  --sakai-font-weight-semibold: 600;
+  --sakai-font-weight-bold: 700;
+  --sakai-line-height-sm: 1.4;
+  --sakai-line-height-md: 1.6;
+  --sakai-line-height-lg: 1.8;
+
+  /* Palette - inspired by PrimeVue Sakai theme */
+  --sakai-primary-50: #eef2ff;
+  --sakai-primary-100: #e0e7ff;
+  --sakai-primary-200: #c7d2fe;
+  --sakai-primary-300: #a5b4fc;
+  --sakai-primary-400: #818cf8;
+  --sakai-primary-500: #6366f1;
+  --sakai-primary-600: #4f46e5;
+  --sakai-primary-700: #4338ca;
+  --sakai-primary-800: #3730a3;
+  --sakai-primary-900: #312e81;
+  --sakai-primary: var(--sakai-primary-500);
+  --sakai-primary-contrast: #ffffff;
+
+  --sakai-secondary-50: #ecfeff;
+  --sakai-secondary-100: #cffafe;
+  --sakai-secondary-200: #a5f3fc;
+  --sakai-secondary-300: #67e8f9;
+  --sakai-secondary-400: #22d3ee;
+  --sakai-secondary-500: #06b6d4;
+  --sakai-secondary-600: #0891b2;
+  --sakai-secondary-700: #0e7490;
+  --sakai-secondary-800: #155e75;
+  --sakai-secondary-900: #164e63;
+  --sakai-secondary: var(--sakai-secondary-500);
+  --sakai-secondary-contrast: #031016;
+
+  --sakai-success: #22c55e;
+  --sakai-info: #3b82f6;
+  --sakai-warning: #f59e0b;
+  --sakai-danger: #ef4444;
+  --sakai-muted: #94a3b8;
+
+  /* Surfaces */
+  --sakai-surface: #ffffff;
+  --sakai-surface-alt: #f8fafc;
+  --sakai-surface-strong: #e2e8f0;
+  --sakai-surface-overlay: rgba(15, 23, 42, 0.55);
+  --sakai-surface-card: var(--sakai-surface);
+  --sakai-surface-section: #f1f5f9;
+  --sakai-surface-elevated: color-mix(in srgb, var(--sakai-text-color) 6%, var(--sakai-surface));
+  --sakai-surface-subtle: color-mix(in srgb, var(--sakai-text-color) 4%, transparent);
+  --sakai-surface-hero: linear-gradient(135deg, var(--sakai-primary-600), var(--sakai-secondary-500));
+
+  /* Text */
+  --sakai-text-color: #1f2937;
+  --sakai-text-color-secondary: #4b5563;
+  --sakai-text-color-tertiary: #6b7280;
+  --sakai-text-color-muted: #94a3b8;
+  --sakai-text-color-inverse: #ffffff;
+
+  /* Borders */
+  --sakai-border-color: #e2e8f0;
+  --sakai-border-color-strong: #cbd5f5;
+  --sakai-border-color-subtle: color-mix(in srgb, var(--sakai-text-color) 8%, transparent);
+  --sakai-border-radius-xs: 0.375rem;
+  --sakai-border-radius-sm: 0.5rem;
+  --sakai-border-radius-md: 0.75rem;
+  --sakai-border-radius-lg: 1rem;
+  --sakai-border-radius-xl: 1.5rem;
+  --sakai-border-radius-pill: 9999px;
+
+  /* Shadows */
+  --sakai-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --sakai-shadow-md: 0 10px 30px rgba(15, 23, 42, 0.12);
+  --sakai-shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.16);
+  --sakai-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  --sakai-focus-ring-color: color-mix(in srgb, var(--sakai-primary) 65%, transparent);
+
+  /* Gradients */
+  --sakai-gradient-primary: linear-gradient(135deg, var(--sakai-primary-500), var(--sakai-secondary-400));
+  --sakai-gradient-secondary: linear-gradient(135deg, var(--sakai-secondary-600), var(--sakai-primary-400));
+  --sakai-gradient-success: linear-gradient(135deg, var(--sakai-success), #16a34a);
+  --sakai-gradient-info: linear-gradient(135deg, var(--sakai-info), var(--sakai-secondary));
+  --sakai-gradient-warning: linear-gradient(135deg, var(--sakai-warning), #f97316);
+  --sakai-gradient-danger: linear-gradient(135deg, var(--sakai-danger), #dc2626);
+  --sakai-success-surface: color-mix(in srgb, var(--sakai-success) 14%, transparent);
+  --sakai-info-surface: color-mix(in srgb, var(--sakai-info) 14%, transparent);
+  --sakai-warning-surface: color-mix(in srgb, var(--sakai-warning) 18%, transparent);
+  --sakai-danger-surface: color-mix(in srgb, var(--sakai-danger) 16%, transparent);
+  --sakai-primary-tint-04: color-mix(in srgb, var(--sakai-primary) 4%, transparent);
+  --sakai-primary-tint-08: color-mix(in srgb, var(--sakai-primary) 8%, transparent);
+  --sakai-primary-tint-12: color-mix(in srgb, var(--sakai-primary) 12%, transparent);
+  --sakai-primary-tint-16: color-mix(in srgb, var(--sakai-primary) 16%, transparent);
+  --sakai-secondary-tint-10: color-mix(in srgb, var(--sakai-secondary) 10%, transparent);
+  --sakai-white-alpha-10: color-mix(in srgb, var(--sakai-text-color-inverse) 10%, transparent);
+  --sakai-white-alpha-18: color-mix(in srgb, var(--sakai-text-color-inverse) 18%, transparent);
+  --sakai-white-alpha-25: color-mix(in srgb, var(--sakai-text-color-inverse) 25%, transparent);
+  --sakai-overlay-strong: color-mix(in srgb, var(--sakai-text-color) 45%, transparent);
+  --sakai-shadow-hero: 0 40px 80px -45px color-mix(in srgb, var(--sakai-primary) 55%, rgba(15, 23, 42, 0.55));
+
+  /* Spacing scale */
+  --sakai-space-0: 0;
+  --sakai-space-1: 0.25rem;
+  --sakai-space-2: 0.5rem;
+  --sakai-space-3: 0.75rem;
+  --sakai-space-4: 1rem;
+  --sakai-space-5: 1.25rem;
+  --sakai-space-6: 1.5rem;
+  --sakai-space-7: 1.75rem;
+  --sakai-space-8: 2rem;
+  --sakai-space-9: 2.5rem;
+  --sakai-space-10: 3rem;
+  --sakai-space-11: 3.5rem;
+  --sakai-space-12: 4rem;
+
+  /* Transition */
+  --sakai-transition-duration: 150ms;
+  --sakai-transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --sakai-sidebar-width: 18rem;
+  --sakai-sidebar-width-collapsed: 5.5rem;
+  --sakai-topbar-height: 4.25rem;
+  --sakai-container-max: 1200px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --sakai-scale-factor: 0.9;
+
+  --sakai-surface: #0f172a;
+  --sakai-surface-alt: #111c34;
+  --sakai-surface-strong: #1e293b;
+  --sakai-surface-overlay: rgba(2, 6, 23, 0.65);
+  --sakai-surface-card: #111c34;
+  --sakai-surface-section: #0b1220;
+  --sakai-surface-elevated: color-mix(in srgb, var(--sakai-text-color) 8%, var(--sakai-surface));
+  --sakai-surface-subtle: color-mix(in srgb, var(--sakai-text-color) 6%, transparent);
+  --sakai-surface-hero: linear-gradient(135deg, color-mix(in srgb, var(--sakai-primary) 70%, #1e1b4b), color-mix(in srgb, var(--sakai-secondary) 65%, #0f766e));
+
+  --sakai-text-color: #e2e8f0;
+  --sakai-text-color-secondary: #cbd5f5;
+  --sakai-text-color-tertiary: #94a3b8;
+  --sakai-text-color-muted: #64748b;
+  --sakai-text-color-inverse: #0f172a;
+
+  --sakai-border-color: #1e293b;
+  --sakai-border-color-strong: #334155;
+  --sakai-border-color-subtle: color-mix(in srgb, var(--sakai-text-color) 12%, transparent);
+
+  --sakai-shadow-sm: 0 2px 6px rgba(2, 6, 23, 0.6);
+  --sakai-shadow-md: 0 12px 32px rgba(2, 6, 23, 0.55);
+  --sakai-shadow-lg: 0 24px 70px rgba(2, 6, 23, 0.65);
+  --sakai-shadow-focus: 0 0 0 3px color-mix(in srgb, var(--sakai-primary) 55%, transparent);
+  --sakai-focus-ring-color: color-mix(in srgb, var(--sakai-primary) 70%, var(--sakai-surface));
+
+  --sakai-success-surface: color-mix(in srgb, var(--sakai-success) 24%, transparent);
+  --sakai-info-surface: color-mix(in srgb, var(--sakai-info) 24%, transparent);
+  --sakai-warning-surface: color-mix(in srgb, var(--sakai-warning) 28%, transparent);
+  --sakai-danger-surface: color-mix(in srgb, var(--sakai-danger) 26%, transparent);
+
+  color-scheme: dark;
+}
+
+/* Legacy token aliases for existing code */
+:root {
+  --muse-primary: var(--sakai-primary);
+  --muse-secondary: var(--sakai-secondary);
+  --muse-success: var(--sakai-success);
+  --muse-info: var(--sakai-info);
+  --muse-warning: var(--sakai-warning);
+  --muse-danger: var(--sakai-danger);
+  --muse-muted: var(--sakai-text-color-muted);
+  --muse-text-primary: var(--sakai-text-color);
+  --muse-text-secondary: var(--sakai-text-color-secondary);
+  --muse-text-heading: var(--sakai-text-color);
+  --muse-text-muted: var(--sakai-text-color-tertiary);
+  --muse-surface: var(--sakai-surface);
+  --muse-surface-alt: var(--sakai-surface-alt);
+  --muse-border: var(--sakai-border-color);
+  --muse-border-strong: var(--sakai-border-color-strong);
+  --muse-shadow-sm: var(--sakai-shadow-sm);
+  --muse-shadow-base: var(--sakai-shadow-md);
+  --muse-shadow-lg: var(--sakai-shadow-lg);
+  --muse-shadow-button: var(--sakai-shadow-md);
+  --muse-shadow-button-hover: var(--sakai-shadow-lg);
+  --muse-gradient-primary: var(--sakai-gradient-primary);
+  --muse-gradient-secondary: var(--sakai-gradient-secondary);
+  --muse-gradient-success: var(--sakai-gradient-success);
+  --muse-gradient-info: var(--sakai-gradient-info);
+  --muse-gradient-warning: var(--sakai-gradient-warning);
+  --muse-gradient-danger: var(--sakai-gradient-danger);
+  --muse-radius-sm: var(--sakai-border-radius-sm);
+  --muse-radius-md: var(--sakai-border-radius-md);
+  --muse-radius-lg: var(--sakai-border-radius-lg);
+  --muse-radius-xl: var(--sakai-border-radius-xl);
+  --muse-radius-pill: var(--sakai-border-radius-pill);
+  --muse-font-regular: var(--sakai-font-weight-regular);
+  --muse-font-medium: var(--sakai-font-weight-medium);
+  --muse-font-semibold: var(--sakai-font-weight-semibold);
+  --muse-font-bold: var(--sakai-font-weight-bold);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='dark'] {
+    --sakai-surface: #0f172a;
+    --sakai-surface-alt: #111c34;
+    --sakai-surface-section: #0b1220;
+    --sakai-text-color: #e2e8f0;
+    --sakai-text-color-secondary: #cbd5f5;
+    --sakai-text-color-tertiary: #94a3b8;
+    --sakai-text-color-muted: #64748b;
+    --sakai-border-color: #1e293b;
+    --sakai-border-color-strong: #334155;
+    --sakai-surface-overlay: rgba(2, 6, 23, 0.65);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "composite": false,
+    "baseUrl": "./",
+    "skipLibCheck": true,
+    "types": ["vitest"],
+    "paths": {
+      "@/*": ["src/*"],
+      "primevue": ["src/vendor/primevue/index.ts"],
+      "primevue/*": ["src/vendor/primevue/*"],
+      "primeicons/*": ["src/vendor/primeicons/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "vitest"],
+  "exclude": ["dist", "node_modules"]
+}

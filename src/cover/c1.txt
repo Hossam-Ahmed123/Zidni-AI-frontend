@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sample 1 - Floating Letters</title>
+  <style>
+    body { margin:0; height:100vh; background:#000; overflow:hidden; font-family:sans-serif; }
+    .container { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+    .text { font-size:clamp(3rem, 12vw, 12rem); color:#fff; letter-spacing:0.15em; }
+    .letter { display:inline-block; opacity:0; transform:translateY(80px) rotateX(60deg); transition:all 1.2s cubic-bezier(0.22,0.61,0.36,1); }
+    .letter.show { opacity:1; transform:none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text" id="title">teacher name</div>
+  </div>
+
+  <script>
+    const title = document.getElementById('title');
+    const str = title.textContent;
+    title.innerHTML = str.split('').map(c => `<span class="letter">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+
+    const letters = document.querySelectorAll('.letter');
+    letters.forEach((l, i) => {
+      setTimeout(() => l.classList.add('show'), i * 80 + Math.random()*300);
+    });
+  </script>
+</body>
+</html>

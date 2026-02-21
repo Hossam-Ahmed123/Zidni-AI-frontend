@@ -1,0 +1,2128 @@
+<template>
+  <ThemePage :title="pageTitle" :subtitle="courseSubtitle">
+    <template #actions>
+      <UiButton variant="link" color="secondary" prepend-icon="ArrowLeftOutlined" @click="goBack">
+        {{ t('nav.teacher') }}
+      </UiButton>
+    </template>
+
+    <div v-if="course" class="course-editor">
+       
+      <section class="course-editor__main">
+        <UiCard :title="t('courses.modules')">
+          <template #actions>
+            <UiButton color="primary" prepend-icon="FolderAddOutlined" @click="openModuleDialog()">
+              {{ t('courses.addModule') }}
+            </UiButton>
+          </template>
+
+          <UiAccordion
+            v-if="moduleAccordionItems.length"
+            :items="moduleAccordionItems"
+            multiple
+            class="course-editor__accordion"
+          >
+            <template #header="{ item }">
+              <div class="course-editor__module-header">
+                <div class="course-editor__module-heading">
+                  <span class="course-editor__module-title">{{ item.module.title }}</span>
+                  <div class="course-editor__module-meta">
+                    <UiTag size="sm" color="secondary">
+                      {{ t('courses.modulePositionLabel', { position: item.module.position }) }}
+                    </UiTag>
+                    <UiTag size="sm" color="info">
+                      {{ t('courses.lessonsCount', { count: item.module.lessons.length }) }}
+                    </UiTag>
+                  </div>
+                </div>
+                <div class="course-editor__module-actions">
+                  <UiButton variant="link" color="primary" prepend-icon="EditOutlined" @click.stop="openModuleDialog(item.module)">
+                    {{ t('common.edit') }}
+                  </UiButton>
+                  <UiButton
+                    variant="link"
+                    color="danger"
+                    prepend-icon="DeleteOutlined"
+                    @click.stop="confirmDeleteModule(item.module)"
+                  >
+                    {{ t('common.delete') }}
+                  </UiButton>
+                </div>
+              </div>
+            </template>
+            <template #content="{ item }">
+              <div class="course-editor__module-body">
+                <div class="course-editor__module-toolbar">
+                  <p class="course-editor__module-label">{{ t('courses.lessons') }}</p>
+                  <UiButton color="primary" prepend-icon="PlusOutlined" @click="goToLessonCreate(item.module)">
+                    {{ t('courses.addLesson') }}
+                  </UiButton>
+                </div>
+                <ul v-if="item.module.lessons.length" class="course-editor__lessons">
+                  <li
+                    v-for="lesson in sortedLessons(item.module.lessons)"
+                    :key="lesson.id"
+                    class="course-editor__lesson"
+                  >
+                    <div class="course-editor__lesson-details">
+                      <span class="course-editor__lesson-title">{{ lesson.title }}</span>
+                      <div class="course-editor__lesson-meta">
+                        <UiTag
+                          v-if="lessonVideoStatusMeta(lesson.videoStatus)"
+                          size="sm"
+                          :color="lessonVideoStatusMeta(lesson.videoStatus)?.color || 'secondary'"
+                        >
+                          {{ lessonVideoStatusMeta(lesson.videoStatus)?.label }}
+                        </UiTag>
+                        <UiTag size="sm" color="neutral">
+                          {{ t('courses.lessonPositionLabel', { position: lesson.position }) }}
+                        </UiTag>
+                        <UiTag size="sm" color="info" v-if="lesson.duration">
+                          {{ formatDuration(lesson.duration) }}
+                        </UiTag>
+                        <UiTag size="sm" color="secondary" v-if="lesson.ytId">
+                          {{ t('courses.lessonYoutube') }}
+                        </UiTag>
+                        <UiTag size="sm" color="secondary" v-if="lesson.pdfUrl">
+                          {{ t('courses.lessonPdf') }}
+                        </UiTag>
+                        <UiTag size="sm" color="secondary" v-if="lesson.videoUrl">
+                          {{ t('courses.lessonVideoTag') }}
+                        </UiTag>
+                      </div>
+                      <div v-if="lesson.content" class="course-editor__lesson-content">
+                        <h4 class="course-editor__lesson-section-title">
+                          {{ t('courses.lessonContentHeading') }}
+                        </h4>
+                        <p>{{ lesson.content }}</p>
+                      </div>
+                      <div
+                        v-if="lesson.videoUrl || lesson.ytId"
+                        class="course-editor__lesson-video"
+                      >
+                        <h4 class="course-editor__lesson-section-title">
+                          {{ t('courses.lessonVideoPreviewHeading') }}
+                        </h4>
+                        <UiAlert
+                          v-if="lessonVideoStatusMeta(lesson.videoStatus)?.banner"
+                          variant="soft"
+                          :color="lessonVideoStatusMeta(lesson.videoStatus)?.color || 'info'"
+                          class="course-editor__lesson-status"
+                        >
+                          <div class="course-editor__lesson-status-title">
+                            {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.title }}
+                          </div>
+                          <p class="course-editor__lesson-status-description">
+                            {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.description }}
+                          </p>
+                        </UiAlert>
+                        <div
+                          v-if="lessonVideoStatusMeta(lesson.videoStatus)?.banner"
+                          class="course-editor__lesson-video-placeholder"
+                        >
+                          {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.placeholder }}
+                        </div>
+                        <MediaVideoPlayer
+                          v-else-if="lesson.videoUrl"
+                          class="course-editor__lesson-video-player"
+                          :src="lessonVideoPlaybackUrl(lesson.videoUrl)"
+                          controls
+                          crossorigin="anonymous"
+                          playsinline
+                        />
+                        <iframe
+                          v-else
+                          class="course-editor__lesson-video-embed"
+                          :src="youtubeEmbed(lesson.ytId)"
+                          :title="lesson.title"
+                          frameborder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowfullscreen
+                        ></iframe>
+                      </div>
+                      <div v-if="lesson.pdfUrl" class="course-editor__lesson-resources">
+                        <h4 class="course-editor__lesson-section-title">
+                          {{ t('courses.lessonResourcesHeading') }}
+                        </h4>
+                        <a
+                          class="course-editor__lesson-link"
+                          :href="lesson.pdfUrl"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {{ t('courses.lessonPdfLinkText') }}
+                        </a>
+                      </div>
+                    </div>
+                    <div class="course-editor__lesson-actions">
+                      <UiButton
+                        variant="link"
+                        color="primary"
+                        prepend-icon="EditOutlined"
+                        @click.stop="goToLessonEdit(item.module, lesson)"
+                      >
+                        {{ t('common.edit') }}
+                      </UiButton>
+                      <UiButton
+                        variant="link"
+                        color="danger"
+                        prepend-icon="DeleteOutlined"
+                        @click.stop="confirmDeleteLesson(item.module, lesson)"
+                      >
+                        {{ t('common.delete') }}
+                      </UiButton>
+                    </div>
+                  </li>
+                </ul>
+                <UiAlert v-else color="info" variant="soft">
+                  {{ t('courses.noLessons') }}
+                </UiAlert>
+              </div>
+            </template>
+          </UiAccordion>
+
+          <UiAlert v-else color="info" variant="soft">
+            {{ t('courses.noModules') }}
+          </UiAlert>
+        </UiCard>
+      </section>
+
+      <aside class="course-editor__sidebar">
+        <UiCard>
+          <div class="course-editor__form-header">
+            <div
+              class="course-editor__form-status"
+              :class="`course-editor__form-status--${visibilityAlert.state}`"
+            >
+              <span class="course-editor__form-status-dot" />
+              <div class="course-editor__form-status-copy">
+                <p class="course-editor__form-status-heading">
+                  {{ visibilityAlert.heading }}
+                </p>
+                <p class="course-editor__form-status-message">
+                  {{ visibilityAlert.message }}
+                </p>
+              </div>
+            </div>
+            <h3 class="course-editor__form-title">{{ t('courses.subtitle') }}</h3>
+          </div>
+          <form class="course-editor__form" @submit.prevent="saveInfo">
+            <UiInput v-model="form.title" :label="t('courses.title')" required />
+            <UiTextarea v-model="form.description" :label="t('courses.descriptionLabel')" :rows="3" />
+            <UiSelect
+              :model-value="form.type"
+              :label="t('courses.typeLabel')"
+              @update:model-value="onCourseTypeChange"
+            >
+              <option v-for="option in courseTypes" :key="option.value" :value="option.value">
+                {{ option.title }}
+              </option>
+            </UiSelect>
+            <UiInput
+              :model-value="form.price"
+              type="number"
+              :label="t('courses.priceLabel')"
+              @update:model-value="onPriceChange"
+            />
+            <UiSelect
+              :model-value="form.currency"
+              :label="t('courses.currencyLabel')"
+              @update:model-value="onCurrencyChange"
+            >
+              <option v-for="option in currencyOptions" :key="option.value" :value="option.value">
+                {{ option.title }}
+              </option>
+            </UiSelect>
+            <UiSelect
+              v-model="form.level"
+              :label="t('courses.levelLabel')"
+              clearable
+              :clear-label="t('common.clear')"
+            >
+              <option v-for="level in courseLevels" :key="level.value" :value="level.value">
+                {{ level.title }}
+              </option>
+            </UiSelect>
+            <UiSelect
+              v-model="form.language"
+              :label="t('courses.languageLabel')"
+              clearable
+              :clear-label="t('common.clear')"
+            >
+              <option v-for="language in courseLanguages" :key="language.value" :value="language.value">
+                {{ language.title }}
+              </option>
+            </UiSelect>
+            <section class="course-editor__thumbnail">
+              <header class="course-editor__thumbnail-header">
+                <h4>{{ t('courses.thumbnailLabel') }}</h4>
+                <p>{{ t('courses.thumbnailHint') }}</p>
+              </header>
+              <div v-if="thumbnailPreviewUrl" class="course-editor__thumbnail-preview">
+                <img
+                  :src="thumbnailPreviewUrl"
+                  :alt="form.title || t('courses.thumbnailAlt')"
+                  class="course-editor__thumbnail-image"
+                />
+                <div class="course-editor__thumbnail-actions">
+                  <UiButton
+                    variant="link"
+                    size="sm"
+                    color="primary"
+                    :disabled="!thumbnailPreviewUrl"
+                    @click.prevent="openThumbnailPreview"
+                  >
+                    {{ t('courses.thumbnailPreviewAction') }}
+                  </UiButton>
+                  <UiButton
+                    variant="link"
+                    size="sm"
+                    color="danger"
+                    @click.prevent="clearThumbnail"
+                  >
+                    {{ t('courses.thumbnailRemoveAction') }}
+                  </UiButton>
+                </div>
+              </div>
+              <UiAlert v-else variant="soft" color="info">
+                {{ t('courses.thumbnailEmpty') }}
+              </UiAlert>
+              <UiInput v-model="form.thumbnailUrl" :label="t('courses.thumbnailUrlLabel')" />
+              <UiFileUpload
+                v-model="thumbnailFiles"
+                :label="t('courses.thumbnailUploadLabel')"
+                :hint="t('courses.thumbnailUploadHint')"
+                accept="image/*"
+                :disabled="thumbnailState.uploading"
+                icon="PictureOutlined"
+                @change="onThumbnailSelected"
+                @remove="onThumbnailRemoved"
+              />
+              <UiProgressBar
+                v-if="thumbnailState.uploading"
+                :value="thumbnailState.progress"
+                color="info"
+                :label="t('courses.thumbnailUploading')"
+              />
+              <UiAlert v-if="thumbnailState.error" variant="soft" color="danger">
+                {{ thumbnailState.error }}
+              </UiAlert>
+            </section>
+            <div class="course-editor__status">
+              <UiSwitch
+                v-model="form.active"
+                :label="form.active ? t('courses.statusActive') : t('courses.statusInactive')"
+              />
+              <p class="course-editor__status-hint">{{ t('courses.statusHint') }}</p>
+            </div>
+            <UiButton
+              button-type="submit"
+              color="primary"
+              prepend-icon="SaveOutlined"
+              :disabled="thumbnailState.uploading"
+            >
+              {{ t('common.save') }}
+            </UiButton>
+          </form>
+        </UiCard>
+      </aside>
+    </div>
+
+    <div v-else class="course-editor__loading">
+      <UiSkeleton height="24px" />
+      <UiSkeleton height="280px" />
+    </div>
+
+    <UiDialog v-model="moduleDialog.open" :title="moduleDialogTitle">
+       <form
+        id="module-dialog-form"
+        class="course-editor__dialog-form"
+        @submit.prevent="submitModule"
+      >
+ 
+        <UiInput
+          v-model="moduleDialog.form.title"
+          :label="t('courses.moduleTitleLabel')"
+          :error="moduleDialogAttempt && !moduleFormValid ? t('courses.moduleTitleRequired') : ''"
+          required
+          autofocus
+        />
+        <UiInput
+          :model-value="moduleDialog.form.position"
+          type="number"
+          min="1"
+          :label="t('courses.positionLabel')"
+          @update:model-value="onModulePositionChange"
+        />
+        <p class="course-editor__dialog-hint">{{ t('courses.modulePositionHelp') }}</p>
+       </form>
+      <template #footer>
+        <UiButton variant="link" color="secondary" @click="closeModuleDialog">
+          {{ t('common.cancel') }}
+        </UiButton>
+        <UiButton
+          button-type="submit"
+          color="primary"
+          :disabled="!moduleFormValid"
+          form="module-dialog-form"
+        >
+          {{ t('common.save') }}
+        </UiButton>
+      </template>
+    </UiDialog>
+
+  </ThemePage>
+</template>
+
+<script setup lang="ts">
+import { reactive, computed, watch, onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useCoursesStore } from '@/stores/courses';
+import { useTeacherUsageStore } from '@/stores/teacherUsage';
+import type { ModulePayload, LessonPayload, LessonVideoStatus } from '@/stores/courses';
+import api from '@/services/api';
+import { buildAuthenticatedMediaUrl } from '@/utils/media';
+import { getHttpStatus, isAuthorizationError } from '@/utils/httpError';
+import {
+  LESSON_UPLOAD_MAX_SIZE_MB,
+  LESSON_UPLOAD_MAX_SIZE_BYTES,
+  extractLessonUploadLimitMb,
+  resolveLessonUploadLimitMb
+} from '@/constants/uploads';
+import { extractVideoMetadata, MAX_LESSON_VIDEO_DURATION_SECONDS } from '@/utils/videoMetadata';
+import ThemePage from '@/layout/theme/ThemePage.vue';
+import UiAlert from '@/components/ui/UiAlert.vue';
+import UiAccordion from '@/components/ui/UiAccordion.vue';
+import type { UiAccordionItem } from '@/components/ui/UiAccordion.vue';
+import UiButton from '@/components/ui/UiButton.vue';
+import UiCard from '@/components/ui/UiCard.vue';
+import UiDialog from '@/components/ui/UiDialog.vue';
+import UiInput from '@/components/ui/UiInput.vue';
+import UiSelect from '@/components/ui/UiSelect.vue';
+import UiTextarea from '@/components/ui/UiTextarea.vue';
+import UiSkeleton from '@/components/ui/UiSkeleton.vue';
+import UiTag from '@/components/ui/UiTag.vue';
+import UiFileUpload from '@/components/ui/UiFileUpload.vue';
+import UiProgressBar from '@/components/ui/UiProgressBar.vue';
+import UiSwitch from '@/components/ui/UiSwitch.vue';
+import { useToast } from '@/composables/useToast';
+import MediaVideoPlayer from '@/components/media/MediaVideoPlayer.vue';
+
+type DialogMode = 'create' | 'edit';
+ 
+
+const route = useRoute();
+const router = useRouter();
+const { t, te } = useI18n();
+const store = useCoursesStore();
+const usageStore = useTeacherUsageStore();
+const { summary: usageSummary } = storeToRefs(usageStore);
+const courseId = Number(route.params.courseId);
+const toast = useToast();
+
+const course = computed(() => store.current);
+const pageTitle = computed(() => course.value?.title || t('courses.untitled'));
+const courseSubtitle = computed(() => course.value?.description || t('courses.subtitle'));
+const SUPPORTED_COURSE_CURRENCIES = ['EGP', 'AED', 'SAR', 'USD'] as const;
+
+const maxVideoDurationSeconds = computed(() => {
+  const minutes = usageSummary.value?.maxVideoDurationMinutes ?? null;
+  if (typeof minutes === 'number' && minutes > 0) {
+    return Math.round(minutes * 60);
+  }
+  return MAX_LESSON_VIDEO_DURATION_SECONDS;
+});
+
+const resolveCurrency = (value?: string | number | null) => {
+  const raw =
+    typeof value === 'number'
+      ? String(value)
+      : typeof value === 'string'
+        ? value
+        : '';
+  const normalized = raw.trim().toUpperCase();
+  return SUPPORTED_COURSE_CURRENCIES.includes(
+    normalized as (typeof SUPPORTED_COURSE_CURRENCIES)[number]
+  )
+    ? normalized
+    : SUPPORTED_COURSE_CURRENCIES[0];
+};
+
+const currencyOptions = computed(() => [
+  { title: t('courses.currencyOptionEGP'), value: 'EGP' },
+  { title: t('courses.currencyOptionAED'), value: 'AED' },
+  { title: t('courses.currencyOptionSAR'), value: 'SAR' },
+  { title: t('courses.currencyOptionUSD'), value: 'USD' }
+]);
+
+const courseTypes = computed(() => [
+  { title: t('courses.typeRecorded'), value: 'recorded' },
+  { title: t('courses.typeLive'), value: 'live' },
+  { title: t('courses.typeBlended'), value: 'blended' }
+]);
+const courseLevels = computed(() => [
+  { title: t('courses.levelDefault'), value: '' },
+  { title: t('courses.levelBeginner'), value: 'beginner' },
+  { title: t('courses.levelIntermediate'), value: 'intermediate' },
+  { title: t('courses.levelAdvanced'), value: 'advanced' }
+]);
+const courseLanguages = computed(() => [
+  { title: t('courses.languageDefault'), value: '' },
+  { title: t('courses.languageArabic'), value: 'ar' },
+  { title: t('courses.languageEnglish'), value: 'en' },
+  { title: t('courses.languageFrench'), value: 'fr' },
+  { title: t('courses.languageSpanish'), value: 'es' }
+]);
+const form = reactive({
+  title: '',
+  description: '',
+  type: 'recorded',
+  price: 0,
+  currency: resolveCurrency(),
+  level: '',
+  language: '',
+  thumbnailUrl: '',
+  active: false
+});
+
+const visibilityAlert = computed(() => {
+  if (form.active) {
+    return {
+      state: 'published',
+      heading: t('courses.visibilityPublishedLabel'),
+      message: t('courses.visibilityPublishedNotice')
+    } as const;
+  }
+
+  return {
+    state: 'draft',
+    heading: t('courses.visibilityDraftLabel'),
+    message: t('courses.visibilityDraftNotice')
+  } as const;
+});
+
+const LESSON_CONTENT_RECOMMENDED_MIN = 120;
+const LESSON_CONTENT_RECOMMENDED_MAX = 600;
+
+const moduleDialog = reactive({
+  open: false,
+  mode: 'create' as DialogMode,
+  moduleId: null as number | null,
+  form: {
+    title: '',
+    position: 1 as number | null
+  }
+});
+
+const lessonDialog = reactive({
+  open: false,
+  mode: 'create' as DialogMode,
+  moduleId: null as number | null,
+  lessonId: null as number | null,
+  form: {
+    title: '',
+    content: '',
+    ytId: '',
+    pdfUrl: '',
+    videoUrl: null as string | null,
+    videoStorageKey: null as string | null,
+    bunnyVideoId: null as string | null,
+    videoStatus: null as LessonVideoStatus | null,
+    duration: null as number | null,
+    position: 1 as number | null
+  }
+});
+
+const thumbnailFiles = ref<File[]>([]);
+const thumbnailState = reactive({
+  uploading: false,
+  error: '',
+  progress: 0
+});
+const thumbnailVersion = ref<number | null>(null);
+
+const moduleDialogAttempt = ref(false);
+const lessonDialogAttempt = ref(false);
+
+const lessonVideoFiles = ref<File[]>([]);
+const lessonVideoState = reactive({
+  uploading: false,
+  error: '',
+  warning: '',
+  progress: 0
+});
+
+const lessonPdfFiles = ref<File[]>([]);
+const lessonPdfState = reactive({
+  uploading: false,
+  error: '',
+  progress: 0
+});
+
+const thumbnailPreviewUrl = computed(() => {
+  const trimmed = form.thumbnailUrl.trim();
+  if (!trimmed) {
+    return '';
+  }
+  const preview = buildAuthenticatedMediaUrl(trimmed, { version: thumbnailVersion.value });
+  return preview || trimmed;
+});
+
+watch(
+  () => form.thumbnailUrl,
+  (next, prev) => {
+    const nextTrimmed = (next ?? '').trim();
+    const prevTrimmed = (prev ?? '').trim();
+    if (nextTrimmed === prevTrimmed) {
+      return;
+    }
+    thumbnailVersion.value = nextTrimmed ? Date.now() : null;
+  },
+  { immediate: true }
+);
+
+const translateCourseString = (key: string, fallback: string) =>
+  te(key) ? t(key) : fallback;
+
+const LESSON_VIDEO_TOO_LARGE_FALLBACK =
+  'The video exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.';
+const LESSON_PDF_TOO_LARGE_FALLBACK =
+  'The PDF exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.';
+const LESSON_UPLOAD_FORBIDDEN_FALLBACK =
+  "You don't have permission to upload files right now. Please refresh the page and try again.";
+
+const formatUploadTooLargeMessage = (key: string, fallback: string, limit?: number | null) => {
+  const effectiveLimit = resolveLessonUploadLimitMb(limit);
+  return translateCourseString(key, fallback).replace('{size}', effectiveLimit.toString());
+};
+
+const buildUploadErrorMessage = (
+  error: unknown,
+  options: {
+    tooLargeKey: string;
+    tooLargeFallback: string;
+    forbiddenMessage: string;
+    uploadFailedMessage: string;
+  }
+) => {
+  if (isPayloadTooLargeError(error)) {
+    const detectedLimit = extractLessonUploadLimitMb(error);
+    return formatUploadTooLargeMessage(
+      options.tooLargeKey,
+      options.tooLargeFallback,
+      detectedLimit
+    );
+  }
+
+  if (isAuthorizationError(error)) {
+    return options.forbiddenMessage;
+  }
+
+  return options.uploadFailedMessage;
+};
+
+const lessonContentLength = computed(() => lessonDialog.form.content.trim().length);
+
+type UploadProgressEvent = { loaded: number; total?: number | null };
+
+const logUploadProgress = (kind: string, progress: number) => {
+  console.debug(`[upload ${kind}] ${progress}%`);
+};
+
+const createUploadProgressHandler = (
+  kind: string,
+  onProgress?: (progress: number) => void
+) =>
+  (event: UploadProgressEvent) => {
+    const total = event.total ?? 0;
+    if (total <= 0) {
+      onProgress?.(0);
+      logUploadProgress(kind, 0);
+      return;
+    }
+    const progress = Math.min(100, Math.max(0, Math.floor((event.loaded / total) * 100)));
+    onProgress?.(progress);
+    logUploadProgress(kind, progress);
+  };
+
+const uploadBinaryWithProgress = async (
+  url: string,
+  file: File,
+  kind: string,
+  onProgress?: (progress: number) => void
+) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const { data } = await api.post<{ url: string; key?: string }>(url, formData, {
+    // Disable Axios timeout so large uploads can complete on slow connections
+    timeout: 0,
+    withCredentials: true,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: createUploadProgressHandler(kind, onProgress)
+  });
+
+  if (onProgress) {
+    onProgress(100);
+  }
+  logUploadProgress(kind, 100);
+
+  return data;
+};
+const lessonContentOutOfRange = computed(
+  () =>
+    lessonContentLength.value > 0 &&
+    (lessonContentLength.value < LESSON_CONTENT_RECOMMENDED_MIN ||
+      lessonContentLength.value > LESSON_CONTENT_RECOMMENDED_MAX)
+);
+const lessonContentHint = computed(() =>
+  t('courses.lessonContentHint', {
+    min: LESSON_CONTENT_RECOMMENDED_MIN,
+    max: LESSON_CONTENT_RECOMMENDED_MAX,
+    count: lessonContentLength.value
+  })
+);
+
+const lessonYoutubeHint = computed(() =>
+  translateCourseString(
+    'courses.lessonYoutubeHint',
+    'Paste the full YouTube link or ID (e.g. https://youtu.be/abcd1234efg).'
+  )
+);
+
+const lessonVideoTexts = computed(() => ({
+  tag: translateCourseString('courses.lessonVideoTag', 'Video'),
+  label: translateCourseString('courses.lessonVideoLabel', 'Lesson video'),
+  uploadLabel: translateCourseString(
+    'courses.lessonVideoUploadLabel',
+    'Drag a video here or click to upload'
+  ),
+  browse: translateCourseString('courses.lessonVideoBrowse', 'Select video'),
+  hint: translateCourseString(
+    'courses.lessonVideoHint',
+    'Accepted formats: MP4, MOV, MKV, WEBM, or AVI.'
+  ),
+  uploading: translateCourseString('courses.lessonVideoUploading', 'Uploading video...'),
+  uploaded: translateCourseString('courses.lessonVideoUploaded', 'Video uploaded.'),
+  preview: translateCourseString('courses.lessonVideoPreview', 'Open link'),
+  remove: translateCourseString('courses.lessonVideoRemove', 'Remove video'),
+  uploadFailed: translateCourseString(
+    'courses.lessonVideoUploadFailed',
+    "We couldn't upload the video. Please try again."
+  ),
+  forbidden: translateCourseString(
+    'courses.lessonUploadForbidden',
+    LESSON_UPLOAD_FORBIDDEN_FALLBACK
+  ),
+  tooLarge: formatUploadTooLargeMessage(
+    'courses.lessonVideoTooLarge',
+    LESSON_VIDEO_TOO_LARGE_FALLBACK
+  ),
+  empty: translateCourseString(
+    'courses.lessonVideoEmpty',
+    'No video uploaded yet. Add one to give learners a walkthrough.'
+  )
+}));
+
+const lessonVideoStatusMap = computed(() => {
+  const processingBanner = {
+    title: translateCourseString(
+      'courses.lessonVideoProcessingBannerTitle',
+      'Video is being prepared'
+    ),
+    description: translateCourseString(
+      'courses.lessonVideoProcessingBannerDescription',
+      'Usually takes 3-5 minutes. You can keep editing the lesson and course now.'
+    ),
+    placeholder: translateCourseString(
+      'courses.lessonVideoProcessingPlaceholder',
+      'Video is processing… It will play automatically once it is ready.'
+    )
+  };
+
+  const failedBanner = {
+    title: translateCourseString(
+      'courses.lessonVideoFailedBannerTitle',
+      'Processing failed'
+    ),
+    description: translateCourseString(
+      'courses.lessonVideoFailedBannerDescription',
+      'Please try uploading the video again.'
+    ),
+    placeholder: translateCourseString(
+      'courses.lessonVideoFailedPlaceholder',
+      'Video is unavailable until processing completes successfully.'
+    )
+  };
+
+  return {
+    UPLOADING: {
+      label: translateCourseString('courses.lessonVideoStatusUploading', 'Uploading video'),
+      color: 'info',
+      banner: processingBanner,
+      showPlayer: false
+    },
+    PROCESSING: {
+      label: translateCourseString('courses.lessonVideoStatusProcessing', 'Processing video'),
+      color: 'warning',
+      banner: processingBanner,
+      showPlayer: false
+    },
+    READY: {
+      label: translateCourseString('courses.lessonVideoStatusReady', 'Ready to watch'),
+      color: 'success',
+      showPlayer: true
+    },
+    FAILED: {
+      label: translateCourseString(
+        'courses.lessonVideoStatusFailed',
+        'Processing failed — please re-upload the video'
+      ),
+      color: 'danger',
+      banner: failedBanner,
+      showPlayer: false
+    }
+  } as Record<LessonVideoStatus, { label: string; color: string; banner?: {
+    title: string;
+    description: string;
+    placeholder: string;
+  }; showPlayer?: boolean }>;
+});
+
+const lessonVideoStatusMeta = (status?: LessonVideoStatus | null) =>
+  (status ? lessonVideoStatusMap.value[status] : null) ?? null;
+
+const lessonPdfTexts = computed(() => ({
+  label: translateCourseString('courses.lessonPdfLabel', 'Lesson attachment (PDF)'),
+  uploadLabel: translateCourseString(
+    'courses.lessonPdfUploadLabel',
+    'Drag a PDF here or click to upload'
+  ),
+  browse: translateCourseString('courses.lessonPdfBrowse', 'Select PDF'),
+  hint: translateCourseString('courses.lessonPdfHint', 'Only PDF files are supported.'),
+  uploading: translateCourseString('courses.lessonPdfUploading', 'Uploading PDF...'),
+  uploaded: translateCourseString('courses.lessonPdfUploaded', 'PDF uploaded.'),
+  preview: translateCourseString('courses.lessonPdfPreview', 'Open attachment'),
+  remove: translateCourseString('courses.lessonPdfRemove', 'Remove attachment'),
+  uploadFailed: translateCourseString(
+    'courses.lessonPdfUploadFailed',
+    "We couldn't upload the PDF. Please try again."
+  ),
+  forbidden: translateCourseString('courses.lessonUploadForbidden', LESSON_UPLOAD_FORBIDDEN_FALLBACK),
+  tooLarge: formatUploadTooLargeMessage(
+    'courses.lessonPdfTooLarge',
+    LESSON_PDF_TOO_LARGE_FALLBACK
+  ),
+  empty: translateCourseString(
+    'courses.lessonPdfEmpty',
+    'No PDF attached yet. Share worksheets or readings to guide learners.'
+  )
+}));
+
+const isPayloadTooLargeError = (error: unknown) => getHttpStatus(error) === 413;
+
+function extractYoutubeId(value?: string | null) {
+  if (!value) return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const patterns = [
+    /youtu\.be\/([\w-]{11})/i,
+    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i
+  ];
+  for (const pattern of patterns) {
+    const match = trimmed.match(pattern);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  if (/^[\w-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
+  return trimmed;
+}
+
+function formatYoutubeDisplay(value?: string | null) {
+  const trimmed = value?.trim() ?? '';
+  if (!trimmed) return '';
+  const id = extractYoutubeId(trimmed);
+  if (id && /^[\w-]{11}$/.test(id)) {
+    return `https://youtu.be/${id}`;
+  }
+  return trimmed;
+}
+
+interface LessonProgressSection {
+  key: string;
+  label: string;
+  description: string;
+  statusLabel: string;
+  tagColor: 'success' | 'warning' | 'danger' | 'info';
+  complete: boolean;
+  optional: boolean;
+  weight: number;
+}
+
+const LESSON_PROGRESS_OPTIONAL_WEIGHT = 0.5;
+
+const lessonProgressSections = computed<LessonProgressSection[]>(() => {
+  const detailsComplete =
+    lessonDialog.form.title.trim().length > 0 &&
+    lessonContentLength.value >= LESSON_CONTENT_RECOMMENDED_MIN &&
+    !lessonContentOutOfRange.value;
+  const mediaComplete = Boolean(
+    lessonDialog.form.videoUrl ||
+      lessonDialog.form.bunnyVideoId ||
+      lessonDialog.form.pdfUrl ||
+      lessonDialog.form.ytId.trim()
+  );
+  const schedulingComplete = (() => {
+    const duration = lessonDialog.form.duration;
+    const position = lessonDialog.form.position;
+    const hasDuration = typeof duration === 'number' && duration > 0;
+    const hasPosition = typeof position === 'number' && position > 0;
+    return hasDuration && hasPosition;
+  })();
+
+  const sections: Array<{
+    key: string;
+    labelKey: string;
+    descriptionKey: string;
+    descriptionCompleteKey?: string;
+    descriptionFallback: string;
+    descriptionCompleteFallback?: string;
+    labelFallback: string;
+    complete: boolean;
+    optional: boolean;
+  }> = [
+    {
+      key: 'details',
+      labelKey: 'courses.lessonProgressDetails',
+      descriptionKey: 'courses.lessonProgressDetailsHint',
+      descriptionCompleteKey: 'courses.lessonProgressDetailsHintDone',
+      descriptionFallback: 'Add a clear title and summary so learners know what to expect.',
+      descriptionCompleteFallback:
+        'Great! Learners will see the title and summary in the module list.',
+      labelFallback: 'Lesson basics',
+      complete: detailsComplete,
+      optional: false,
+    },
+    {
+      key: 'media',
+      labelKey: 'courses.lessonProgressMedia',
+      descriptionKey: 'courses.lessonProgressMediaHint',
+      descriptionCompleteKey: 'courses.lessonProgressMediaHintDone',
+      descriptionFallback: 'Attach at least one video or PDF so students can review materials.',
+      descriptionCompleteFallback:
+        'Media is ready. Learners can watch or download supporting resources.',
+      labelFallback: 'Resources & media',
+      complete: mediaComplete,
+      optional: true,
+    },
+    {
+      key: 'schedule',
+      labelKey: 'courses.lessonProgressSchedule',
+      descriptionKey: 'courses.lessonProgressScheduleHint',
+      descriptionCompleteKey: 'courses.lessonProgressScheduleHintDone',
+      descriptionFallback: 'Set duration and position to help learners plan their time.',
+      descriptionCompleteFallback: 'Timing and order are set for this lesson.',
+      labelFallback: 'Publishing & order',
+      complete: schedulingComplete,
+      optional: true,
+    },
+  ];
+
+  const optionalLabel = translateCourseString('courses.lessonProgressOptional', 'Optional');
+  const completeLabel = translateCourseString('courses.lessonProgressComplete', 'Complete');
+  const incompleteLabel = translateCourseString(
+    'courses.lessonProgressIncomplete',
+    'Pending'
+  );
+
+  return sections.map((section) => {
+    const label = translateCourseString(section.labelKey, section.labelFallback);
+    const description = translateCourseString(
+      section.complete && section.descriptionCompleteKey
+        ? section.descriptionCompleteKey
+        : section.descriptionKey,
+      section.complete
+        ? section.descriptionCompleteFallback ?? section.descriptionFallback
+        : section.descriptionFallback
+    );
+    const statusLabel = section.complete
+      ? completeLabel
+      : section.optional
+        ? optionalLabel
+        : incompleteLabel;
+    const tagColor: LessonProgressSection['tagColor'] = section.complete
+      ? 'success'
+      : section.optional
+        ? 'warning'
+        : 'danger';
+
+    return {
+      key: section.key,
+      label,
+      description,
+      statusLabel,
+      tagColor,
+      complete: section.complete,
+      optional: section.optional,
+      weight: section.optional ? LESSON_PROGRESS_OPTIONAL_WEIGHT : 1,
+    } satisfies LessonProgressSection;
+  });
+});
+
+const lessonProgressPercent = computed(() => {
+  const sections = lessonProgressSections.value;
+  if (!sections.length) return 0;
+  const totalWeight = sections.reduce((total, section) => total + section.weight, 0);
+  const completedWeight = sections.reduce(
+    (sum, section) => sum + (section.complete ? section.weight : 0),
+    0
+  );
+  if (totalWeight <= 0) return 0;
+  return Math.round((completedWeight / totalWeight) * 100);
+});
+
+const onLessonYoutubeBlur = () => {
+  lessonDialog.form.ytId = formatYoutubeDisplay(lessonDialog.form.ytId);
+};
+
+const performLessonVideoUpload = async (
+  file: File,
+  onProgress?: (progress: number) => void,
+  metadata?: { durationSeconds?: number | null; width?: number | null; height?: number | null }
+) => {
+  if (typeof store.uploadLessonVideo === 'function') {
+    if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
+      const message = te('courses.saveLessonBeforeUpload')
+        ? t('courses.saveLessonBeforeUpload')
+        : 'Please save the lesson before uploading a video';
+      throw new Error(message);
+    }
+    return store.uploadLessonVideo(
+      courseId,
+      lessonDialog.moduleId,
+      lessonDialog.lessonId,
+      file,
+      onProgress,
+      metadata
+    );
+  }
+
+  if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
+    const message = te('courses.saveLessonBeforeUpload')
+      ? t('courses.saveLessonBeforeUpload')
+      : 'Please save the lesson before uploading a video';
+    throw new Error(message);
+  }
+
+  return uploadBinaryWithProgress(
+    `/v1/teacher/courses/${courseId}/modules/${lessonDialog.moduleId}/lessons/${lessonDialog.lessonId}/video`,
+    file,
+    'lesson-video',
+    onProgress
+  );
+};
+
+const performLessonPdfUpload = async (
+  file: File,
+  onProgress?: (progress: number) => void
+) => {
+  if (typeof store.uploadLessonPdf === 'function') {
+    return store.uploadLessonPdf(file, onProgress);
+  }
+
+  return uploadBinaryWithProgress(
+    '/v1/teacher/courses/content/upload',
+    file,
+    'lesson-pdf',
+    onProgress
+  );
+};
+
+const performCourseThumbnailUpload = async (
+  file: File,
+  onProgress?: (progress: number) => void
+) => {
+  return uploadBinaryWithProgress(
+    '/v1/teacher/courses/content/upload-image',
+    file,
+    'course-thumbnail',
+    onProgress
+  );
+};
+
+const sortedModules = computed(() =>
+  course.value ? [...course.value.modules].sort((a, b) => a.position - b.position) : []
+);
+
+const sortedLessons = (lessons: LessonPayload[]) =>
+  [...lessons].sort((a, b) => a.position - b.position);
+
+const moduleFormValid = computed(() => moduleDialog.form.title.trim().length > 0);
+const lessonFormValid = computed(
+  () => lessonDialog.moduleId !== null && lessonDialog.form.title.trim().length > 0
+);
+
+const moduleDialogTitle = computed(() =>
+  moduleDialog.mode === 'create' ? t('courses.createModuleTitle') : t('courses.editModuleTitle')
+);
+
+const lessonDialogTitle = computed(() =>
+  lessonDialog.mode === 'create' ? t('courses.createLessonTitle') : t('courses.editLessonTitle')
+);
+
+interface ModuleAccordionItem extends UiAccordionItem {
+  module: ModulePayload;
+}
+
+const moduleAccordionItems = computed<ModuleAccordionItem[]>(() =>
+  sortedModules.value.map((module) => ({
+    value: module.id,
+    title: module.title,
+    module
+  }))
+);
+
+const sanitizedPosition = (value: number | null | undefined) =>
+  value && value > 0 ? Math.floor(value) : undefined;
+
+
+const onCourseTypeChange = (value: string | number | null) => {
+  form.type = typeof value === 'string' ? value : String(value ?? form.type);
+};
+
+const onPriceChange = (value: string | number | null) => {
+  const parsed = Number(value);
+  form.price = Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const onCurrencyChange = (value: string | number | null) => {
+  form.currency = resolveCurrency(value);
+};
+
+const onThumbnailSelected = async (files: File[]) => {
+  if (!files.length) {
+    return;
+  }
+  const [file] = files;
+  if (!file) {
+    return;
+  }
+  thumbnailState.uploading = true;
+  thumbnailState.error = '';
+  thumbnailState.progress = 0;
+  try {
+    const result = await performCourseThumbnailUpload(file, (progress) => {
+      thumbnailState.progress = progress;
+    });
+    const uploadedUrl = (result.url ?? '').trim();
+    if (uploadedUrl) {
+      form.thumbnailUrl = uploadedUrl;
+      thumbnailVersion.value = Date.now();
+      if (store.current && store.current.id === courseId) {
+        store.current.thumbnailUrl = uploadedUrl;
+      }
+      const summary = store.list.find((courseItem) => courseItem.id === courseId);
+      if (summary) {
+        summary.thumbnailUrl = uploadedUrl;
+      }
+    }
+  } catch (error) {
+    console.error('[CourseEditor] Failed to upload course thumbnail', error);
+    thumbnailState.error = t('courses.thumbnailUploadFailed');
+  } finally {
+    thumbnailFiles.value = [];
+    thumbnailState.uploading = false;
+    thumbnailState.progress = 0;
+  }
+};
+
+const onThumbnailRemoved = () => {
+  thumbnailFiles.value = [];
+  thumbnailState.error = '';
+};
+
+const clearThumbnail = () => {
+  form.thumbnailUrl = '';
+  thumbnailFiles.value = [];
+  thumbnailState.error = '';
+};
+
+const openThumbnailPreview = () => {
+  const preview = thumbnailPreviewUrl.value;
+  if (!preview) {
+    return;
+  }
+  if (typeof window !== 'undefined') {
+    window.open(preview, '_blank', 'noopener');
+  }
+};
+
+const onModulePositionChange = (value: string | number | null) => {
+  const parsed = Number(value);
+  moduleDialog.form.position = Number.isNaN(parsed) ? 1 : Math.max(1, Math.floor(parsed));
+};
+
+const onLessonPositionChange = (value: string | number | null) => {
+  const parsed = Number(value);
+  lessonDialog.form.position = Number.isNaN(parsed) ? 1 : Math.max(1, Math.floor(parsed));
+};
+
+const resetLessonVideoState = () => {
+  lessonVideoFiles.value = [];
+  lessonVideoState.uploading = false;
+  lessonVideoState.error = '';
+  lessonVideoState.warning = '';
+  lessonVideoState.progress = 0;
+};
+
+const resetLessonPdfState = () => {
+  lessonPdfFiles.value = [];
+  lessonPdfState.uploading = false;
+  lessonPdfState.error = '';
+  lessonPdfState.progress = 0;
+};
+
+const hasInitializedVisibility = ref(false);
+const hasUserAdjustedVisibility = ref(false);
+const syncingVisibilityFromCourse = ref(false);
+
+watch(
+  () => form.active,
+  (next, prev) => {
+    if (!hasInitializedVisibility.value) {
+      return;
+    }
+    if (syncingVisibilityFromCourse.value) {
+      return;
+    }
+    if (next !== prev) {
+      hasUserAdjustedVisibility.value = true;
+    }
+  }
+);
+
+watch(
+  course,
+  (value) => {
+    if (value) {
+      syncingVisibilityFromCourse.value = true;
+      try {
+        form.title = value.title;
+        form.description = value.description || '';
+        form.type = value.type;
+        form.price = value.price;
+        form.currency = resolveCurrency(value.currency);
+        form.level = value.level || '';
+        form.language = value.language || '';
+        form.thumbnailUrl = value.thumbnailUrl || '';
+        const nextActive = value.active ?? false;
+        if (!hasInitializedVisibility.value) {
+          form.active = nextActive;
+          hasInitializedVisibility.value = true;
+        } else if (!hasUserAdjustedVisibility.value) {
+          form.active = nextActive;
+        }
+        thumbnailState.error = '';
+      } finally {
+        syncingVisibilityFromCourse.value = false;
+      }
+      return;
+    }
+    syncingVisibilityFromCourse.value = false;
+  },
+  { immediate: true }
+);
+
+watch(
+  () => moduleDialog.open,
+  (isOpen) => {
+    if (!isOpen) {
+      resetModuleDialog();
+    }
+  }
+);
+
+watch(
+  () => lessonDialog.open,
+  (isOpen) => {
+    if (!isOpen) {
+      resetLessonDialog();
+    }
+  }
+);
+
+onMounted(async () => {
+  if (!course.value || course.value.id !== courseId) {
+    await store.fetchCourse(courseId);
+  }
+  void usageStore.loadSummary();
+});
+
+const resetModuleDialog = () => {
+  moduleDialog.mode = 'create';
+  moduleDialog.moduleId = null;
+  moduleDialog.form.title = '';
+  moduleDialog.form.position = Math.max(sortedModules.value.length + 1, 1);
+  moduleDialogAttempt.value = false;
+};
+
+const resetLessonDialog = () => {
+  lessonDialog.mode = 'create';
+  lessonDialog.moduleId = null;
+  lessonDialog.lessonId = null;
+  lessonDialog.form.title = '';
+  lessonDialog.form.content = '';
+  lessonDialog.form.ytId = '';
+  lessonDialog.form.pdfUrl = '';
+  lessonDialog.form.videoUrl = null;
+  lessonDialog.form.videoStorageKey = null;
+  lessonDialog.form.bunnyVideoId = null;
+  lessonDialog.form.videoStatus = null;
+  lessonDialog.form.duration = null;
+  lessonDialog.form.position = 1;
+  lessonDialogAttempt.value = false;
+  resetLessonVideoState();
+  resetLessonPdfState();
+};
+
+const goBack = () => router.push({ name: 'teacher-dashboard' });
+
+const openModuleDialog = (module?: ModulePayload) => {
+  moduleDialogAttempt.value = false;
+  if (module) {
+    moduleDialog.mode = 'edit';
+    moduleDialog.moduleId = module.id;
+    moduleDialog.form.title = module.title;
+    moduleDialog.form.position = module.position;
+  } else {
+    moduleDialog.mode = 'create';
+    moduleDialog.moduleId = null;
+    moduleDialog.form.title = '';
+    moduleDialog.form.position = Math.max(sortedModules.value.length + 1, 1);
+  }
+  moduleDialog.open = true;
+};
+
+const closeModuleDialog = () => {
+  moduleDialog.open = false;
+};
+
+const submitModule = async () => {
+  moduleDialogAttempt.value = true;
+  if (!moduleFormValid.value) {
+    return;
+  }
+  const payload = {
+    title: moduleDialog.form.title.trim(),
+    position: sanitizedPosition(moduleDialog.form.position)
+  };
+  if (moduleDialog.mode === 'create') {
+    await store.addModule(courseId, payload);
+    toast.success(t('courses.toast.moduleCreated'));
+  } else if (moduleDialog.moduleId !== null) {
+    await store.updateModule(courseId, moduleDialog.moduleId, payload);
+    toast.success(t('courses.toast.moduleUpdated'));
+  }
+  moduleDialog.open = false;
+};
+
+const openLessonDialog = (module: ModulePayload, lesson?: LessonPayload) => {
+  lessonDialogAttempt.value = false;
+  resetLessonVideoState();
+  resetLessonPdfState();
+  lessonDialog.moduleId = module.id;
+  if (lesson) {
+    lessonDialog.mode = 'edit';
+    lessonDialog.lessonId = lesson.id;
+    lessonDialog.form.title = lesson.title;
+    lessonDialog.form.content = lesson.content || '';
+    lessonDialog.form.ytId = formatYoutubeDisplay(lesson.ytId || '');
+    lessonDialog.form.pdfUrl = lesson.pdfUrl || '';
+    lessonDialog.form.videoUrl = lesson.videoUrl ?? null;
+    lessonDialog.form.videoStorageKey = lesson.videoStorageKey ?? null;
+    lessonDialog.form.bunnyVideoId = lesson.bunnyVideoId ?? null;
+    lessonDialog.form.videoStatus = lesson.videoStatus ?? null;
+    lessonDialog.form.duration = lesson.duration ?? null;
+    lessonDialog.form.position = lesson.position;
+  } else {
+    lessonDialog.mode = 'create';
+    lessonDialog.lessonId = null;
+    lessonDialog.form.title = '';
+    lessonDialog.form.content = '';
+    lessonDialog.form.ytId = '';
+    lessonDialog.form.pdfUrl = '';
+    lessonDialog.form.videoUrl = null;
+    lessonDialog.form.videoStorageKey = null;
+    lessonDialog.form.bunnyVideoId = null;
+    lessonDialog.form.videoStatus = null;
+    lessonDialog.form.duration = null;
+    lessonDialog.form.position = module.lessons.length + 1;
+  }
+  lessonDialog.open = true;
+};
+
+const closeLessonDialog = () => {
+  lessonDialog.open = false;
+};
+
+const onLessonVideoChange = async (files: File[]) => {
+  if (!files.length || lessonVideoState.uploading) {
+    return;
+  }
+  const [file] = files;
+  if (!file) return;
+  lessonVideoState.error = '';
+  lessonVideoState.warning = '';
+  lessonVideoState.progress = 0;
+  if (file.size > LESSON_UPLOAD_MAX_SIZE_BYTES) {
+    lessonVideoState.error = formatUploadTooLargeMessage(
+      'courses.lessonVideoTooLarge',
+      LESSON_VIDEO_TOO_LARGE_FALLBACK,
+      LESSON_UPLOAD_MAX_SIZE_MB
+    );
+    return;
+  }
+  const metadata = await extractVideoMetadata(file).catch(() => ({
+    durationSeconds: null,
+    width: null,
+    height: null
+  }));
+  if (metadata.durationSeconds && metadata.durationSeconds > maxVideoDurationSeconds.value) {
+    const maxMinutes = Math.round(maxVideoDurationSeconds.value / 60);
+    lessonVideoState.error = translateCourseString(
+      'courses.lessonVideoTooLong',
+      `The video exceeds the ${maxMinutes}-minute limit. Please upload a shorter video.`
+    );
+    return;
+  }
+  if (!lessonDialog.form.duration && metadata.durationSeconds) {
+    lessonDialog.form.duration = metadata.durationSeconds;
+  }
+  lessonVideoState.uploading = true;
+  try {
+    const result = await performLessonVideoUpload(file, (progress) => {
+      lessonVideoState.progress = progress;
+    }, metadata);
+    lessonVideoState.warning = result.warning ?? '';
+    if (lessonVideoState.warning) {
+      toast.warning(lessonVideoState.warning);
+    }
+    const uploadedUrl = (result.videoUrl ?? result.url ?? '').trim();
+    lessonDialog.form.videoUrl = uploadedUrl || null;
+    lessonDialog.form.videoStorageKey = null;
+    lessonDialog.form.bunnyVideoId = result.bunnyVideoId ?? null;
+    lessonDialog.form.videoStatus = (result.status as LessonVideoStatus | undefined) ?? 'PROCESSING';
+    lessonVideoFiles.value = [];
+    await store.fetchCourse(courseId).catch((error) => {
+      console.warn('[CourseEditor] Failed to refresh course after video upload', error);
+    });
+  } catch (error) {
+    console.error('[CourseEditor] Failed to upload lesson video', error);
+    lessonVideoState.error = buildUploadErrorMessage(error, {
+      tooLargeKey: 'courses.lessonVideoTooLarge',
+      tooLargeFallback: LESSON_VIDEO_TOO_LARGE_FALLBACK,
+      forbiddenMessage: lessonVideoTexts.value.forbidden,
+      uploadFailedMessage: lessonVideoTexts.value.uploadFailed
+    });
+    lessonVideoState.warning = '';
+    lessonVideoState.progress = 0;
+  } finally {
+    lessonVideoState.uploading = false;
+  }
+};
+
+const onLessonPdfChange = async (files: File[]) => {
+  if (!files.length || lessonPdfState.uploading) {
+    return;
+  }
+  const [file] = files;
+  if (!file) return;
+  lessonPdfState.error = '';
+  lessonPdfState.progress = 0;
+  if (file.size > LESSON_UPLOAD_MAX_SIZE_BYTES) {
+    lessonPdfState.error = formatUploadTooLargeMessage(
+      'courses.lessonPdfTooLarge',
+      LESSON_PDF_TOO_LARGE_FALLBACK,
+      LESSON_UPLOAD_MAX_SIZE_MB
+    );
+    return;
+  }
+  lessonPdfState.uploading = true;
+  try {
+    const result = await performLessonPdfUpload(file, (progress) => {
+      lessonPdfState.progress = progress;
+    });
+    lessonDialog.form.pdfUrl = result.url;
+    lessonPdfFiles.value = [];
+    await store.fetchCourse(courseId).catch((error) => {
+      console.warn('[CourseEditor] Failed to refresh course after PDF upload', error);
+    });
+  } catch (error) {
+    console.error('[CourseEditor] Failed to upload lesson PDF', error);
+    lessonPdfState.error = buildUploadErrorMessage(error, {
+      tooLargeKey: 'courses.lessonPdfTooLarge',
+      tooLargeFallback: LESSON_PDF_TOO_LARGE_FALLBACK,
+      forbiddenMessage: lessonPdfTexts.value.forbidden,
+      uploadFailedMessage: lessonPdfTexts.value.uploadFailed
+    });
+    lessonPdfState.progress = 0;
+  } finally {
+    lessonPdfState.uploading = false;
+  }
+};
+
+const clearLessonVideo = () => {
+  lessonDialog.form.videoUrl = null;
+  lessonDialog.form.videoStorageKey = null;
+  lessonDialog.form.bunnyVideoId = null;
+  lessonDialog.form.videoStatus = null;
+  lessonVideoState.error = '';
+  lessonVideoState.warning = '';
+};
+
+const clearLessonPdf = () => {
+  lessonDialog.form.pdfUrl = '';
+  resetLessonPdfState();
+};
+
+const lessonVideoPlaybackUrl = (url?: string | null) => buildAuthenticatedMediaUrl(url);
+
+const openLessonVideo = () => {
+  if (!lessonDialog.form.videoUrl) {
+    return;
+  }
+  const playbackUrl = lessonVideoPlaybackUrl(lessonDialog.form.videoUrl);
+  if (!playbackUrl) {
+    return;
+  }
+  if (typeof window !== 'undefined') {
+    window.open(playbackUrl, '_blank', 'noopener');
+  }
+};
+
+const openLessonPdf = () => {
+  if (!lessonDialog.form.pdfUrl) {
+    return;
+  }
+  const pdfUrl = buildAuthenticatedMediaUrl(lessonDialog.form.pdfUrl);
+  if (!pdfUrl) {
+    return;
+  }
+  if (typeof window !== 'undefined') {
+    window.open(pdfUrl, '_blank', 'noopener');
+  }
+};
+
+const submitLesson = async () => {
+  lessonDialogAttempt.value = true;
+  if (!lessonFormValid.value || lessonDialog.moduleId === null) {
+    return;
+  }
+  const youtubeId = extractYoutubeId(lessonDialog.form.ytId);
+
+  const payload = {
+    title: lessonDialog.form.title.trim(),
+    content: lessonDialog.form.content.trim() || undefined,
+    ytId: youtubeId || undefined,
+    pdfUrl: lessonDialog.form.pdfUrl.trim() || undefined,
+    videoUrl: lessonDialog.form.videoUrl,
+    videoStorageKey: lessonDialog.form.videoStorageKey,
+    bunnyVideoId: lessonDialog.form.bunnyVideoId || undefined,
+    position: sanitizedPosition(lessonDialog.form.position)
+  };
+  if (lessonDialog.mode === 'create') {
+    await store.addLesson(courseId, lessonDialog.moduleId, payload);
+    toast.success(t('courses.toast.lessonCreated'));
+  } else if (lessonDialog.lessonId !== null) {
+    await store.updateLesson(courseId, lessonDialog.moduleId, lessonDialog.lessonId, payload);
+    toast.success(t('courses.toast.lessonUpdated'));
+  }
+  lessonDialog.open = false;
+};
+
+const confirmDeleteModule = async (module: ModulePayload) => {
+  if (confirm(t('courses.deleteModuleConfirm', { title: module.title }))) {
+    await store.removeModule(courseId, module.id);
+  }
+};
+
+const confirmDeleteLesson = async (module: ModulePayload, lesson: LessonPayload) => {
+  if (confirm(t('courses.deleteLessonConfirm', { title: lesson.title }))) {
+    await store.removeLesson(courseId, module.id, lesson.id);
+  }
+};
+
+const goToLessonCreate = (module: ModulePayload) => {
+  router.push({ name: 'teacher-lesson-create', params: { courseId, moduleId: module.id } });
+};
+
+const goToLessonEdit = (module: ModulePayload, lesson: LessonPayload) => {
+  router.push({
+    name: 'teacher-lesson-edit',
+    params: { courseId, moduleId: module.id, lessonId: lesson.id }
+  });
+};
+
+ 
+const formatDuration = (duration?: number | null) => {
+  if (!duration || duration <= 0) {
+    return t('courses.durationNotSet');
+  }
+  const minutes = Math.floor(duration / 60);
+  const seconds = duration % 60;
+  if (minutes > 0 && seconds > 0) {
+    return t('courses.durationMinutesSeconds', { minutes, seconds });
+  }
+  if (minutes > 0) {
+    return t('courses.durationMinutes', { minutes });
+  }
+  return t('courses.durationSeconds', { seconds: duration });
+};
+
+const youtubeEmbed = (value?: string | null) => {
+  if (!value) return '';
+  const patterns = [
+    /youtu\.be\/([\w-]{11})/i,
+    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i
+  ];
+  let videoId = value.trim();
+  for (const pattern of patterns) {
+    const match = videoId.match(pattern);
+    if (match && match[1]) {
+      videoId = match[1];
+      break;
+    }
+  }
+  return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+};
+
+const saveInfo = async () => {
+  const description = form.description?.trim();
+  const thumbnail = form.thumbnailUrl.trim();
+  await store.updateCourse(courseId, {
+    title: form.title,
+    description: description && description.length ? description : undefined,
+    type: form.type,
+    price: form.price,
+    currency: form.currency,
+    thumbnailUrl: thumbnail ? thumbnail : null,
+    level: form.level || null,
+    language: form.language || null,
+    active: form.active
+  });
+  hasUserAdjustedVisibility.value = false;
+  const toastKey = form.active ? 'courses.toast.courseSaved' : 'courses.toast.courseSavedHidden';
+  toast.success(t(toastKey));
+};
+</script>
+
+<style scoped>
+.course-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--sakai-space-5);
+}
+
+.course-editor__visibility-card {
+  width: 100%;
+  max-width: 28rem;
+  margin-bottom: var(--sakai-space-4);
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+.course-editor__visibility-card :deep(.ui-card__body) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sakai-space-3);
+  padding: var(--sakai-space-4);
+  border-radius: var(--sakai-border-radius-lg);
+}
+
+.course-editor__visibility-card--published :deep(.ui-card__body) {
+  background: var(--sakai-success-surface);
+}
+
+.course-editor__visibility-card--draft :deep(.ui-card__body) {
+  background: var(--sakai-danger-surface);
+}
+
+.course-editor__visibility-content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sakai-space-3);
+}
+
+.course-editor__visibility-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.course-editor__visibility-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--sakai-border-radius-pill);
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  box-shadow: 0 0 0 6px transparent;
+}
+
+.course-editor__visibility-dot--published {
+  background: var(--sakai-success);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--sakai-success) 22%, transparent);
+}
+
+.course-editor__visibility-dot--draft {
+  background: var(--sakai-danger);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--sakai-danger) 22%, transparent);
+}
+
+.course-editor__visibility-heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__visibility-card--published .course-editor__visibility-heading {
+  color: color-mix(in srgb, var(--sakai-success) 45%, var(--sakai-text-color));
+}
+
+.course-editor__visibility-card--draft .course-editor__visibility-heading {
+  color: color-mix(in srgb, var(--sakai-danger) 45%, var(--sakai-text-color));
+}
+
+.course-editor__visibility-message {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--sakai-text-color-secondary);
+  line-height: var(--sakai-line-height-md);
+}
+
+.course-editor__main {
+  flex: 1 1 640px;
+  min-width: 0;
+}
+
+.course-editor__sidebar {
+  flex: 0 0 320px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-4);
+}
+
+.course-editor__accordion :deep(.ui-accordion__content) {
+  background: transparent;
+}
+
+.course-editor__module-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sakai-space-3);
+  align-items: flex-start;
+}
+
+.course-editor__module-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-2);
+}
+
+.course-editor__module-title {
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__module-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sakai-space-2);
+}
+
+.course-editor__module-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sakai-space-2);
+}
+
+.course-editor__module-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-4);
+}
+
+.course-editor__module-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sakai-space-3);
+}
+
+.course-editor__module-label {
+  margin: 0;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__lessons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-3);
+}
+
+.course-editor__lesson {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-4);
+  padding: var(--sakai-space-4);
+  border-radius: var(--sakai-border-radius-lg);
+  background: color-mix(in srgb, var(--sakai-primary) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
+}
+
+@media (min-width: 640px) {
+  .course-editor__lesson {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.course-editor__lesson-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.course-editor__lesson-title {
+  font-weight: var(--sakai-font-weight-medium);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sakai-space-2);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__lesson-section-title {
+  margin: 0 0 var(--sakai-space-2);
+  font-size: var(--sakai-font-size-sm);
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__lesson-content,
+.course-editor__lesson-video,
+.course-editor__lesson-resources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-2);
+}
+
+.course-editor__lesson-content p {
+  margin: 0;
+  color: var(--sakai-text-color);
+  white-space: pre-wrap;
+}
+
+.course-editor__lesson-video-player,
+.course-editor__lesson-video-embed {
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--sakai-border-radius-md);
+  background: var(--sakai-surface-color);
+  box-shadow: var(--sakai-shadow-xs);
+  border: none;
+}
+
+.course-editor__lesson-status {
+  margin: 0;
+}
+
+.course-editor__lesson-status-title {
+  font-weight: var(--sakai-font-weight-semibold);
+}
+
+.course-editor__lesson-status-description {
+  margin: var(--sakai-space-1) 0 0;
+  color: var(--sakai-text-color);
+}
+
+.course-editor__lesson-video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  max-width: 520px;
+  padding: var(--sakai-space-4);
+  border-radius: var(--sakai-border-radius-md);
+  background: color-mix(in srgb, var(--sakai-border-color) 25%, var(--sakai-surface) 75%);
+  color: var(--sakai-text-color);
+  text-align: center;
+  font-weight: var(--sakai-font-weight-medium);
+}
+
+.course-editor__lesson-video-player {
+  display: block;
+  max-height: 320px;
+}
+
+.course-editor__lesson-video-embed {
+  aspect-ratio: 16 / 9;
+}
+
+.course-editor__lesson-link {
+  color: var(--sakai-primary);
+  font-weight: var(--sakai-font-weight-medium);
+  text-decoration: none;
+}
+
+.course-editor__lesson-link:hover,
+.course-editor__lesson-link:focus {
+  text-decoration: underline;
+}
+
+.course-editor__field-label {
+  display: block;
+  margin-bottom: var(--sakai-space-2);
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__video-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-3);
+}
+
+.course-editor__video-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sakai-space-2);
+  font-weight: var(--sakai-font-weight-medium);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__video-progress-value {
+  color: var(--sakai-primary);
+}
+
+.course-editor__video-alert {
+  flex-wrap: wrap;
+}
+
+.course-editor__pdf-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-3);
+}
+
+.course-editor__pdf-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sakai-space-2);
+  font-weight: var(--sakai-font-weight-medium);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__pdf-progress-value {
+  color: var(--sakai-primary);
+}
+
+.course-editor__pdf-alert {
+  flex-wrap: wrap;
+}
+
+.course-editor__lesson-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sakai-space-2);
+  justify-content: flex-end;
+}
+
+.course-editor__form-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-3);
+  margin-bottom: var(--sakai-space-4);
+}
+
+.course-editor__form-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__form-status {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sakai-space-3);
+  padding: var(--sakai-space-3);
+  border-radius: var(--sakai-border-radius-lg);
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--sakai-surface) 92%, var(--sakai-text-color) 8%);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__form-status--published {
+  border-color: color-mix(in srgb, var(--sakai-success) 26%, transparent);
+  background: color-mix(in srgb, var(--sakai-success) 14%, transparent);
+  color: color-mix(in srgb, var(--sakai-success) 40%, var(--sakai-text-color));
+}
+
+.course-editor__form-status--draft {
+  border-color: color-mix(in srgb, var(--sakai-danger) 26%, transparent);
+  background: color-mix(in srgb, var(--sakai-danger) 16%, transparent);
+  color: color-mix(in srgb, var(--sakai-danger) 40%, var(--sakai-text-color));
+}
+
+.course-editor__form-status-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: 0.1rem;
+  border-radius: var(--sakai-border-radius-pill);
+  flex-shrink: 0;
+  background: currentColor;
+  box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.course-editor__form-status-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-1);
+}
+
+.course-editor__form-status-heading {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: inherit;
+}
+
+.course-editor__form-status-message {
+  margin: 0;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, currentColor 60%, var(--sakai-text-color-tertiary));
+  line-height: var(--sakai-line-height-md);
+}
+
+.course-editor__form {
+  display: grid;
+  gap: var(--sakai-space-4);
+}
+
+.course-editor__thumbnail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-3);
+  padding: var(--sakai-space-4);
+  border-radius: var(--sakai-border-radius-lg);
+  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 75%, transparent);
+  background: color-mix(in srgb, var(--sakai-surface) 95%, var(--sakai-primary) 5%);
+}
+
+.course-editor__thumbnail-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-1);
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__thumbnail-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+}
+
+.course-editor__thumbnail-header p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.course-editor__thumbnail-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-2);
+  border-radius: var(--sakai-border-radius-md);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
+  background: color-mix(in srgb, var(--sakai-surface) 92%, var(--sakai-primary) 6%);
+}
+
+.course-editor__thumbnail-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--sakai-border-color) 40%, transparent);
+}
+
+.course-editor__thumbnail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sakai-space-2);
+  justify-content: flex-end;
+  padding: 0 var(--sakai-space-2) var(--sakai-space-2);
+}
+
+.course-editor__status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sakai-space-2);
+  padding: var(--sakai-space-3);
+  border-radius: var(--sakai-border-radius-lg);
+  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--sakai-primary) 6%, transparent);
+}
+
+.course-editor__status-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__dialog-form {
+  display: grid;
+  gap: var(--sakai-space-4);
+}
+
+.course-editor__dialog-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--sakai-text-color-tertiary);
+}
+
+.course-editor__loading {
+  display: grid;
+  gap: var(--sakai-space-3);
+}
+
+@media (max-width: 960px) {
+  .course-editor__sidebar {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
+</style>

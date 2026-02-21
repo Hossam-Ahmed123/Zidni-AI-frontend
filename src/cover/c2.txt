@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sample 23 - Scatter to Assemble</title>
+  <style>
+    body { margin:0; height:100vh; background:#000; display:grid; place-items:center; overflow:hidden; }
+    .text { font-size:clamp(5rem,14vw,12rem); color:#fff; position:relative; }
+    .letter { position:absolute; transition:all 2.5s cubic-bezier(0.18,0.89,0.32,1.28); opacity:0; }
+    .center { position:relative; opacity:1 !important; transform:none !important; }
+  </style>
+</head>
+<body>
+  <div class="text" id="txt">teacher name</div>
+
+  <script>
+    const txt = document.getElementById('txt');
+    const str = txt.textContent;
+    txt.innerHTML = '';
+    const letters = [];
+    str.split('').forEach((c,i) => {
+      const s = document.createElement('span');
+      s.className = 'letter';
+      s.textContent = c;
+      s.style.left = Math.random()*80 + 10 + 'vw';
+      s.style.top = Math.random()*80 + 10 + 'vh';
+      s.style.transform = `rotate(${Math.random()*360}deg) scale(${0.2 + Math.random()*0.6})`;
+      txt.appendChild(s);
+      letters.push(s);
+    });
+
+    setTimeout(() => {
+      letters.forEach((l,i) => {
+        setTimeout(() => {
+          l.style.left = '';
+          l.style.top = '';
+          l.style.transform = '';
+          l.classList.add('center');
+        }, i*120 + 500);
+      });
+    }, 1000);
+  </script>
+</body>
+</html>

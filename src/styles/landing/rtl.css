@@ -1,0 +1,77 @@
+[dir='rtl'] .landing-header__content {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .landing-nav {
+  flex-direction: row-reverse;
+}
+
+@media (max-width: 960px) {
+  [dir='rtl'] .landing-nav {
+    flex-direction: column;
+    text-align: right;
+  }
+}
+
+[dir='rtl'] .landing-nav__link,
+[dir='rtl'] .landing-nav__cta {
+  text-align: center;
+}
+
+[dir='rtl'] .landing-hero__content {
+  text-align: right;
+}
+
+[dir='rtl'] .landing-hero__copy {
+  align-items: flex-end;
+}
+
+[dir='rtl'] .landing-hero__secondary span {
+  transform: rotate(180deg);
+}
+
+[dir='rtl'] .landing-hero__subtitle {
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+
+[dir='rtl'] .landing-hero__visual-frame {
+  transform: rotate(4deg);
+}
+
+[dir='rtl'] .landing-hero__visual:hover .landing-hero__visual-frame {
+  transform: rotate(0deg);
+}
+
+[dir='rtl'] .landing-section__header {
+  text-align: right;
+}
+
+[dir='rtl'] .landing-section__description {
+  margin-inline: 0;
+}
+
+[dir='rtl'] .landing-integrations__item,
+[dir='rtl'] .landing-card,
+[dir='rtl'] .landing-logo-wall__item {
+  text-align: right;
+}
+
+[dir='rtl'] .landing-testimonial__author {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  [dir='rtl'] .landing-testimonial__author {
+    flex-direction: column;
+  }
+}
+
+[dir='rtl'] .landing-footer__links {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .landing-footer__text {
+  text-align: right;
+}

@@ -1,0 +1,46 @@
+export interface PhoneCountryCodeOption {
+  value: string;
+  nameKey: string;
+}
+
+export const PHONE_COUNTRY_CODES: PhoneCountryCodeOption[] = [
+  { value: '+1', nameKey: 'phoneCountryCodes.usCa' },
+  { value: '+20', nameKey: 'phoneCountryCodes.eg' },
+  { value: '+27', nameKey: 'phoneCountryCodes.za' },
+  { value: '+30', nameKey: 'phoneCountryCodes.gr' },
+  { value: '+33', nameKey: 'phoneCountryCodes.fr' },
+  { value: '+34', nameKey: 'phoneCountryCodes.es' },
+  { value: '+39', nameKey: 'phoneCountryCodes.it' },
+  { value: '+44', nameKey: 'phoneCountryCodes.gb' },
+  { value: '+49', nameKey: 'phoneCountryCodes.de' },
+  { value: '+52', nameKey: 'phoneCountryCodes.mx' },
+  { value: '+55', nameKey: 'phoneCountryCodes.br' },
+  { value: '+61', nameKey: 'phoneCountryCodes.au' },
+  { value: '+62', nameKey: 'phoneCountryCodes.id' },
+  { value: '+81', nameKey: 'phoneCountryCodes.jp' },
+  { value: '+82', nameKey: 'phoneCountryCodes.kr' },
+  { value: '+86', nameKey: 'phoneCountryCodes.cn' },
+  { value: '+90', nameKey: 'phoneCountryCodes.tr' },
+  { value: '+91', nameKey: 'phoneCountryCodes.in' },
+  { value: '+212', nameKey: 'phoneCountryCodes.ma' },
+  { value: '+213', nameKey: 'phoneCountryCodes.dz' },
+  { value: '+216', nameKey: 'phoneCountryCodes.tn' },
+  { value: '+218', nameKey: 'phoneCountryCodes.ly' },
+  { value: '+222', nameKey: 'phoneCountryCodes.mr' },
+  { value: '+249', nameKey: 'phoneCountryCodes.sd' },
+  { value: '+252', nameKey: 'phoneCountryCodes.so' },
+  { value: '+253', nameKey: 'phoneCountryCodes.dj' },
+  { value: '+269', nameKey: 'phoneCountryCodes.km' },
+  { value: '+961', nameKey: 'phoneCountryCodes.lb' },
+  { value: '+962', nameKey: 'phoneCountryCodes.jo' },
+  { value: '+963', nameKey: 'phoneCountryCodes.sy' },
+  { value: '+964', nameKey: 'phoneCountryCodes.iq' },
+  { value: '+965', nameKey: 'phoneCountryCodes.kw' },
+  { value: '+966', nameKey: 'phoneCountryCodes.sa' },
+  { value: '+967', nameKey: 'phoneCountryCodes.ye' },
+  { value: '+968', nameKey: 'phoneCountryCodes.om' },
+  { value: '+970', nameKey: 'phoneCountryCodes.ps' },
+  { value: '+971', nameKey: 'phoneCountryCodes.ae' },
+  { value: '+973', nameKey: 'phoneCountryCodes.bh' },
+  { value: '+974', nameKey: 'phoneCountryCodes.qa' }
+];

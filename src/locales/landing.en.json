@@ -1,0 +1,477 @@
+{
+  "hero": {
+    "eyebrow": "Zidni AI Learning OS",
+    "title": "Run every cohort from one AI-enabled workspace",
+    "subtitle": "Coordinate multi-tenant catalogs, live sessions, assessments, payments, and communications without switching tools.",
+    "cta_primary": "Get Started",
+    "cta_secondary": "Sign In"
+  },
+  "nav": {
+    "integrations": "Platform",
+    "reports": "Reports & Alerts",
+    "testimonials": "Testimonials",
+    "cta": "Get Started",
+    "sign_in": "Sign In",
+    "toggle": "Toggle navigation menu",
+    "close": "Close navigation",
+    "whatsappMessage": "I want to register my academy."
+  },
+  "legal": {
+    "brand": "Zidni"
+  },
+  "zidniLanding": {
+    "brandName": "Zidni AI",
+    "floatingCta": "Get started",
+    "aria": {
+      "logo": "Zidni AI logo"
+    },
+    "language": {
+      "switchToEnglish": "Switch to English",
+      "switchToArabic": "Switch to Arabic",
+      "aria": "Toggle between Arabic and English",
+      "shortEnglish": "EN",
+      "shortArabic": "AR"
+    },
+    "nav": {
+      "home": "Home",
+      "features": "Features",
+      "verify": "Verify certificate",
+      "testimonials": "Testimonials",
+      "contact": "Contact",
+      "teacherLogin": "sign in",
+      "teacherRegister": "sign up",
+      "whatsappMessage": "I want to register my academy.",
+      "primaryLabel": "Primary navigation",
+      "openMenu": "Open navigation",
+      "closeMenu": "Close navigation"
+    },
+    "hero": {
+      "title": "Launch your independent academy with advanced AI",
+      "subtitle": "A complete digital solution that lets you build a branded academy in days, with auto-generated curricula, smart teaching assistants, real-time learner progress tracking, and adaptive experiences tailored to every student.",
+      "primaryCta": "Register",
+      "secondaryCta": "sign in"
+    },
+    "features": {
+      "title": "💡 How does Zidni AI transform learning?",
+      "items": {
+        "teachers": {
+          "title": "For teachers",
+          "description": "AI-assisted course authoring, live classrooms, subscription bundles, and advanced assessments in one place."
+        },
+        "students": {
+          "title": "For students",
+          "description": "Personalised learning paths, live broadcasts, interactive homework, and adaptive quizzes with motivating badges."
+        },
+        "admins": {
+          "title": "For institutions",
+          "description": "Real-time KPIs, attendance and attainment reports, and centralised control over permissions across every academy."
+        }
+      }
+    },
+    "stats": {
+      "title": "Why do partners trust Zidni AI?",
+      "items": {
+        "activeUsers": {
+          "value": "+10,000",
+          "label": "Active teachers and students"
+        },
+        "satisfaction": {
+          "value": "98%",
+          "label": "Customer satisfaction rate"
+        },
+        "support": {
+          "value": "24/7",
+          "label": "Always-on support"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "What our partners say",
+      "items": {
+        "ahmed": {
+          "quote": "Zidni AI made interactive lesson design effortless, and performance analytics helped me elevate every class.",
+          "author": "Ahmed — Teacher"
+        },
+        "sara": {
+          "quote": "Adaptive assessments and smart summaries turned learning into an organised, enjoyable experience.",
+          "author": "Sara — Student"
+        },
+        "khaled": {
+          "quote": "Instant dashboards and precise reports transformed how we track academic quality across our school.",
+          "author": "Khaled — School Principal"
+        }
+      }
+    },
+    "verify": {
+      "title": "Verify a certificate",
+      "subtitle": "Confirm the authenticity of any Zidni certificate in seconds.",
+      "label": "Certificate verification code",
+      "placeholder": "Enter the verification code",
+      "button": "Verify",
+      "hint": "Use the code printed on the certificate or scan its QR code.",
+      "error": "Please enter the verification code to continue."
+    },
+    "contact": {
+      "title": "Contact us",
+      "intro": "Send your question using the form below and we will get back to you shortly.",
+      "form": {
+        "nameLabel": "Full name",
+        "phoneLabel": "Mobile number",
+        "phoneCountryCodeLabel": "Country code",
+        "emailLabel": "Email",
+        "messageLabel": "Message",
+        "submit": "Send",
+        "submitting": "Sending..."
+      },
+      "messages": {
+        "required": "Please fill in all fields!",
+        "invalidEmail": "Please enter a valid email address!",
+        "success": "Your message has been sent successfully!",
+        "error": "Something went wrong while sending your request. Please try again later."
+      }
+    },
+    "footer": {
+      "phoneLabel": "Phone:",
+      "emailLabel": "Email:",
+      "addressLabel": "Address:",
+      "contacts": {
+        "uae": {
+          "name": "Dubai, UAE",
+          "phone": "+971582302840",
+          "email": "info@zidni.cloud",
+          "address": "Al Barsha 1, Dubai, UAE"
+        },
+        "eg": {
+          "name": "Mansoura, Egypt",
+          "phone": "+201004003528",
+          "email": "info@zidni.cloud",
+          "address": "Mansoura, University District, Egypt"
+        }
+      },
+      "qr": {
+        "title": "SCAN ME",
+        "hint": "Open your camera to scan and start a WhatsApp chat with our team.",
+        "alt": "Zidni AI WhatsApp QR code"
+      },
+      "rights": "© 2025 Zidni AI. All rights reserved.",
+      "social": {
+        "linkedin": "LinkedIn",
+        "facebook": "Facebook",
+        "twitter": "Twitter"
+      }
+    }
+  },
+  "skip_to_content": "Skip to main content",
+  "integrations": {
+    "title": "Everything your operations, teaching, and marketing teams rely on",
+    "body": "Zidni AI combines AI authoring with roster, payment, and engagement workflows for every tenant.",
+    "items": {
+      "aiWorkspace": {
+        "title": "AI lesson studio",
+        "body": "Draft modules, adapt reading levels, and summarise meetings with teacher copilots and student helpers."
+      },
+      "assessmentBuilder": {
+        "title": "Assessment & exam workflows",
+        "body": "Build question banks, map competencies, auto-grade submissions, and sync scores to your SIS."
+      },
+      "liveSessions": {
+        "title": "Live cohorts & classrooms",
+        "body": "Schedule cohorts, send reminders, and run sessions with chat, polls, and automated attendance logs."
+      },
+      "tutoring": {
+        "title": "Roster & memberships",
+        "body": "Centralise registrations, roster groups, and teacher payments across multi-tenant academies."
+      },
+      "marketingHub": {
+        "title": "Offers & catalog syndication",
+        "body": "Launch bundles, promo codes, and multilingual landing pages that sync to every storefront."
+      },
+      "notifications": {
+        "title": "Unified notifications & automation",
+        "body": "Trigger in-app, email, and WebSocket alerts for renewals, milestones, and AI-generated updates."
+      }
+    }
+  },
+  "reports": {
+    "title": "Operational intelligence across every tenant",
+    "cards": {
+      "exports": {
+        "title": "Finance-ready exports",
+        "body": "Monitor enrollments, revenue, and entitlement usage with scheduled CSV and PDF deliveries."
+      },
+      "assessments": {
+        "title": "Teacher & learner analytics",
+        "body": "Track completion, mastery, and instructor workload with dedicated teacher and student dashboards."
+      },
+      "alerts": {
+        "title": "Proactive alerts",
+        "body": "Surface renewal risks, expiring offers, and stalled cohorts with automated, real-time notifications."
+      }
+    }
+  },
+  "logos": {
+    "title": "Trusted by modern academies",
+    "items": [
+      "Campus One",
+      "Horizon Academy",
+      "NextGen Schools",
+      "Future Path",
+      "Bright Minds",
+      "Learning Hub"
+    ]
+  },
+  "testimonial": {
+    "title": "Academies scale faster with Zidni AI",
+    "quote": "Zidni AI aligned our catalogs, AI lesson creation, and finance exports in one place. Live cohorts, offers, and alerts now run on autopilot for every campus.",
+    "name": "Layla Hassan",
+    "role": "Director of Digital Learning, Horizon Academy"
+  },
+  "cta": {
+    "title": "Ready to orchestrate your next cohort?",
+    "body": "Spin up tenants, onboard staff, and activate AI copilots, live classrooms, offers, and billing in a single day.",
+    "button": "Get Started"
+  },
+  "footer": {
+    "text": "Zidni AI powers multi-tenant operations, AI assistance, and analytics for ambitious educators. Review our privacy commitments, policies, and support options anytime.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "support": "Help & Support"
+  },
+  "privacy_page": {
+    "title": "Privacy at Zidni AI",
+    "intro": "Zidni AI protects the data that powers your AI workspace, live cohorts, assessments, and notifications. This summary explains how we handle information for every tenant, educator, and learner.",
+    "sections": [
+      {
+        "title": "The information we collect",
+        "paragraphs": [
+          "We only collect information needed to operate Zidni AI’s multi-tenant learning platform and AI assistants."
+        ],
+        "bullets": [
+          "Account, tenant, and billing details provided by platform owners and administrators.",
+          "Learning content, assessment submissions, feedback, and tutoring notes created inside the AI lesson studio and assessment workflows.",
+          "Engagement signals from live sessions, chat, polls, offers, and notifications so we can deliver reliable experiences in real time."
+        ]
+      },
+      {
+        "title": "How we use your information",
+        "paragraphs": [
+          "Data enables Zidni AI to author content with AI copilots, roster cohorts, process payments, and surface analytics across your tenants."
+        ],
+        "bullets": [
+          "Delivering core features like assessment grading, live attendance, catalog syndication, and proactive alerts.",
+          "Training tenant-level AI models with anonymised context so assistants can draft lessons and summaries securely.",
+          "Improving product reliability, for example monitoring API usage to prevent downtime during exams or live sessions."
+        ]
+      },
+      {
+        "title": "How we protect and retain data",
+        "paragraphs": [
+          "Zidni AI encrypts data in transit and at rest, limits access to vetted staff, and keeps audit logs across every workflow.",
+          "We retain learner and financial records only for the periods required by law or to support your contractual commitments."
+        ]
+      },
+      {
+        "title": "Your choices and controls",
+        "paragraphs": [
+          "Platform owners can export or delete tenant data by contacting support. Learners can request access, correction, or deletion of their records at any time.",
+          "We notify administrators when workflows rely on third-party integrations so you can manage consent with your communities."
+        ]
+      }
+    ],
+    "cta": {
+      "title": "Questions about privacy?",
+      "paragraphs": [
+        "Our trust team is available to discuss data protection impact assessments, regional hosting, and custom retention policies."
+      ],
+      "actions": [
+        {
+          "label": "Email support@Zidni AI.app",
+          "href": "mailto:support@Zidni AI.app"
+        }
+      ]
+    }
+  },
+  "terms_page": {
+    "title": "Zidni Terms of Use Agreement",
+    "intro": "These terms explain how educators and learners use the Zidni platform. By creating an account, you agree to the rules below.",
+    "sections": [
+      {
+        "title": "1. Our relationship",
+        "paragraphs": [
+          "By creating your account, we consider you a partner and you agree to these terms. We keep improving the platform, so we may update these terms to deliver better features. We will always notify you of any important changes that affect you."
+        ]
+      },
+      {
+        "title": "2. Your video journey on Zidni",
+        "paragraphs": [
+          "Automatic quality optimization keeps lessons smooth even on weak connections (up to 720p or 1080p depending on your plan).",
+          "After processing is complete, we delete the original raw upload to make room for new videos, so keep your original copy on your device.",
+          "Each plan includes a storage allowance by hours or words. You can upgrade or add extra storage at any time."
+        ]
+      },
+      {
+        "title": "3. Viewing and consumption",
+        "paragraphs": [
+          "You receive a monthly viewing minutes quota. If students consume it, you can add extra minutes to keep learning uninterrupted.",
+          "We apply fair-use protections to prevent abnormal load and keep the platform stable for everyone."
+        ]
+      },
+      {
+        "title": "4. Your intellectual property",
+        "paragraphs": [
+          "Your content is yours. We are simply the home for hosting your knowledge and do not claim ownership of your uploads.",
+          "You are responsible for ensuring you have the rights to any content you upload."
+        ]
+      },
+      {
+        "title": "5. Subscription and payment",
+        "paragraphs": [
+          "Subscriptions renew automatically to avoid service interruption. You can cancel from account settings at least 24 hours before renewal.",
+          "Because we reserve server resources and begin processing immediately, payments are non-refundable. You still receive the full value of your subscription period."
+        ]
+      },
+      {
+        "title": "6. Keeping the Zidni community safe",
+        "paragraphs": [
+          "We are committed to a safe learning environment. Content that violates laws or public morals is not accepted. In rare cases, we may suspend accounts that misuse the system in ways that harm others."
+        ]
+      },
+      {
+        "title": "7. Service stability",
+        "paragraphs": [
+          "Our technical team works around the clock to keep the platform available at 99%. If an outage occurs beyond our control (for example, global cloud providers), we will notify you and work to resolve it quickly."
+        ]
+      }
+    ],
+    "cta": {
+      "title": "Questions about these terms?",
+      "paragraphs": [
+        "Our support team is always ready to help if you need any clarification."
+      ],
+      "actions": [
+        {
+          "label": "Contact us",
+          "href": "mailto:info@zidni.cloud"
+        }
+      ]
+    }
+  },
+  "support_page": {
+    "title": "Zidni AI Help & Support",
+    "intro": "We combine documentation, proactive monitoring, and human expertise to keep your AI workspace, assessments, and live sessions running smoothly.",
+    "sections": [
+      {
+        "title": "How to reach us",
+        "paragraphs": [
+          "Our support engineers and learning specialists provide coverage across EMEA working hours with priority routing for critical issues."
+        ],
+        "bullets": [
+          "Email support@Zidni AI.app for account, billing, privacy, or data export requests.",
+          "Use the in-app help widget to chat with our team when configuring AI lesson studios, assessments, or offers.",
+          "Join weekly office hours for implementation walkthroughs and roadmap updates."
+        ]
+      },
+      {
+        "title": "Onboarding and training resources",
+        "paragraphs": [
+          "We provide multilingual guides so teams can launch new tenants, automate workflows, and adopt AI copilots responsibly."
+        ],
+        "links": [
+          {
+            "label": "Implementation guides",
+            "href": "https://docs.Zidni AI.app/implementation"
+          },
+          {
+            "label": "Educator training playbooks",
+            "href": "https://docs.Zidni AI.app/training"
+          }
+        ]
+      },
+      {
+        "title": "Incident response",
+        "paragraphs": [
+          "We monitor live classrooms, notifications, and integrations around the clock. Critical alerts trigger our on-call response immediately."
+        ],
+        "bullets": [
+          "Real-time status updates are posted when assessments, payments, or live services are degraded.",
+          "Post-incident reviews are shared with tenant admins along with preventative recommendations."
+        ]
+      },
+      {
+        "title": "Feature-specific guidance",
+        "paragraphs": [
+          "Need help designing assessments, scheduling cohorts, or enabling new AI copilots? Our specialists provide targeted coaching."
+        ],
+        "bullets": [
+          "Assessment builders: mapping competencies, auto-grading, and SIS exports.",
+          "Live learning: attendance automation, chat moderation, and poll analytics.",
+          "Offers and storefronts: pricing strategies, promo codes, and catalog syndication."
+        ]
+      }
+    ],
+    "cta": {
+      "title": "Stay connected",
+      "paragraphs": [
+        "Bookmark these channels to keep your teams informed about new releases and platform health."
+      ],
+      "actions": [
+        {
+          "label": "Email support@Zidni AI.app",
+          "href": "mailto:support@Zidni AI.app"
+        },
+        {
+          "label": "Check status.Zidni AI.app",
+          "href": "https://status.Zidni AI.app"
+        },
+        {
+          "label": "Browse documentation",
+          "href": "https://docs.Zidni AI.app"
+        }
+      ]
+    }
+  },
+  "phoneCountryCodes": {
+    "usCa": "United States/Canada",
+    "eg": "Egypt",
+    "za": "South Africa",
+    "gr": "Greece",
+    "fr": "France",
+    "es": "Spain",
+    "it": "Italy",
+    "gb": "United Kingdom",
+    "de": "Germany",
+    "mx": "Mexico",
+    "br": "Brazil",
+    "au": "Australia",
+    "id": "Indonesia",
+    "jp": "Japan",
+    "kr": "South Korea",
+    "cn": "China",
+    "tr": "Turkey",
+    "in": "India",
+    "ma": "Morocco",
+    "dz": "Algeria",
+    "tn": "Tunisia",
+    "ly": "Libya",
+    "mr": "Mauritania",
+    "sd": "Sudan",
+    "so": "Somalia",
+    "dj": "Djibouti",
+    "km": "Comoros",
+    "lb": "Lebanon",
+    "jo": "Jordan",
+    "sy": "Syria",
+    "iq": "Iraq",
+    "kw": "Kuwait",
+    "sa": "Saudi Arabia",
+    "ye": "Yemen",
+    "om": "Oman",
+    "ps": "Palestine",
+    "ae": "United Arab Emirates",
+    "bh": "Bahrain",
+    "qa": "Qatar"
+  }
+}
+
+
+

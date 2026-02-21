@@ -1,0 +1,69 @@
+@use './tokens';
+@use './mixins' as *;
+
+:root {
+  font-size: var(--sakai-font-size-root);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sakai-font-family-base);
+  font-weight: var(--sakai-font-weight-regular);
+  color: var(--sakai-text-color);
+  background: var(--sakai-surface-section);
+  line-height: var(--sakai-line-height-lg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex='0']:focus-visible {
+  @include sakai-focus-ring;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--sakai-space-3);
+  color: var(--sakai-text-color-secondary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 var(--sakai-space-3);
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+}
+
+button {
+  font: inherit;
+}
+
+:root {
+  --sakai-card-padding: var(--sakai-space-5);
+  --sakai-section-gap: clamp(2rem, 5vw, 3.5rem);
+}
