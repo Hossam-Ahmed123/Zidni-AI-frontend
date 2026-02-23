@@ -3,9 +3,13 @@ import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 
-const API_PROXY_TARGET = 'http://localhost:8080';
+export default defineConfig(({ mode }) => {
+  const API_PROXY_TARGET =
+    mode === 'development'
+      ? 'http://app-test.72.61.18.248.nip.io'
+      : 'http://localhost:8080';
 
-export default defineConfig(() => ({
+  return ({
   plugins: [vue(), vuetify({ autoImport: true })],
 
   resolve: {
@@ -30,7 +34,7 @@ export default defineConfig(() => ({
     }
   },
 
-  server: {
+    server: {
     host: true,
     port: 5174,
     allowedHosts: [
@@ -40,7 +44,7 @@ export default defineConfig(() => ({
       'app-test.72.61.18.248.nip.io',
       'mrhossam.72.61.18.248.nip.io'
     ],
-        proxy: {
+      proxy: {
       '/api': {
         target: API_PROXY_TARGET,
         changeOrigin: true,
@@ -70,11 +74,12 @@ export default defineConfig(() => ({
         ws: true,
         secure: false
       }
-    }
-  },
+      }
+    },
 
-  hmr: {
-    host: 'app-test.127.0.0.1.nip.io',
-    protocol: 'ws'
-  }
-}));
+    hmr: {
+      host: 'app-test.127.0.0.1.nip.io',
+      protocol: 'ws'
+    }
+  });
+});
