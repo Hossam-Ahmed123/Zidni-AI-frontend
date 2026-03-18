@@ -10,7 +10,9 @@ vi.mock('vue-router', () => ({
 
 const authStoreMock: Record<string, any> = {
   assistantName: '',
-  assistantPermissions: [] as string[]
+  assistantPermissions: [] as string[],
+  assistantRoleId: null as number | null,
+  me: vi.fn()
 };
 
 const featuresStoreMock: Record<string, any> = {
@@ -73,9 +75,13 @@ describe('AssistantDashboardView', () => {
       }
     });
 
+  const findQuickActionsCard = (wrapper: ReturnType<typeof mountView>) => wrapper.findAll('.ui-card')[0];
+
   beforeEach(() => {
     authStoreMock.assistantName = '';
     authStoreMock.assistantPermissions = [];
+    authStoreMock.assistantRoleId = null;
+    authStoreMock.me = vi.fn().mockResolvedValue(undefined);
 
     featuresStoreMock.loading = false;
     featuresStoreMock.loaded = false;
@@ -98,10 +104,11 @@ describe('AssistantDashboardView', () => {
 
     const wrapper = mountView();
     await nextTick();
+    const quickActionsCard = findQuickActionsCard(wrapper);
 
     expect(featuresStoreMock.ensureLoaded).toHaveBeenCalled();
-    expect(wrapper.find('.assistant-dashboard__links-loading').exists()).toBe(true);
-    expect(wrapper.find('.assistant-dashboard__empty').exists()).toBe(false);
+    expect(quickActionsCard.find('.assistant-dashboard__links-loading').exists()).toBe(true);
+    expect(quickActionsCard.find('.assistant-dashboard__empty').exists()).toBe(false);
   });
 
   it('shows available quick links while other feature-gated links are pending', async () => {
@@ -112,10 +119,11 @@ describe('AssistantDashboardView', () => {
 
     const wrapper = mountView();
     await nextTick();
+    const quickActionsCard = findQuickActionsCard(wrapper);
 
-    expect(wrapper.find('.assistant-dashboard__links-loading').exists()).toBe(true);
-    const quickLinks = wrapper.findAll('.assistant-dashboard__link-item');
-    expect(quickLinks).toHaveLength(1);
+    expect(quickActionsCard.find('.assistant-dashboard__links-loading').exists()).toBe(true);
+    const quickLinks = quickActionsCard.findAll('.assistant-dashboard__link-item');
+    expect(quickLinks).toHaveLength(2);
     expect(quickLinks[0].text()).toContain('assistant.dashboard.links.courses.title');
   });
 
@@ -128,18 +136,19 @@ describe('AssistantDashboardView', () => {
 
     const wrapper = mountView();
     await nextTick();
+    const quickActionsCard = findQuickActionsCard(wrapper);
 
-    const alert = wrapper.find('.assistant-dashboard__links-alert');
+    const alert = quickActionsCard.find('.assistant-dashboard__links-alert');
     expect(alert.text()).toContain('assistant.dashboard.featuresDisabled:1');
     expect(alert.text()).toContain('assistant.dashboard.featuresDisabledListIntro');
-    const disabledItems = wrapper.findAll('.assistant-dashboard__disabled-link');
+    const disabledItems = quickActionsCard.findAll('.assistant-dashboard__disabled-link');
     expect(disabledItems).toHaveLength(1);
     expect(disabledItems[0].text()).toContain(
       'assistant.dashboard.links.students.title'
     );
-    expect(wrapper.find('.assistant-dashboard__empty-title').text()).toBe(
-      'assistant.dashboard.featuresDisabledTitle'
-    );
+    const visibleLinks = quickActionsCard.findAll('.assistant-dashboard__link-item');
+    expect(visibleLinks).toHaveLength(1);
+    expect(visibleLinks[0].text()).toContain('assistant.dashboard.links.certificates.title');
   });
 
   it('keeps permission shortcuts visible when feature load fails', async () => {
@@ -149,11 +158,12 @@ describe('AssistantDashboardView', () => {
 
     const wrapper = mountView();
     await nextTick();
+    const quickActionsCard = findQuickActionsCard(wrapper);
 
-    const quickLinks = wrapper.findAll('.assistant-dashboard__link-item');
+    const quickLinks = quickActionsCard.findAll('.assistant-dashboard__link-item');
     expect(quickLinks).toHaveLength(1);
     expect(quickLinks[0].text()).toContain('assistant.dashboard.links.courses.title');
-    expect(wrapper.find('.assistant-dashboard__links-alert').text()).toContain(
+    expect(quickActionsCard.find('.assistant-dashboard__links-alert').text()).toContain(
       'assistant.dashboard.featuresLoadError'
     );
   });
@@ -167,10 +177,28 @@ describe('AssistantDashboardView', () => {
 
     const wrapper = mountView();
     await nextTick();
+    const quickActionsCard = findQuickActionsCard(wrapper);
 
-    expect(wrapper.find('.assistant-dashboard__links-loading').exists()).toBe(false);
-    const quickLinks = wrapper.findAll('.assistant-dashboard__link-item');
-    expect(quickLinks).toHaveLength(1);
+    expect(quickActionsCard.find('.assistant-dashboard__links-loading').exists()).toBe(false);
+    const quickLinks = quickActionsCard.findAll('.assistant-dashboard__link-item');
+    expect(quickLinks).toHaveLength(2);
     expect(quickLinks[0].text()).toContain('assistant.dashboard.links.students.title');
+  });
+
+  it('shows a refresh action when a role is assigned but permissions are not loaded', async () => {
+    authStoreMock.assistantRoleId = 7;
+
+    const wrapper = mountView();
+    await nextTick();
+
+    expect(wrapper.text()).toContain('assistant.dashboard.roleAssignedEmptyTitle');
+    expect(wrapper.text()).toContain('assistant.dashboard.roleAssignedPermissionsEmptyTitle');
+
+    const refreshButtons = wrapper.findAll('.assistant-dashboard__empty-action');
+    expect(refreshButtons.length).toBeGreaterThan(0);
+
+    await refreshButtons[0].trigger('click');
+
+    expect(authStoreMock.me).toHaveBeenCalledWith(true);
   });
 });

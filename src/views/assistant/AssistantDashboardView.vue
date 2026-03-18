@@ -85,6 +85,17 @@
         <div v-else-if="showQuickLinksEmptyState" class="assistant-dashboard__empty">
           <h3 class="assistant-dashboard__empty-title">{{ quickLinksEmptyState.title }}</h3>
           <p class="assistant-dashboard__empty-description">{{ quickLinksEmptyState.description }}</p>
+          <UiButton
+            v-if="showAccessRefreshAction"
+            class="assistant-dashboard__empty-action"
+            variant="outline"
+            color="primary"
+            size="sm"
+            :disabled="refreshingAccess"
+            @click="refreshAccess"
+          >
+            {{ refreshingAccess ? t('common.loading') : t('assistant.dashboard.refreshAccess') }}
+          </UiButton>
         </div>
       </UiCard>
 
@@ -98,8 +109,19 @@
           </li>
         </ul>
         <div v-else class="assistant-dashboard__empty">
-          <h3 class="assistant-dashboard__empty-title">{{ t('assistant.dashboard.permissionsEmptyTitle') }}</h3>
-          <p class="assistant-dashboard__empty-description">{{ t('assistant.dashboard.permissionsEmptyDescription') }}</p>
+          <h3 class="assistant-dashboard__empty-title">{{ permissionsEmptyState.title }}</h3>
+          <p class="assistant-dashboard__empty-description">{{ permissionsEmptyState.description }}</p>
+          <UiButton
+            v-if="showAccessRefreshAction"
+            class="assistant-dashboard__empty-action"
+            variant="outline"
+            color="primary"
+            size="sm"
+            :disabled="refreshingAccess"
+            @click="refreshAccess"
+          >
+            {{ refreshingAccess ? t('common.loading') : t('assistant.dashboard.refreshAccess') }}
+          </UiButton>
         </div>
       </UiCard>
 
@@ -163,6 +185,7 @@ const auth = useAuthStore();
 const featuresStore = useFeaturesStore();
 
 const assistantName = computed(() => (auth.assistantName || '').trim());
+const hasAssignedRole = computed(() => auth.assistantRoleId != null);
 
 const quickLinkDefinitions: AssistantQuickLinkDefinition[] = [
   {
@@ -342,6 +365,12 @@ const quickLinksEmptyState = computed(() => {
       description: t('assistant.dashboard.featuresLoadErrorDescription')
     };
   }
+  if (hasAssignedRole.value) {
+    return {
+      title: t('assistant.dashboard.roleAssignedEmptyTitle'),
+      description: t('assistant.dashboard.roleAssignedEmptyDescription')
+    };
+  }
   return {
     title: t('assistant.dashboard.emptyTitle'),
     description: t('assistant.dashboard.emptyDescription')
@@ -349,6 +378,7 @@ const quickLinksEmptyState = computed(() => {
 });
 
 const retryingFeatures = ref(false);
+const refreshingAccess = ref(false);
 
 const retryFeatureLoad = async () => {
   if (retryingFeatures.value) {
@@ -364,12 +394,44 @@ const retryFeatureLoad = async () => {
   }
 };
 
+const refreshAccess = async () => {
+  if (refreshingAccess.value) {
+    return;
+  }
+  refreshingAccess.value = true;
+  try {
+    await auth.me(true);
+    await featuresStore.ensureLoaded();
+  } catch (error) {
+    console.warn('[assistant-dashboard] failed to refresh assistant access', error);
+  } finally {
+    refreshingAccess.value = false;
+  }
+};
+
 const permissionDetails = computed(() =>
   ASSISTANT_PERMISSION_OPTIONS.filter((option) => permissionSet.value.has(option.id)).map((option) => ({
     id: option.id,
     label: t(option.labelKey),
     description: t(option.descriptionKey)
   }))
+);
+
+const permissionsEmptyState = computed(() => {
+  if (hasAssignedRole.value) {
+    return {
+      title: t('assistant.dashboard.roleAssignedPermissionsEmptyTitle'),
+      description: t('assistant.dashboard.roleAssignedPermissionsEmptyDescription')
+    };
+  }
+  return {
+    title: t('assistant.dashboard.permissionsEmptyTitle'),
+    description: t('assistant.dashboard.permissionsEmptyDescription')
+  };
+});
+
+const showAccessRefreshAction = computed(
+  () => !permissionDetails.value.length && !blockedFeatureLinks.value.length
 );
 
 const openLink = async (target: RouteLocationRaw) => {
@@ -562,6 +624,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: var(--sakai-space-2);
+  align-items: center;
 }
 
 .assistant-dashboard__empty-title {
@@ -572,6 +635,10 @@ onMounted(async () => {
 .assistant-dashboard__empty-description {
   margin: 0;
   color: var(--sakai-text-color-secondary);
+}
+
+.assistant-dashboard__empty-action {
+  margin-top: var(--sakai-space-2);
 }
 
 .assistant-dashboard__help {
