@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.6.8",
     "google-libphonenumber": "^3.2.37",
     "pinia": "^2.1.7",
