@@ -20,9 +20,18 @@ export interface CourseSummary {
   price: number;
   currency: string;
   active: boolean;
+  active1?: string;
   thumbnailUrl?: string;
   level?: string;
   language?: string;
+  certificateInfo?: boolean;
+  courseRequirements?: string;
+  faq?: string;
+  instructor?: string;
+  previewVideo?: string;
+  targetAudience?: string;
+  whatYouWillLearn?: [];
+
 }
 
 export type LessonVideoStatus = 'UPLOADING' | 'PROCESSING' | 'READY' | 'FAILED';
@@ -142,6 +151,17 @@ interface CourseWritePayload {
   level?: string | null;
   language?: string | null;
   active?: boolean;
+  // courseOverview: string | null;
+  instructor: string | null;
+  faq: string | null;
+  certificateInfo: boolean;
+  duration: string | null;
+  targetAudience: string | null;
+  previewVideo?: string | null;
+  whatYouWillLearn: any | null;
+  courseRequirements: string | null;
+  // refundPolicy: string | null;
+  // curriculum: string | null;
 }
 
 export const useCoursesStore = defineStore('courses', {
@@ -200,7 +220,8 @@ export const useCoursesStore = defineStore('courses', {
         active: normalized.active,
         thumbnailUrl: normalized.thumbnailUrl,
         level: normalized.level,
-        language: normalized.language
+        language: normalized.language,
+        previewVideo: normalized?.previewVideo
       };
       this.list.unshift(summary);
       this.current = normalized;
@@ -309,7 +330,7 @@ export const useCoursesStore = defineStore('courses', {
           .sort((a, b) => a.position - b.position);
       }
     },
- 
+
     async updateLesson(
       courseId: number,
       moduleId: number,
@@ -406,7 +427,7 @@ export const useCoursesStore = defineStore('courses', {
       finalizeUploadProgress('lesson-video', onProgress);
       return data;
     },
- 
+
     async reorderLessons(courseId: number, moduleId: number, items: ReorderItem[]) {
       await api.post(`/v1/teacher/courses/${courseId}/modules/${moduleId}/lessons/reorder`, { items });
       const module = this.current?.modules.find((m) => m.id === moduleId);
@@ -418,7 +439,7 @@ export const useCoursesStore = defineStore('courses', {
           )
           .sort((a, b) => a.position - b.position);
       }
- 
+
     }
   }
 });
