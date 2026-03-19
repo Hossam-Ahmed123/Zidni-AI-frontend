@@ -1,18 +1,26 @@
 <template>
   <ThemePage :title="pageTitle" :subtitle="courseSubtitle">
     <template #actions>
-      <UiButton variant="link" color="secondary" prepend-icon="ArrowLeftOutlined" @click="goBack">
-        {{ t('nav.teacher') }}
+      <UiButton
+        variant="link"
+        color="secondary"
+        prepend-icon="ArrowLeftOutlined"
+        @click="goBack"
+      >
+        {{ t("nav.teacher") }}
       </UiButton>
     </template>
 
     <div v-if="course" class="course-editor">
-       
       <section class="course-editor__main">
         <UiCard :title="t('courses.modules')">
           <template #actions>
-            <UiButton color="primary" prepend-icon="FolderAddOutlined" @click="openModuleDialog()">
-              {{ t('courses.addModule') }}
+            <UiButton
+              color="primary"
+              prepend-icon="FolderAddOutlined"
+              @click="openModuleDialog()"
+            >
+              {{ t("courses.addModule") }}
             </UiButton>
           </template>
 
@@ -25,19 +33,34 @@
             <template #header="{ item }">
               <div class="course-editor__module-header">
                 <div class="course-editor__module-heading">
-                  <span class="course-editor__module-title">{{ item.module.title }}</span>
+                  <span class="course-editor__module-title">{{
+                    item.module.title
+                  }}</span>
                   <div class="course-editor__module-meta">
                     <UiTag size="sm" color="secondary">
-                      {{ t('courses.modulePositionLabel', { position: item.module.position }) }}
+                      {{
+                        t("courses.modulePositionLabel", {
+                          position: item.module.position,
+                        })
+                      }}
                     </UiTag>
                     <UiTag size="sm" color="info">
-                      {{ t('courses.lessonsCount', { count: item.module.lessons.length }) }}
+                      {{
+                        t("courses.lessonsCount", {
+                          count: item.module.lessons.length,
+                        })
+                      }}
                     </UiTag>
                   </div>
                 </div>
                 <div class="course-editor__module-actions">
-                  <UiButton variant="link" color="primary" prepend-icon="EditOutlined" @click.stop="openModuleDialog(item.module)">
-                    {{ t('common.edit') }}
+                  <UiButton
+                    variant="link"
+                    color="primary"
+                    prepend-icon="EditOutlined"
+                    @click.stop="openModuleDialog(item.module)"
+                  >
+                    {{ t("common.edit") }}
                   </UiButton>
                   <UiButton
                     variant="link"
@@ -45,7 +68,7 @@
                     prepend-icon="DeleteOutlined"
                     @click.stop="confirmDeleteModule(item.module)"
                   >
-                    {{ t('common.delete') }}
+                    {{ t("common.delete") }}
                   </UiButton>
                 </div>
               </div>
@@ -53,46 +76,71 @@
             <template #content="{ item }">
               <div class="course-editor__module-body">
                 <div class="course-editor__module-toolbar">
-                  <p class="course-editor__module-label">{{ t('courses.lessons') }}</p>
-                  <UiButton color="primary" prepend-icon="PlusOutlined" @click="goToLessonCreate(item.module)">
-                    {{ t('courses.addLesson') }}
+                  <p class="course-editor__module-label">
+                    {{ t("courses.lessons") }}
+                  </p>
+                  <UiButton
+                    color="primary"
+                    prepend-icon="PlusOutlined"
+                    @click="goToLessonCreate(item.module)"
+                  >
+                    {{ t("courses.addLesson") }}
                   </UiButton>
                 </div>
-                <ul v-if="item.module.lessons.length" class="course-editor__lessons">
+                <ul
+                  v-if="item.module.lessons.length"
+                  class="course-editor__lessons"
+                >
                   <li
                     v-for="lesson in sortedLessons(item.module.lessons)"
                     :key="lesson.id"
                     class="course-editor__lesson"
                   >
                     <div class="course-editor__lesson-details">
-                      <span class="course-editor__lesson-title">{{ lesson.title }}</span>
+                      <span class="course-editor__lesson-title">{{
+                        lesson.title
+                      }}</span>
                       <div class="course-editor__lesson-meta">
                         <UiTag
                           v-if="lessonVideoStatusMeta(lesson.videoStatus)"
                           size="sm"
-                          :color="lessonVideoStatusMeta(lesson.videoStatus)?.color || 'secondary'"
+                          :color="
+                            lessonVideoStatusMeta(lesson.videoStatus)?.color ||
+                            'secondary'
+                          "
                         >
                           {{ lessonVideoStatusMeta(lesson.videoStatus)?.label }}
                         </UiTag>
                         <UiTag size="sm" color="neutral">
-                          {{ t('courses.lessonPositionLabel', { position: lesson.position }) }}
+                          {{
+                            t("courses.lessonPositionLabel", {
+                              position: lesson.position,
+                            })
+                          }}
                         </UiTag>
                         <UiTag size="sm" color="info" v-if="lesson.duration">
                           {{ formatDuration(lesson.duration) }}
                         </UiTag>
                         <UiTag size="sm" color="secondary" v-if="lesson.ytId">
-                          {{ t('courses.lessonYoutube') }}
+                          {{ t("courses.lessonYoutube") }}
                         </UiTag>
                         <UiTag size="sm" color="secondary" v-if="lesson.pdfUrl">
-                          {{ t('courses.lessonPdf') }}
+                          {{ t("courses.lessonPdf") }}
                         </UiTag>
-                        <UiTag size="sm" color="secondary" v-if="lesson.videoUrl">
-                          {{ t('courses.lessonVideoTag') }}
+                        <UiTag
+                          size="sm"
+                          color="secondary"
+                          v-if="lesson.videoUrl"
+                        >
+                          {{ t("courses.lessonVideoTag") }}
                         </UiTag>
                       </div>
-                      <div v-if="lesson.content" class="course-editor__lesson-content">
+                      <div
+                        v-if="lesson.content"
+                        class="course-editor__lesson-content"
+                      >
                         <h4 class="course-editor__lesson-section-title">
-                          {{ t('courses.lessonContentHeading') }}
+                          {{ t("courses.lessonContentHeading") }}
                         </h4>
                         <p>{{ lesson.content }}</p>
                       </div>
@@ -101,26 +149,42 @@
                         class="course-editor__lesson-video"
                       >
                         <h4 class="course-editor__lesson-section-title">
-                          {{ t('courses.lessonVideoPreviewHeading') }}
+                          {{ t("courses.lessonVideoPreviewHeading") }}
                         </h4>
                         <UiAlert
-                          v-if="lessonVideoStatusMeta(lesson.videoStatus)?.banner"
+                          v-if="
+                            lessonVideoStatusMeta(lesson.videoStatus)?.banner
+                          "
                           variant="soft"
-                          :color="lessonVideoStatusMeta(lesson.videoStatus)?.color || 'info'"
+                          :color="
+                            lessonVideoStatusMeta(lesson.videoStatus)?.color ||
+                            'info'
+                          "
                           class="course-editor__lesson-status"
                         >
                           <div class="course-editor__lesson-status-title">
-                            {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.title }}
+                            {{
+                              lessonVideoStatusMeta(lesson.videoStatus)?.banner
+                                ?.title
+                            }}
                           </div>
                           <p class="course-editor__lesson-status-description">
-                            {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.description }}
+                            {{
+                              lessonVideoStatusMeta(lesson.videoStatus)?.banner
+                                ?.description
+                            }}
                           </p>
                         </UiAlert>
                         <div
-                          v-if="lessonVideoStatusMeta(lesson.videoStatus)?.banner"
+                          v-if="
+                            lessonVideoStatusMeta(lesson.videoStatus)?.banner
+                          "
                           class="course-editor__lesson-video-placeholder"
                         >
-                          {{ lessonVideoStatusMeta(lesson.videoStatus)?.banner?.placeholder }}
+                          {{
+                            lessonVideoStatusMeta(lesson.videoStatus)?.banner
+                              ?.placeholder
+                          }}
                         </div>
                         <MediaVideoPlayer
                           v-else-if="lesson.videoUrl"
@@ -140,9 +204,12 @@
                           allowfullscreen
                         ></iframe>
                       </div>
-                      <div v-if="lesson.pdfUrl" class="course-editor__lesson-resources">
+                      <div
+                        v-if="lesson.pdfUrl"
+                        class="course-editor__lesson-resources"
+                      >
                         <h4 class="course-editor__lesson-section-title">
-                          {{ t('courses.lessonResourcesHeading') }}
+                          {{ t("courses.lessonResourcesHeading") }}
                         </h4>
                         <a
                           class="course-editor__lesson-link"
@@ -150,7 +217,7 @@
                           target="_blank"
                           rel="noopener"
                         >
-                          {{ t('courses.lessonPdfLinkText') }}
+                          {{ t("courses.lessonPdfLinkText") }}
                         </a>
                       </div>
                     </div>
@@ -161,7 +228,7 @@
                         prepend-icon="EditOutlined"
                         @click.stop="goToLessonEdit(item.module, lesson)"
                       >
-                        {{ t('common.edit') }}
+                        {{ t("common.edit") }}
                       </UiButton>
                       <UiButton
                         variant="link"
@@ -169,20 +236,20 @@
                         prepend-icon="DeleteOutlined"
                         @click.stop="confirmDeleteLesson(item.module, lesson)"
                       >
-                        {{ t('common.delete') }}
+                        {{ t("common.delete") }}
                       </UiButton>
                     </div>
                   </li>
                 </ul>
                 <UiAlert v-else color="info" variant="soft">
-                  {{ t('courses.noLessons') }}
+                  {{ t("courses.noLessons") }}
                 </UiAlert>
               </div>
             </template>
           </UiAccordion>
 
           <UiAlert v-else color="info" variant="soft">
-            {{ t('courses.noModules') }}
+            {{ t("courses.noModules") }}
           </UiAlert>
         </UiCard>
       </section>
@@ -204,61 +271,22 @@
                 </p>
               </div>
             </div>
-            <h3 class="course-editor__form-title">{{ t('courses.subtitle') }}</h3>
+            <h3 class="course-editor__form-title">
+              {{ t("courses.subtitle") }}
+            </h3>
           </div>
           <form class="course-editor__form" @submit.prevent="saveInfo">
-            <UiInput v-model="form.title" :label="t('courses.title')" required />
-            <UiTextarea v-model="form.description" :label="t('courses.descriptionLabel')" :rows="3" />
-            <UiSelect
-              :model-value="form.type"
-              :label="t('courses.typeLabel')"
-              @update:model-value="onCourseTypeChange"
-            >
-              <option v-for="option in courseTypes" :key="option.value" :value="option.value">
-                {{ option.title }}
-              </option>
-            </UiSelect>
-            <UiInput
-              :model-value="form.price"
-              type="number"
-              :label="t('courses.priceLabel')"
-              @update:model-value="onPriceChange"
-            />
-            <UiSelect
-              :model-value="form.currency"
-              :label="t('courses.currencyLabel')"
-              @update:model-value="onCurrencyChange"
-            >
-              <option v-for="option in currencyOptions" :key="option.value" :value="option.value">
-                {{ option.title }}
-              </option>
-            </UiSelect>
-            <UiSelect
-              v-model="form.level"
-              :label="t('courses.levelLabel')"
-              clearable
-              :clear-label="t('common.clear')"
-            >
-              <option v-for="level in courseLevels" :key="level.value" :value="level.value">
-                {{ level.title }}
-              </option>
-            </UiSelect>
-            <UiSelect
-              v-model="form.language"
-              :label="t('courses.languageLabel')"
-              clearable
-              :clear-label="t('common.clear')"
-            >
-              <option v-for="language in courseLanguages" :key="language.value" :value="language.value">
-                {{ language.title }}
-              </option>
-            </UiSelect>
+            <!-- <h1>edit course</h1> -->
+            <!-- <UploadVideo :courseId="{ courseId }" /> -->
             <section class="course-editor__thumbnail">
               <header class="course-editor__thumbnail-header">
-                <h4>{{ t('courses.thumbnailLabel') }}</h4>
-                <p>{{ t('courses.thumbnailHint') }}</p>
+                <h4>{{ t("courses.thumbnailLabel") }}</h4>
+                <p>{{ t("courses.thumbnailHint") }}</p>
               </header>
-              <div v-if="thumbnailPreviewUrl" class="course-editor__thumbnail-preview">
+              <div
+                v-if="thumbnailPreviewUrl"
+                class="course-editor__thumbnail-preview"
+              >
                 <img
                   :src="thumbnailPreviewUrl"
                   :alt="form.title || t('courses.thumbnailAlt')"
@@ -272,7 +300,7 @@
                     :disabled="!thumbnailPreviewUrl"
                     @click.prevent="openThumbnailPreview"
                   >
-                    {{ t('courses.thumbnailPreviewAction') }}
+                    {{ t("courses.thumbnailPreviewAction") }}
                   </UiButton>
                   <UiButton
                     variant="link"
@@ -280,14 +308,17 @@
                     color="danger"
                     @click.prevent="clearThumbnail"
                   >
-                    {{ t('courses.thumbnailRemoveAction') }}
+                    {{ t("courses.thumbnailRemoveAction") }}
                   </UiButton>
                 </div>
               </div>
               <UiAlert v-else variant="soft" color="info">
-                {{ t('courses.thumbnailEmpty') }}
+                {{ t("courses.thumbnailEmpty") }}
               </UiAlert>
-              <UiInput v-model="form.thumbnailUrl" :label="t('courses.thumbnailUrlLabel')" />
+              <UiInput
+                v-model="form.thumbnailUrl"
+                :label="t('courses.thumbnailUrlLabel')"
+              />
               <UiFileUpload
                 v-model="thumbnailFiles"
                 :label="t('courses.thumbnailUploadLabel')"
@@ -304,16 +335,422 @@
                 color="info"
                 :label="t('courses.thumbnailUploading')"
               />
-              <UiAlert v-if="thumbnailState.error" variant="soft" color="danger">
+              <UiAlert
+                v-if="thumbnailState.error"
+                variant="soft"
+                color="danger"
+              >
                 {{ thumbnailState.error }}
               </UiAlert>
             </section>
+            <div class="lesson-editor__upload">
+              <label class="lesson-editor__field-label">
+                {{ t("courses.CourseIntro") }}</label
+              >
+              <UiFileUpload
+                v-model="lessonVideoFiles"
+                :label="lessonVideoTexts.uploadLabel"
+                :hint="lessonVideoTexts.hint"
+                :disabled="lessonVideoState.uploading"
+                :button-label="lessonVideoTexts.browse"
+                accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo"
+                @change="onLessonVideoChange"
+              />
+              <UiAlert
+                v-if="lessonVideoState.uploading"
+                color="info"
+                variant="soft"
+              >
+                <div class="lesson-editor__upload-progress">
+                  <span>{{ lessonVideoTexts.uploading }}</span>
+                  <span
+                    v-if="lessonVideoState.progress > 0"
+                    class="lesson-editor__upload-progress-value"
+                  >
+                    {{ lessonVideoState.progress }}%
+                  </span>
+                </div>
+                <UiProgressBar
+                  :value="lessonVideoState.progress"
+                  color="info"
+                />
+              </UiAlert>
+              <UiAlert
+                v-else-if="lessonVideoState.error"
+                color="danger"
+                variant="soft"
+              >
+                {{ lessonVideoState.error }}
+              </UiAlert>
+              <UiAlert
+                v-else-if="form.videoUrl"
+                color="success"
+                variant="soft"
+                class="lesson-editor__upload-alert"
+              >
+                <span>{{ lessonVideoTexts.uploaded }}</span>
+                <UiButton
+                  variant="link"
+                  color="primary"
+                  @click.prevent="openLessonVideo"
+                >
+                  {{ lessonVideoTexts.preview }}
+                </UiButton>
+                <UiButton
+                  variant="link"
+                  color="danger"
+                  @click.prevent="clearLessonVideo"
+                >
+                  {{ lessonVideoTexts.remove }}
+                </UiButton>
+              </UiAlert>
+              <UiAlert
+                v-else
+                color="info"
+                variant="soft"
+                class="lesson-editor__empty-alert"
+              >
+                {{ lessonVideoTexts.empty }}
+              </UiAlert>
+              <UiAlert
+                v-if="lessonVideoState.warning"
+                color="warning"
+                variant="soft"
+              >
+                {{ lessonVideoState.warning }}
+              </UiAlert>
+              <UiAlert
+                v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
+                :color="
+                  lessonVideoStatusMeta(form.videoStatus)?.color || 'info'
+                "
+                variant="soft"
+                class="lesson-editor__status"
+              >
+                <div class="lesson-editor__status-title">
+                  {{ lessonVideoStatusMeta(form.videoStatus)?.banner?.title }}
+                </div>
+                <p class="lesson-editor__status-description">
+                  {{
+                    lessonVideoStatusMeta(form.videoStatus)?.banner?.description
+                  }}
+                </p>
+              </UiAlert>
+              <div
+                v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
+                class="lesson-editor__video-placeholder"
+              >
+                {{
+                  lessonVideoStatusMeta(form.videoStatus)?.banner?.placeholder
+                }}
+              </div>
+            </div>
+            <UiInput
+              v-model="form.title"
+              :label="t('courses.title')"
+              required
+            />
+            <label>{{ t("courses.whatYouWillLearn") }}</label>
+            <input
+              v-model="whatYouWillLearnItem"
+              placeholder="Enter text"
+              class="form-control"
+            />
+            <input
+              type="number"
+              v-model="whatYouWillLearnItemOrder"
+              placeholder="order"
+              class="form-control"
+            />
+            <button
+              type="button"
+              class="btn btn-add-item"
+              :disabled="!whatYouWillLearnItem"
+              @click="addItemToArr"
+            >
+              Add
+            </button>
+
+            <div
+              class="text-center"
+              v-for="(item, index) in whatYouWillLearnArray"
+              :key="index"
+            >
+              <textarea
+                style="min-height: 150px; width: 100%; margin-bottom: 10px"
+                v-model="item.learnText"
+                :placeholder="item.learnText"
+                class="form-control"
+              ></textarea>
+              <input
+                type="number"
+                v-model="item.ordered"
+                :placeholder="item.ordered"
+                class="form-control"
+              />
+              <!-- {{ item.text }} -->
+              <button
+                type="button"
+                class="ui-button ui-button--link ui-button--tone-danger"
+                @click="removeItem(index)"
+              >
+                <i
+                  style="color: red; font-weight: bold; margin-left: 10px"
+                  class="pi pi-trash"
+                ></i>
+              </button>
+            </div>
+
+            <!-- <label>{{ t("courses.whatYouWillLearn") }}</label>
+            <input type="text" v-model="learnItem" class="form-control" />
+            <button
+              type="button"
+              @click="addLearnitemToArray"
+              class="btn btn-add-item"
+            >
+              Add Item
+            </button>
+
+            <ul>
+              <li v-for="(item, index) in arrayItemsLast" :key="index">
+                {{ item.text }}
+              </li>
+            </ul> -->
+
+            <!-- <QuillEditor
+              v-model:content="form.whatYouWillLearn"
+              contentType="html"
+            /> -->
+            <!-- <UiInput v-model="form.hero" :label="'Hero Content'" /> -->
+
+            <label>{{ t("courses.courseRequirements") }}</label>
+            <QuillEditor
+              v-model:content="form.courseRequirements"
+              contentType="html"
+            />
+
+            <!-- <label>{{ t("courses.refundPolicy") }}</label>
+            <QuillEditor
+              v-model:content="form.refundPolicy"
+              contentType="html"
+            /> -->
+            <!-- <label>{{ t("courses.curriculum") }}</label>
+            <QuillEditor v-model:content="form.curriculum" contentType="html" /> -->
+            <!-- <UiTextarea
+              v-model="form.courseOverview"
+              :label="t('courses.courseOverview')"
+              :rows="3"
+            /> -->
+            <UiInput
+              v-model="form.instructor"
+              :label="t('courses.instructor')"
+            />
+            <!-- <UiInput v-model="form.pricing" :label="t('courses.pricing')" /> -->
+            <UiInput v-model="form.faq" :label="t('courses.faq')" />
+            <!-- <UiInput
+              v-model="form.certificateInfo"
+              :label="t('courses.certificateInfo')"
+            /> -->
+            <label>
+              <input type="checkbox" v-model="form.certificateInfo" />
+              {{ t("courses.certificateInfo") }}
+            </label>
+            <UiInput v-model="form.duration" :label="t('courses.duration')" />
+            <UiInput
+              v-model="form.targetAudience"
+              :label="t('courses.targetAudience')"
+            />
+            <!-- <UiInput
+              v-model="form.previewVideo"
+              :label="t('courses.previewVideo')"
+            /> -->
+            <!-- <section class="lesson-editor__section">
+              <h3 class="lesson-editor__section-title">
+                {{ t("courses.lessonMediaSectionTitle") }}
+              </h3>
+
+              <div class="lesson-editor__upload">
+                <label class="lesson-editor__field-label">{{
+                  lessonVideoTexts.label
+                }}</label>
+                <UiFileUpload
+                  v-model="lessonVideoFiles"
+                  :label="lessonVideoTexts.uploadLabel"
+                  :hint="lessonVideoTexts.hint"
+                  :disabled="lessonVideoState.uploading"
+                  :button-label="lessonVideoTexts.browse"
+                  accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo"
+                  @change="onLessonVideoChange"
+                />
+                <UiAlert
+                  v-if="lessonVideoState.uploading"
+                  color="info"
+                  variant="soft"
+                >
+                  <div class="lesson-editor__upload-progress">
+                    <span>{{ lessonVideoTexts.uploading }}</span>
+                    <span
+                      v-if="lessonVideoState.progress > 0"
+                      class="lesson-editor__upload-progress-value"
+                    >
+                      {{ lessonVideoState.progress }}%
+                    </span>
+                  </div>
+                  <UiProgressBar
+                    :value="lessonVideoState.progress"
+                    color="info"
+                  />
+                </UiAlert>
+                <UiAlert
+                  v-else-if="lessonVideoState.error"
+                  color="danger"
+                  variant="soft"
+                >
+                  {{ lessonVideoState.error }}
+                </UiAlert>
+                <UiAlert
+                  v-else-if="form.videoUrl"
+                  color="success"
+                  variant="soft"
+                  class="lesson-editor__upload-alert"
+                >
+                  <span>{{ lessonVideoTexts.uploaded }}</span>
+                  <UiButton
+                    variant="link"
+                    color="primary"
+                    @click.prevent="openLessonVideo"
+                  >
+                    {{ lessonVideoTexts.preview }}
+                  </UiButton>
+                  <UiButton
+                    variant="link"
+                    color="danger"
+                    @click.prevent="clearLessonVideo"
+                  >
+                    {{ lessonVideoTexts.remove }}
+                  </UiButton>
+                </UiAlert>
+                <UiAlert
+                  v-else
+                  color="info"
+                  variant="soft"
+                  class="lesson-editor__empty-alert"
+                >
+                  {{ lessonVideoTexts.empty }}
+                </UiAlert>
+                <UiAlert
+                  v-if="lessonVideoState.warning"
+                  color="warning"
+                  variant="soft"
+                >
+                  {{ lessonVideoState.warning }}
+                </UiAlert>
+                <UiAlert
+                  v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
+                  :color="
+                    lessonVideoStatusMeta(form.videoStatus)?.color || 'info'
+                  "
+                  variant="soft"
+                  class="lesson-editor__status"
+                >
+                  <div class="lesson-editor__status-title">
+                    {{ lessonVideoStatusMeta(form.videoStatus)?.banner?.title }}
+                  </div>
+                  <p class="lesson-editor__status-description">
+                    {{
+                      lessonVideoStatusMeta(form.videoStatus)?.banner
+                        ?.description
+                    }}
+                  </p>
+                </UiAlert>
+                <div
+                  v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
+                  class="lesson-editor__video-placeholder"
+                >
+                  {{
+                    lessonVideoStatusMeta(form.videoStatus)?.banner?.placeholder
+                  }}
+                </div>
+              </div>
+            </section> -->
+            <UiTextarea
+              v-model="form.description"
+              :label="t('courses.descriptionLabel')"
+              :rows="3"
+            />
+            <UiSelect
+              :model-value="form.type"
+              :label="t('courses.typeLabel')"
+              @update:model-value="onCourseTypeChange"
+            >
+              <option
+                v-for="option in courseTypes"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.title }}
+              </option>
+            </UiSelect>
+            <UiInput
+              :model-value="form.price"
+              type="number"
+              :label="t('courses.priceLabel')"
+              @update:model-value="onPriceChange"
+            />
+            <UiSelect
+              :model-value="form.currency"
+              :label="t('courses.currencyLabel')"
+              @update:model-value="onCurrencyChange"
+            >
+              <option
+                v-for="option in currencyOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.title }}
+              </option>
+            </UiSelect>
+            <UiSelect
+              v-model="form.level"
+              :label="t('courses.levelLabel')"
+              clearable
+              :clear-label="t('common.clear')"
+            >
+              <option
+                v-for="level in courseLevels"
+                :key="level.value"
+                :value="level.value"
+              >
+                {{ level.title }}
+              </option>
+            </UiSelect>
+            <UiSelect
+              v-model="form.language"
+              :label="t('courses.languageLabel')"
+              clearable
+              :clear-label="t('common.clear')"
+            >
+              <option
+                v-for="language in courseLanguages"
+                :key="language.value"
+                :value="language.value"
+              >
+                {{ language.title }}
+              </option>
+            </UiSelect>
+
             <div class="course-editor__status">
               <UiSwitch
                 v-model="form.active"
-                :label="form.active ? t('courses.statusActive') : t('courses.statusInactive')"
+                :label="
+                  form.active
+                    ? t('courses.statusActive')
+                    : t('courses.statusInactive')
+                "
               />
-              <p class="course-editor__status-hint">{{ t('courses.statusHint') }}</p>
+              <p class="course-editor__status-hint">
+                {{ t("courses.statusHint") }}
+              </p>
             </div>
             <UiButton
               button-type="submit"
@@ -321,7 +758,7 @@
               prepend-icon="SaveOutlined"
               :disabled="thumbnailState.uploading"
             >
-              {{ t('common.save') }}
+              {{ t("common.save") }}
             </UiButton>
           </form>
         </UiCard>
@@ -334,16 +771,19 @@
     </div>
 
     <UiDialog v-model="moduleDialog.open" :title="moduleDialogTitle">
-       <form
+      <form
         id="module-dialog-form"
         class="course-editor__dialog-form"
         @submit.prevent="submitModule"
       >
- 
         <UiInput
           v-model="moduleDialog.form.title"
           :label="t('courses.moduleTitleLabel')"
-          :error="moduleDialogAttempt && !moduleFormValid ? t('courses.moduleTitleRequired') : ''"
+          :error="
+            moduleDialogAttempt && !moduleFormValid
+              ? t('courses.moduleTitleRequired')
+              : ''
+          "
           required
           autofocus
         />
@@ -354,11 +794,13 @@
           :label="t('courses.positionLabel')"
           @update:model-value="onModulePositionChange"
         />
-        <p class="course-editor__dialog-hint">{{ t('courses.modulePositionHelp') }}</p>
-       </form>
+        <p class="course-editor__dialog-hint">
+          {{ t("courses.modulePositionHelp") }}
+        </p>
+      </form>
       <template #footer>
         <UiButton variant="link" color="secondary" @click="closeModuleDialog">
-          {{ t('common.cancel') }}
+          {{ t("common.cancel") }}
         </UiButton>
         <UiButton
           button-type="submit"
@@ -366,53 +808,62 @@
           :disabled="!moduleFormValid"
           form="module-dialog-form"
         >
-          {{ t('common.save') }}
+          {{ t("common.save") }}
         </UiButton>
       </template>
     </UiDialog>
-
   </ThemePage>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch, onMounted, ref } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { useCoursesStore } from '@/stores/courses';
-import { useTeacherUsageStore } from '@/stores/teacherUsage';
-import type { ModulePayload, LessonPayload, LessonVideoStatus } from '@/stores/courses';
-import api from '@/services/api';
-import { buildAuthenticatedMediaUrl } from '@/utils/media';
-import { getHttpStatus, isAuthorizationError } from '@/utils/httpError';
+import { reactive, computed, watch, onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { useCoursesStore } from "@/stores/courses";
+import { useTeacherUsageStore } from "@/stores/teacherUsage";
+import { QuillEditor } from "@vueup/vue-quill";
+import "@vueup/vue-quill/dist/vue-quill.snow.css";
+import type {
+  ModulePayload,
+  LessonPayload,
+  LessonVideoStatus,
+} from "@/stores/courses";
+import api from "@/services/api";
+import { buildAuthenticatedMediaUrl } from "@/utils/media";
+import { getHttpStatus, isAuthorizationError } from "@/utils/httpError";
 import {
   LESSON_UPLOAD_MAX_SIZE_MB,
   LESSON_UPLOAD_MAX_SIZE_BYTES,
   extractLessonUploadLimitMb,
-  resolveLessonUploadLimitMb
-} from '@/constants/uploads';
-import { extractVideoMetadata, MAX_LESSON_VIDEO_DURATION_SECONDS } from '@/utils/videoMetadata';
-import ThemePage from '@/layout/theme/ThemePage.vue';
-import UiAlert from '@/components/ui/UiAlert.vue';
-import UiAccordion from '@/components/ui/UiAccordion.vue';
-import type { UiAccordionItem } from '@/components/ui/UiAccordion.vue';
-import UiButton from '@/components/ui/UiButton.vue';
-import UiCard from '@/components/ui/UiCard.vue';
-import UiDialog from '@/components/ui/UiDialog.vue';
-import UiInput from '@/components/ui/UiInput.vue';
-import UiSelect from '@/components/ui/UiSelect.vue';
-import UiTextarea from '@/components/ui/UiTextarea.vue';
-import UiSkeleton from '@/components/ui/UiSkeleton.vue';
-import UiTag from '@/components/ui/UiTag.vue';
-import UiFileUpload from '@/components/ui/UiFileUpload.vue';
-import UiProgressBar from '@/components/ui/UiProgressBar.vue';
-import UiSwitch from '@/components/ui/UiSwitch.vue';
-import { useToast } from '@/composables/useToast';
-import MediaVideoPlayer from '@/components/media/MediaVideoPlayer.vue';
+  resolveLessonUploadLimitMb,
+} from "@/constants/uploads";
+import {
+  extractVideoMetadata,
+  MAX_LESSON_VIDEO_DURATION_SECONDS,
+} from "@/utils/videoMetadata";
+import ThemePage from "@/layout/theme/ThemePage.vue";
+import UiAlert from "@/components/ui/UiAlert.vue";
 
-type DialogMode = 'create' | 'edit';
- 
+import UiAccordion from "@/components/ui/UiAccordion.vue";
+import type { UiAccordionItem } from "@/components/ui/UiAccordion.vue";
+import UiButton from "@/components/ui/UiButton.vue";
+import UiCard from "@/components/ui/UiCard.vue";
+import UiDialog from "@/components/ui/UiDialog.vue";
+import UiInput from "@/components/ui/UiInput.vue";
+import UiSelect from "@/components/ui/UiSelect.vue";
+import UiTextarea from "@/components/ui/UiTextarea.vue";
+import UiSkeleton from "@/components/ui/UiSkeleton.vue";
+import UiTag from "@/components/ui/UiTag.vue";
+import UiFileUpload from "@/components/ui/UiFileUpload.vue";
+import UiProgressBar from "@/components/ui/UiProgressBar.vue";
+import UiSwitch from "@/components/ui/UiSwitch.vue";
+import { useToast } from "@/composables/useToast";
+import MediaVideoPlayer from "@/components/media/MediaVideoPlayer.vue";
+import UploadVideo from "@/components/uploadVideo/UploadVideo.vue";
 
+type DialogMode = "create" | "edit";
+const editorVal = ref("");
 const route = useRoute();
 const router = useRouter();
 const { t, te } = useI18n();
@@ -421,15 +872,67 @@ const usageStore = useTeacherUsageStore();
 const { summary: usageSummary } = storeToRefs(usageStore);
 const courseId = Number(route.params.courseId);
 const toast = useToast();
-
 const course = computed(() => store.current);
-const pageTitle = computed(() => course.value?.title || t('courses.untitled'));
-const courseSubtitle = computed(() => course.value?.description || t('courses.subtitle'));
-const SUPPORTED_COURSE_CURRENCIES = ['EGP', 'AED', 'SAR', 'USD'] as const;
+const pageTitle = computed(() => course.value?.title || t("courses.untitled"));
+const courseSubtitle = computed(
+  () => course.value?.description || t("courses.subtitle")
+);
+const SUPPORTED_COURSE_CURRENCIES = ["EGP", "AED", "SAR", "USD"] as const;
 
+const selectedFile = ref(null);
+const videoUrl = ref(null);
+const error = ref("");
+
+// Validation rules
+const maxSizeMB = 50;
+const allowedTypes = ["video/mp4", "video/webm", "video/ogg"];
+
+function handleFileChange(event: any) {
+  error.value = "";
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  // ✅ Type validation
+  if (!allowedTypes.includes(file.type)) {
+    error.value = "Only MP4, WebM, and OGG videos are allowed.";
+    return;
+  }
+
+  // ✅ Size validation
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    error.value = `File must be smaller than ${maxSizeMB}MB.`;
+    return;
+  }
+
+  selectedFile.value = file;
+  uploadVideo();
+  // Preview
+  // videoUrl.value = URL.createObjectURL(file);
+}
+
+async function uploadVideo() {
+  console.log(courseId);
+  if (!selectedFile.value) return;
+
+  const formData = new FormData();
+  formData.append("file", selectedFile.value);
+  ///api/v1/teacher/courses/{courseId}/preview-video
+  try {
+    await fetch(`/api/v1/teacher/courses/${courseId}/preview-video`, {
+      method: "POST",
+      body: formData,
+    });
+
+    alert("Upload successful!");
+  } catch (err) {
+    error.value = "Upload failed.";
+    console.log(err);
+  }
+}
 const maxVideoDurationSeconds = computed(() => {
   const minutes = usageSummary.value?.maxVideoDurationMinutes ?? null;
-  if (typeof minutes === 'number' && minutes > 0) {
+  if (typeof minutes === "number" && minutes > 0) {
     return Math.round(minutes * 60);
   }
   return MAX_LESSON_VIDEO_DURATION_SECONDS;
@@ -437,11 +940,11 @@ const maxVideoDurationSeconds = computed(() => {
 
 const resolveCurrency = (value?: string | number | null) => {
   const raw =
-    typeof value === 'number'
+    typeof value === "number"
       ? String(value)
-      : typeof value === 'string'
-        ? value
-        : '';
+      : typeof value === "string"
+      ? value
+      : "";
   const normalized = raw.trim().toUpperCase();
   return SUPPORTED_COURSE_CURRENCIES.includes(
     normalized as (typeof SUPPORTED_COURSE_CURRENCIES)[number]
@@ -449,57 +952,71 @@ const resolveCurrency = (value?: string | number | null) => {
     ? normalized
     : SUPPORTED_COURSE_CURRENCIES[0];
 };
+const learnItem = ref<any>("");
+
+const arrayItemsLast = ref<any>([]);
 
 const currencyOptions = computed(() => [
-  { title: t('courses.currencyOptionEGP'), value: 'EGP' },
-  { title: t('courses.currencyOptionAED'), value: 'AED' },
-  { title: t('courses.currencyOptionSAR'), value: 'SAR' },
-  { title: t('courses.currencyOptionUSD'), value: 'USD' }
+  { title: t("courses.currencyOptionEGP"), value: "EGP" },
+  { title: t("courses.currencyOptionAED"), value: "AED" },
+  { title: t("courses.currencyOptionSAR"), value: "SAR" },
+  { title: t("courses.currencyOptionUSD"), value: "USD" },
 ]);
 
 const courseTypes = computed(() => [
-  { title: t('courses.typeRecorded'), value: 'recorded' },
-  { title: t('courses.typeLive'), value: 'live' },
-  { title: t('courses.typeBlended'), value: 'blended' }
+  { title: t("courses.typeRecorded"), value: "recorded" },
+  { title: t("courses.typeLive"), value: "live" },
+  { title: t("courses.typeBlended"), value: "blended" },
 ]);
 const courseLevels = computed(() => [
-  { title: t('courses.levelDefault'), value: '' },
-  { title: t('courses.levelBeginner'), value: 'beginner' },
-  { title: t('courses.levelIntermediate'), value: 'intermediate' },
-  { title: t('courses.levelAdvanced'), value: 'advanced' }
+  { title: t("courses.levelDefault"), value: "" },
+  { title: t("courses.levelBeginner"), value: "beginner" },
+  { title: t("courses.levelIntermediate"), value: "intermediate" },
+  { title: t("courses.levelAdvanced"), value: "advanced" },
 ]);
 const courseLanguages = computed(() => [
-  { title: t('courses.languageDefault'), value: '' },
-  { title: t('courses.languageArabic'), value: 'ar' },
-  { title: t('courses.languageEnglish'), value: 'en' },
-  { title: t('courses.languageFrench'), value: 'fr' },
-  { title: t('courses.languageSpanish'), value: 'es' }
+  { title: t("courses.languageDefault"), value: "" },
+  { title: t("courses.languageArabic"), value: "ar" },
+  { title: t("courses.languageEnglish"), value: "en" },
+  { title: t("courses.languageFrench"), value: "fr" },
+  { title: t("courses.languageSpanish"), value: "es" },
 ]);
 const form = reactive({
-  title: '',
-  description: '',
-  type: 'recorded',
+  title: "",
+  description: "",
+  // courseOverview: "",
+  instructor: "",
+  faq: "",
+  certificateInfo: false,
+  duration: "",
+  targetAudience: "",
+  // previewVideo: "",
+  type: "recorded",
   price: 0,
   currency: resolveCurrency(),
-  level: '',
-  language: '',
-  thumbnailUrl: '',
-  active: false
+  level: "",
+  language: "",
+  thumbnailUrl: "",
+  active: false,
+  whatYouWillLearn: [],
+  courseRequirements: "",
+  // refundPolicy: "",
+  // curriculum: "",
 });
 
 const visibilityAlert = computed(() => {
   if (form.active) {
     return {
-      state: 'published',
-      heading: t('courses.visibilityPublishedLabel'),
-      message: t('courses.visibilityPublishedNotice')
+      state: "published",
+      heading: t("courses.visibilityPublishedLabel"),
+      message: t("courses.visibilityPublishedNotice"),
     } as const;
   }
 
   return {
-    state: 'draft',
-    heading: t('courses.visibilityDraftLabel'),
-    message: t('courses.visibilityDraftNotice')
+    state: "draft",
+    heading: t("courses.visibilityDraftLabel"),
+    message: t("courses.visibilityDraftNotice"),
   } as const;
 });
 
@@ -508,38 +1025,38 @@ const LESSON_CONTENT_RECOMMENDED_MAX = 600;
 
 const moduleDialog = reactive({
   open: false,
-  mode: 'create' as DialogMode,
+  mode: "create" as DialogMode,
   moduleId: null as number | null,
   form: {
-    title: '',
-    position: 1 as number | null
-  }
+    title: "",
+    position: 1 as number | null,
+  },
 });
 
 const lessonDialog = reactive({
   open: false,
-  mode: 'create' as DialogMode,
+  mode: "create" as DialogMode,
   moduleId: null as number | null,
   lessonId: null as number | null,
   form: {
-    title: '',
-    content: '',
-    ytId: '',
-    pdfUrl: '',
+    title: "",
+    content: "",
+    ytId: "",
+    pdfUrl: "",
     videoUrl: null as string | null,
     videoStorageKey: null as string | null,
     bunnyVideoId: null as string | null,
     videoStatus: null as LessonVideoStatus | null,
     duration: null as number | null,
-    position: 1 as number | null
-  }
+    position: 1 as number | null,
+  },
 });
 
 const thumbnailFiles = ref<File[]>([]);
 const thumbnailState = reactive({
   uploading: false,
-  error: '',
-  progress: 0
+  error: "",
+  progress: 0,
 });
 const thumbnailVersion = ref<number | null>(null);
 
@@ -549,32 +1066,60 @@ const lessonDialogAttempt = ref(false);
 const lessonVideoFiles = ref<File[]>([]);
 const lessonVideoState = reactive({
   uploading: false,
-  error: '',
-  warning: '',
-  progress: 0
+  error: "",
+  warning: "",
+  progress: 0,
 });
+function removeItem(index: any) {
+  whatYouWillLearnArray.value.splice(index, 1);
+}
+const addLearnitemToArray = () => {
+  arrayItemsLast.value.push({
+    text: learnItem,
+  });
+  console.log(arrayItemsLast);
+  learnItem.value = "";
+};
+
+const whatYouWillLearnItem = ref<any>("");
+const whatYouWillLearnItemOrder = ref<any>("");
+const whatYouWillLearnArray = ref<any>([]);
+
+function addItemToArr() {
+  if (!whatYouWillLearnItem.value) return;
+
+  whatYouWillLearnArray.value.push({
+    learnText: whatYouWillLearnItem.value,
+    ordered: whatYouWillLearnItemOrder.value,
+  });
+
+  whatYouWillLearnItem.value = "";
+  whatYouWillLearnItemOrder.value = 0;
+}
 
 const lessonPdfFiles = ref<File[]>([]);
 const lessonPdfState = reactive({
   uploading: false,
-  error: '',
-  progress: 0
+  error: "",
+  progress: 0,
 });
 
 const thumbnailPreviewUrl = computed(() => {
   const trimmed = form.thumbnailUrl.trim();
   if (!trimmed) {
-    return '';
+    return "";
   }
-  const preview = buildAuthenticatedMediaUrl(trimmed, { version: thumbnailVersion.value });
+  const preview = buildAuthenticatedMediaUrl(trimmed, {
+    version: thumbnailVersion.value,
+  });
   return preview || trimmed;
 });
 
 watch(
   () => form.thumbnailUrl,
   (next, prev) => {
-    const nextTrimmed = (next ?? '').trim();
-    const prevTrimmed = (prev ?? '').trim();
+    const nextTrimmed = (next ?? "").trim();
+    const prevTrimmed = (prev ?? "").trim();
     if (nextTrimmed === prevTrimmed) {
       return;
     }
@@ -587,15 +1132,22 @@ const translateCourseString = (key: string, fallback: string) =>
   te(key) ? t(key) : fallback;
 
 const LESSON_VIDEO_TOO_LARGE_FALLBACK =
-  'The video exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.';
+  "The video exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.";
 const LESSON_PDF_TOO_LARGE_FALLBACK =
-  'The PDF exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.';
+  "The PDF exceeds the {size} MB upload limit. Try compressing it or choose a smaller file.";
 const LESSON_UPLOAD_FORBIDDEN_FALLBACK =
   "You don't have permission to upload files right now. Please refresh the page and try again.";
 
-const formatUploadTooLargeMessage = (key: string, fallback: string, limit?: number | null) => {
+const formatUploadTooLargeMessage = (
+  key: string,
+  fallback: string,
+  limit?: number | null
+) => {
   const effectiveLimit = resolveLessonUploadLimitMb(limit);
-  return translateCourseString(key, fallback).replace('{size}', effectiveLimit.toString());
+  return translateCourseString(key, fallback).replace(
+    "{size}",
+    effectiveLimit.toString()
+  );
 };
 
 const buildUploadErrorMessage = (
@@ -623,7 +1175,9 @@ const buildUploadErrorMessage = (
   return options.uploadFailedMessage;
 };
 
-const lessonContentLength = computed(() => lessonDialog.form.content.trim().length);
+const lessonContentLength = computed(
+  () => lessonDialog.form.content.trim().length
+);
 
 type UploadProgressEvent = { loaded: number; total?: number | null };
 
@@ -631,10 +1185,8 @@ const logUploadProgress = (kind: string, progress: number) => {
   console.debug(`[upload ${kind}] ${progress}%`);
 };
 
-const createUploadProgressHandler = (
-  kind: string,
-  onProgress?: (progress: number) => void
-) =>
+const createUploadProgressHandler =
+  (kind: string, onProgress?: (progress: number) => void) =>
   (event: UploadProgressEvent) => {
     const total = event.total ?? 0;
     if (total <= 0) {
@@ -642,7 +1194,10 @@ const createUploadProgressHandler = (
       logUploadProgress(kind, 0);
       return;
     }
-    const progress = Math.min(100, Math.max(0, Math.floor((event.loaded / total) * 100)));
+    const progress = Math.min(
+      100,
+      Math.max(0, Math.floor((event.loaded / total) * 100))
+    );
     onProgress?.(progress);
     logUploadProgress(kind, progress);
   };
@@ -654,15 +1209,19 @@ const uploadBinaryWithProgress = async (
   onProgress?: (progress: number) => void
 ) => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
-  const { data } = await api.post<{ url: string; key?: string }>(url, formData, {
-    // Disable Axios timeout so large uploads can complete on slow connections
-    timeout: 0,
-    withCredentials: true,
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: createUploadProgressHandler(kind, onProgress)
-  });
+  const { data } = await api.post<{ url: string; key?: string }>(
+    url,
+    formData,
+    {
+      // Disable Axios timeout so large uploads can complete on slow connections
+      timeout: 0,
+      withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: createUploadProgressHandler(kind, onProgress),
+    }
+  );
 
   if (onProgress) {
     onProgress(100);
@@ -678,158 +1237,193 @@ const lessonContentOutOfRange = computed(
       lessonContentLength.value > LESSON_CONTENT_RECOMMENDED_MAX)
 );
 const lessonContentHint = computed(() =>
-  t('courses.lessonContentHint', {
+  t("courses.lessonContentHint", {
     min: LESSON_CONTENT_RECOMMENDED_MIN,
     max: LESSON_CONTENT_RECOMMENDED_MAX,
-    count: lessonContentLength.value
+    count: lessonContentLength.value,
   })
 );
 
 const lessonYoutubeHint = computed(() =>
   translateCourseString(
-    'courses.lessonYoutubeHint',
-    'Paste the full YouTube link or ID (e.g. https://youtu.be/abcd1234efg).'
+    "courses.lessonYoutubeHint",
+    "Paste the full YouTube link or ID (e.g. https://youtu.be/abcd1234efg)."
   )
 );
 
 const lessonVideoTexts = computed(() => ({
-  tag: translateCourseString('courses.lessonVideoTag', 'Video'),
-  label: translateCourseString('courses.lessonVideoLabel', 'Lesson video'),
+  tag: translateCourseString("courses.lessonVideoTag", "Video"),
+  label: translateCourseString("courses.lessonVideoLabel", "Lesson video"),
   uploadLabel: translateCourseString(
-    'courses.lessonVideoUploadLabel',
-    'Drag a video here or click to upload'
+    "courses.lessonVideoUploadLabel",
+    "Drag a video here or click to upload"
   ),
-  browse: translateCourseString('courses.lessonVideoBrowse', 'Select video'),
+  browse: translateCourseString("courses.lessonVideoBrowse", "Select video"),
   hint: translateCourseString(
-    'courses.lessonVideoHint',
-    'Accepted formats: MP4, MOV, MKV, WEBM, or AVI.'
+    "courses.lessonVideoHint",
+    "Accepted formats: MP4, MOV, MKV, WEBM, or AVI."
   ),
-  uploading: translateCourseString('courses.lessonVideoUploading', 'Uploading video...'),
-  uploaded: translateCourseString('courses.lessonVideoUploaded', 'Video uploaded.'),
-  preview: translateCourseString('courses.lessonVideoPreview', 'Open link'),
-  remove: translateCourseString('courses.lessonVideoRemove', 'Remove video'),
+  uploading: translateCourseString(
+    "courses.lessonVideoUploading",
+    "Uploading video..."
+  ),
+  uploaded: translateCourseString(
+    "courses.lessonVideoUploaded",
+    "Video uploaded."
+  ),
+  preview: translateCourseString("courses.lessonVideoPreview", "Open link"),
+  remove: translateCourseString("courses.lessonVideoRemove", "Remove video"),
   uploadFailed: translateCourseString(
-    'courses.lessonVideoUploadFailed',
+    "courses.lessonVideoUploadFailed",
     "We couldn't upload the video. Please try again."
   ),
   forbidden: translateCourseString(
-    'courses.lessonUploadForbidden',
+    "courses.lessonUploadForbidden",
     LESSON_UPLOAD_FORBIDDEN_FALLBACK
   ),
   tooLarge: formatUploadTooLargeMessage(
-    'courses.lessonVideoTooLarge',
+    "courses.lessonVideoTooLarge",
     LESSON_VIDEO_TOO_LARGE_FALLBACK
   ),
   empty: translateCourseString(
-    'courses.lessonVideoEmpty',
-    'No video uploaded yet. Add one to give learners a walkthrough.'
-  )
+    "courses.lessonVideoEmpty",
+    "No video uploaded yet. Add one to give learners a walkthrough."
+  ),
 }));
 
 const lessonVideoStatusMap = computed(() => {
   const processingBanner = {
     title: translateCourseString(
-      'courses.lessonVideoProcessingBannerTitle',
-      'Video is being prepared'
+      "courses.lessonVideoProcessingBannerTitle",
+      "Video is being prepared"
     ),
     description: translateCourseString(
-      'courses.lessonVideoProcessingBannerDescription',
-      'Usually takes 3-5 minutes. You can keep editing the lesson and course now.'
+      "courses.lessonVideoProcessingBannerDescription",
+      "Usually takes 3-5 minutes. You can keep editing the lesson and course now."
     ),
     placeholder: translateCourseString(
-      'courses.lessonVideoProcessingPlaceholder',
-      'Video is processing… It will play automatically once it is ready.'
-    )
+      "courses.lessonVideoProcessingPlaceholder",
+      "Video is processing… It will play automatically once it is ready."
+    ),
   };
 
   const failedBanner = {
     title: translateCourseString(
-      'courses.lessonVideoFailedBannerTitle',
-      'Processing failed'
+      "courses.lessonVideoFailedBannerTitle",
+      "Processing failed"
     ),
     description: translateCourseString(
-      'courses.lessonVideoFailedBannerDescription',
-      'Please try uploading the video again.'
+      "courses.lessonVideoFailedBannerDescription",
+      "Please try uploading the video again."
     ),
     placeholder: translateCourseString(
-      'courses.lessonVideoFailedPlaceholder',
-      'Video is unavailable until processing completes successfully.'
-    )
+      "courses.lessonVideoFailedPlaceholder",
+      "Video is unavailable until processing completes successfully."
+    ),
   };
 
   return {
     UPLOADING: {
-      label: translateCourseString('courses.lessonVideoStatusUploading', 'Uploading video'),
-      color: 'info',
+      label: translateCourseString(
+        "courses.lessonVideoStatusUploading",
+        "Uploading video"
+      ),
+      color: "info",
       banner: processingBanner,
-      showPlayer: false
+      showPlayer: false,
     },
     PROCESSING: {
-      label: translateCourseString('courses.lessonVideoStatusProcessing', 'Processing video'),
-      color: 'warning',
+      label: translateCourseString(
+        "courses.lessonVideoStatusProcessing",
+        "Processing video"
+      ),
+      color: "warning",
       banner: processingBanner,
-      showPlayer: false
+      showPlayer: false,
     },
     READY: {
-      label: translateCourseString('courses.lessonVideoStatusReady', 'Ready to watch'),
-      color: 'success',
-      showPlayer: true
+      label: translateCourseString(
+        "courses.lessonVideoStatusReady",
+        "Ready to watch"
+      ),
+      color: "success",
+      showPlayer: true,
     },
     FAILED: {
       label: translateCourseString(
-        'courses.lessonVideoStatusFailed',
-        'Processing failed — please re-upload the video'
+        "courses.lessonVideoStatusFailed",
+        "Processing failed — please re-upload the video"
       ),
-      color: 'danger',
+      color: "danger",
       banner: failedBanner,
-      showPlayer: false
+      showPlayer: false,
+    },
+  } as Record<
+    LessonVideoStatus,
+    {
+      label: string;
+      color: string;
+      banner?: {
+        title: string;
+        description: string;
+        placeholder: string;
+      };
+      showPlayer?: boolean;
     }
-  } as Record<LessonVideoStatus, { label: string; color: string; banner?: {
-    title: string;
-    description: string;
-    placeholder: string;
-  }; showPlayer?: boolean }>;
+  >;
 });
 
 const lessonVideoStatusMeta = (status?: LessonVideoStatus | null) =>
   (status ? lessonVideoStatusMap.value[status] : null) ?? null;
 
 const lessonPdfTexts = computed(() => ({
-  label: translateCourseString('courses.lessonPdfLabel', 'Lesson attachment (PDF)'),
-  uploadLabel: translateCourseString(
-    'courses.lessonPdfUploadLabel',
-    'Drag a PDF here or click to upload'
+  label: translateCourseString(
+    "courses.lessonPdfLabel",
+    "Lesson attachment (PDF)"
   ),
-  browse: translateCourseString('courses.lessonPdfBrowse', 'Select PDF'),
-  hint: translateCourseString('courses.lessonPdfHint', 'Only PDF files are supported.'),
-  uploading: translateCourseString('courses.lessonPdfUploading', 'Uploading PDF...'),
-  uploaded: translateCourseString('courses.lessonPdfUploaded', 'PDF uploaded.'),
-  preview: translateCourseString('courses.lessonPdfPreview', 'Open attachment'),
-  remove: translateCourseString('courses.lessonPdfRemove', 'Remove attachment'),
+  uploadLabel: translateCourseString(
+    "courses.lessonPdfUploadLabel",
+    "Drag a PDF here or click to upload"
+  ),
+  browse: translateCourseString("courses.lessonPdfBrowse", "Select PDF"),
+  hint: translateCourseString(
+    "courses.lessonPdfHint",
+    "Only PDF files are supported."
+  ),
+  uploading: translateCourseString(
+    "courses.lessonPdfUploading",
+    "Uploading PDF..."
+  ),
+  uploaded: translateCourseString("courses.lessonPdfUploaded", "PDF uploaded."),
+  preview: translateCourseString("courses.lessonPdfPreview", "Open attachment"),
+  remove: translateCourseString("courses.lessonPdfRemove", "Remove attachment"),
   uploadFailed: translateCourseString(
-    'courses.lessonPdfUploadFailed',
+    "courses.lessonPdfUploadFailed",
     "We couldn't upload the PDF. Please try again."
   ),
-  forbidden: translateCourseString('courses.lessonUploadForbidden', LESSON_UPLOAD_FORBIDDEN_FALLBACK),
+  forbidden: translateCourseString(
+    "courses.lessonUploadForbidden",
+    LESSON_UPLOAD_FORBIDDEN_FALLBACK
+  ),
   tooLarge: formatUploadTooLargeMessage(
-    'courses.lessonPdfTooLarge',
+    "courses.lessonPdfTooLarge",
     LESSON_PDF_TOO_LARGE_FALLBACK
   ),
   empty: translateCourseString(
-    'courses.lessonPdfEmpty',
-    'No PDF attached yet. Share worksheets or readings to guide learners.'
-  )
+    "courses.lessonPdfEmpty",
+    "No PDF attached yet. Share worksheets or readings to guide learners."
+  ),
 }));
 
 const isPayloadTooLargeError = (error: unknown) => getHttpStatus(error) === 413;
 
 function extractYoutubeId(value?: string | null) {
-  if (!value) return '';
+  if (!value) return "";
   const trimmed = value.trim();
-  if (!trimmed) return '';
+  if (!trimmed) return "";
   const patterns = [
     /youtu\.be\/([\w-]{11})/i,
-    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i
+    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i,
   ];
   for (const pattern of patterns) {
     const match = trimmed.match(pattern);
@@ -844,8 +1438,8 @@ function extractYoutubeId(value?: string | null) {
 }
 
 function formatYoutubeDisplay(value?: string | null) {
-  const trimmed = value?.trim() ?? '';
-  if (!trimmed) return '';
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed) return "";
   const id = extractYoutubeId(trimmed);
   if (id && /^[\w-]{11}$/.test(id)) {
     return `https://youtu.be/${id}`;
@@ -858,7 +1452,7 @@ interface LessonProgressSection {
   label: string;
   description: string;
   statusLabel: string;
-  tagColor: 'success' | 'warning' | 'danger' | 'info';
+  tagColor: "success" | "warning" | "danger" | "info";
   complete: boolean;
   optional: boolean;
   weight: number;
@@ -880,8 +1474,8 @@ const lessonProgressSections = computed<LessonProgressSection[]>(() => {
   const schedulingComplete = (() => {
     const duration = lessonDialog.form.duration;
     const position = lessonDialog.form.position;
-    const hasDuration = typeof duration === 'number' && duration > 0;
-    const hasPosition = typeof position === 'number' && position > 0;
+    const hasDuration = typeof duration === "number" && duration > 0;
+    const hasPosition = typeof position === "number" && position > 0;
     return hasDuration && hasPosition;
   })();
 
@@ -897,51 +1491,63 @@ const lessonProgressSections = computed<LessonProgressSection[]>(() => {
     optional: boolean;
   }> = [
     {
-      key: 'details',
-      labelKey: 'courses.lessonProgressDetails',
-      descriptionKey: 'courses.lessonProgressDetailsHint',
-      descriptionCompleteKey: 'courses.lessonProgressDetailsHintDone',
-      descriptionFallback: 'Add a clear title and summary so learners know what to expect.',
+      key: "details",
+      labelKey: "courses.lessonProgressDetails",
+      descriptionKey: "courses.lessonProgressDetailsHint",
+      descriptionCompleteKey: "courses.lessonProgressDetailsHintDone",
+      descriptionFallback:
+        "Add a clear title and summary so learners know what to expect.",
       descriptionCompleteFallback:
-        'Great! Learners will see the title and summary in the module list.',
-      labelFallback: 'Lesson basics',
+        "Great! Learners will see the title and summary in the module list.",
+      labelFallback: "Lesson basics",
       complete: detailsComplete,
       optional: false,
     },
     {
-      key: 'media',
-      labelKey: 'courses.lessonProgressMedia',
-      descriptionKey: 'courses.lessonProgressMediaHint',
-      descriptionCompleteKey: 'courses.lessonProgressMediaHintDone',
-      descriptionFallback: 'Attach at least one video or PDF so students can review materials.',
+      key: "media",
+      labelKey: "courses.lessonProgressMedia",
+      descriptionKey: "courses.lessonProgressMediaHint",
+      descriptionCompleteKey: "courses.lessonProgressMediaHintDone",
+      descriptionFallback:
+        "Attach at least one video or PDF so students can review materials.",
       descriptionCompleteFallback:
-        'Media is ready. Learners can watch or download supporting resources.',
-      labelFallback: 'Resources & media',
+        "Media is ready. Learners can watch or download supporting resources.",
+      labelFallback: "Resources & media",
       complete: mediaComplete,
       optional: true,
     },
     {
-      key: 'schedule',
-      labelKey: 'courses.lessonProgressSchedule',
-      descriptionKey: 'courses.lessonProgressScheduleHint',
-      descriptionCompleteKey: 'courses.lessonProgressScheduleHintDone',
-      descriptionFallback: 'Set duration and position to help learners plan their time.',
-      descriptionCompleteFallback: 'Timing and order are set for this lesson.',
-      labelFallback: 'Publishing & order',
+      key: "schedule",
+      labelKey: "courses.lessonProgressSchedule",
+      descriptionKey: "courses.lessonProgressScheduleHint",
+      descriptionCompleteKey: "courses.lessonProgressScheduleHintDone",
+      descriptionFallback:
+        "Set duration and position to help learners plan their time.",
+      descriptionCompleteFallback: "Timing and order are set for this lesson.",
+      labelFallback: "Publishing & order",
       complete: schedulingComplete,
       optional: true,
     },
   ];
 
-  const optionalLabel = translateCourseString('courses.lessonProgressOptional', 'Optional');
-  const completeLabel = translateCourseString('courses.lessonProgressComplete', 'Complete');
+  const optionalLabel = translateCourseString(
+    "courses.lessonProgressOptional",
+    "Optional"
+  );
+  const completeLabel = translateCourseString(
+    "courses.lessonProgressComplete",
+    "Complete"
+  );
   const incompleteLabel = translateCourseString(
-    'courses.lessonProgressIncomplete',
-    'Pending'
+    "courses.lessonProgressIncomplete",
+    "Pending"
   );
 
   return sections.map((section) => {
-    const label = translateCourseString(section.labelKey, section.labelFallback);
+    const label = translateCourseString(
+      section.labelKey,
+      section.labelFallback
+    );
     const description = translateCourseString(
       section.complete && section.descriptionCompleteKey
         ? section.descriptionCompleteKey
@@ -953,13 +1559,13 @@ const lessonProgressSections = computed<LessonProgressSection[]>(() => {
     const statusLabel = section.complete
       ? completeLabel
       : section.optional
-        ? optionalLabel
-        : incompleteLabel;
-    const tagColor: LessonProgressSection['tagColor'] = section.complete
-      ? 'success'
+      ? optionalLabel
+      : incompleteLabel;
+    const tagColor: LessonProgressSection["tagColor"] = section.complete
+      ? "success"
       : section.optional
-        ? 'warning'
-        : 'danger';
+      ? "warning"
+      : "danger";
 
     return {
       key: section.key,
@@ -977,7 +1583,10 @@ const lessonProgressSections = computed<LessonProgressSection[]>(() => {
 const lessonProgressPercent = computed(() => {
   const sections = lessonProgressSections.value;
   if (!sections.length) return 0;
-  const totalWeight = sections.reduce((total, section) => total + section.weight, 0);
+  const totalWeight = sections.reduce(
+    (total, section) => total + section.weight,
+    0
+  );
   const completedWeight = sections.reduce(
     (sum, section) => sum + (section.complete ? section.weight : 0),
     0
@@ -993,36 +1602,41 @@ const onLessonYoutubeBlur = () => {
 const performLessonVideoUpload = async (
   file: File,
   onProgress?: (progress: number) => void,
-  metadata?: { durationSeconds?: number | null; width?: number | null; height?: number | null }
+  metadata?: {
+    durationSeconds?: number | null;
+    width?: number | null;
+    height?: number | null;
+  }
 ) => {
-  if (typeof store.uploadLessonVideo === 'function') {
-    if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
-      const message = te('courses.saveLessonBeforeUpload')
-        ? t('courses.saveLessonBeforeUpload')
-        : 'Please save the lesson before uploading a video';
+  if (typeof store.uploadLessonVideo === "function") {
+    if (courseId === null) {
+      const message = te("courses.saveLessonBeforeUpload")
+        ? t("courses.saveLessonBeforeUpload")
+        : "Please save the lesson before uploading a video";
       throw new Error(message);
     }
-    return store.uploadLessonVideo(
-      courseId,
-      lessonDialog.moduleId,
-      lessonDialog.lessonId,
-      file,
-      onProgress,
-      metadata
-    );
+    console.log("------2----------");
+    // return store.uploadLessonVideo(
+    //   courseId,
+    //   lessonDialog.moduleId,
+    //   lessonDialog.lessonId,
+    //   file,
+    //   onProgress,
+    //   metadata
+    // );
   }
 
-  if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
-    const message = te('courses.saveLessonBeforeUpload')
-      ? t('courses.saveLessonBeforeUpload')
-      : 'Please save the lesson before uploading a video';
-    throw new Error(message);
-  }
-
+  // if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
+  //   const message = te("courses.saveLessonBeforeUpload")
+  //     ? t("courses.saveLessonBeforeUpload")
+  //     : "Please save the lesson before uploading a video";
+  //   throw new Error(message);
+  // }
+  //`/api/v1/teacher/courses/${props.courseId.courseId}/preview-video`
   return uploadBinaryWithProgress(
-    `/v1/teacher/courses/${courseId}/modules/${lessonDialog.moduleId}/lessons/${lessonDialog.lessonId}/video`,
+    `/v1/teacher/courses/${courseId}/preview-video`,
     file,
-    'lesson-video',
+    "co-video",
     onProgress
   );
 };
@@ -1031,14 +1645,14 @@ const performLessonPdfUpload = async (
   file: File,
   onProgress?: (progress: number) => void
 ) => {
-  if (typeof store.uploadLessonPdf === 'function') {
+  if (typeof store.uploadLessonPdf === "function") {
     return store.uploadLessonPdf(file, onProgress);
   }
 
   return uploadBinaryWithProgress(
-    '/v1/teacher/courses/content/upload',
+    "/v1/teacher/courses/content/upload",
     file,
-    'lesson-pdf',
+    "lesson-pdf",
     onProgress
   );
 };
@@ -1048,31 +1662,40 @@ const performCourseThumbnailUpload = async (
   onProgress?: (progress: number) => void
 ) => {
   return uploadBinaryWithProgress(
-    '/v1/teacher/courses/content/upload-image',
+    "/v1/teacher/courses/content/upload-image",
     file,
-    'course-thumbnail',
+    "course-thumbnail",
     onProgress
   );
 };
 
 const sortedModules = computed(() =>
-  course.value ? [...course.value.modules].sort((a, b) => a.position - b.position) : []
+  course.value
+    ? [...course.value.modules].sort((a, b) => a.position - b.position)
+    : []
 );
 
 const sortedLessons = (lessons: LessonPayload[]) =>
   [...lessons].sort((a, b) => a.position - b.position);
 
-const moduleFormValid = computed(() => moduleDialog.form.title.trim().length > 0);
+const moduleFormValid = computed(
+  () => moduleDialog.form.title.trim().length > 0
+);
 const lessonFormValid = computed(
-  () => lessonDialog.moduleId !== null && lessonDialog.form.title.trim().length > 0
+  () =>
+    lessonDialog.moduleId !== null && lessonDialog.form.title.trim().length > 0
 );
 
 const moduleDialogTitle = computed(() =>
-  moduleDialog.mode === 'create' ? t('courses.createModuleTitle') : t('courses.editModuleTitle')
+  moduleDialog.mode === "create"
+    ? t("courses.createModuleTitle")
+    : t("courses.editModuleTitle")
 );
 
 const lessonDialogTitle = computed(() =>
-  lessonDialog.mode === 'create' ? t('courses.createLessonTitle') : t('courses.editLessonTitle')
+  lessonDialog.mode === "create"
+    ? t("courses.createLessonTitle")
+    : t("courses.editLessonTitle")
 );
 
 interface ModuleAccordionItem extends UiAccordionItem {
@@ -1083,16 +1706,15 @@ const moduleAccordionItems = computed<ModuleAccordionItem[]>(() =>
   sortedModules.value.map((module) => ({
     value: module.id,
     title: module.title,
-    module
+    module,
   }))
 );
 
 const sanitizedPosition = (value: number | null | undefined) =>
   value && value > 0 ? Math.floor(value) : undefined;
 
-
 const onCourseTypeChange = (value: string | number | null) => {
-  form.type = typeof value === 'string' ? value : String(value ?? form.type);
+  form.type = typeof value === "string" ? value : String(value ?? form.type);
 };
 
 const onPriceChange = (value: string | number | null) => {
@@ -1113,27 +1735,29 @@ const onThumbnailSelected = async (files: File[]) => {
     return;
   }
   thumbnailState.uploading = true;
-  thumbnailState.error = '';
+  thumbnailState.error = "";
   thumbnailState.progress = 0;
   try {
     const result = await performCourseThumbnailUpload(file, (progress) => {
       thumbnailState.progress = progress;
     });
-    const uploadedUrl = (result.url ?? '').trim();
+    const uploadedUrl = (result.url ?? "").trim();
     if (uploadedUrl) {
       form.thumbnailUrl = uploadedUrl;
       thumbnailVersion.value = Date.now();
       if (store.current && store.current.id === courseId) {
         store.current.thumbnailUrl = uploadedUrl;
       }
-      const summary = store.list.find((courseItem) => courseItem.id === courseId);
+      const summary = store.list.find(
+        (courseItem) => courseItem.id === courseId
+      );
       if (summary) {
         summary.thumbnailUrl = uploadedUrl;
       }
     }
   } catch (error) {
-    console.error('[CourseEditor] Failed to upload course thumbnail', error);
-    thumbnailState.error = t('courses.thumbnailUploadFailed');
+    console.error("[CourseEditor] Failed to upload course thumbnail", error);
+    thumbnailState.error = t("courses.thumbnailUploadFailed");
   } finally {
     thumbnailFiles.value = [];
     thumbnailState.uploading = false;
@@ -1143,13 +1767,13 @@ const onThumbnailSelected = async (files: File[]) => {
 
 const onThumbnailRemoved = () => {
   thumbnailFiles.value = [];
-  thumbnailState.error = '';
+  thumbnailState.error = "";
 };
 
 const clearThumbnail = () => {
-  form.thumbnailUrl = '';
+  form.thumbnailUrl = "";
   thumbnailFiles.value = [];
-  thumbnailState.error = '';
+  thumbnailState.error = "";
 };
 
 const openThumbnailPreview = () => {
@@ -1157,33 +1781,37 @@ const openThumbnailPreview = () => {
   if (!preview) {
     return;
   }
-  if (typeof window !== 'undefined') {
-    window.open(preview, '_blank', 'noopener');
+  if (typeof window !== "undefined") {
+    window.open(preview, "_blank", "noopener");
   }
 };
 
 const onModulePositionChange = (value: string | number | null) => {
   const parsed = Number(value);
-  moduleDialog.form.position = Number.isNaN(parsed) ? 1 : Math.max(1, Math.floor(parsed));
+  moduleDialog.form.position = Number.isNaN(parsed)
+    ? 1
+    : Math.max(1, Math.floor(parsed));
 };
 
 const onLessonPositionChange = (value: string | number | null) => {
   const parsed = Number(value);
-  lessonDialog.form.position = Number.isNaN(parsed) ? 1 : Math.max(1, Math.floor(parsed));
+  lessonDialog.form.position = Number.isNaN(parsed)
+    ? 1
+    : Math.max(1, Math.floor(parsed));
 };
 
 const resetLessonVideoState = () => {
   lessonVideoFiles.value = [];
   lessonVideoState.uploading = false;
-  lessonVideoState.error = '';
-  lessonVideoState.warning = '';
+  lessonVideoState.error = "";
+  lessonVideoState.warning = "";
   lessonVideoState.progress = 0;
 };
 
 const resetLessonPdfState = () => {
   lessonPdfFiles.value = [];
   lessonPdfState.uploading = false;
-  lessonPdfState.error = '';
+  lessonPdfState.error = "";
   lessonPdfState.progress = 0;
 };
 
@@ -1210,16 +1838,40 @@ watch(
   course,
   (value) => {
     if (value) {
+      //      ?: string;
+      // courseRequirements?: string;
+      // faq?: string;
+      // instructor?: string;
+      // previewVideo?: string;
+      // targetAudience?: string;
+      // whatYouWillLearn?: [];
+
+      // console.log("---- valueeee" + value.certificateInfo);
       syncingVisibilityFromCourse.value = true;
       try {
         form.title = value.title;
-        form.description = value.description || '';
+        form.description = value.description || "";
+        form.certificateInfo = value?.certificateInfo || false;
+        form.courseRequirements = value?.courseRequirements || "";
+        form.faq = value?.faq || "";
+        form.instructor = value?.instructor || "";
+        form.targetAudience = value?.targetAudience || "";
+        form.whatYouWillLearn = value?.whatYouWillLearn || [];
+        console.log(form.whatYouWillLearn);
+        for (let i = 0; i < form.whatYouWillLearn?.length; i++) {
+          whatYouWillLearnArray.value.push(form.whatYouWillLearn[i]);
+        }
+        console.log(whatYouWillLearnArray);
+        // whatYouWillLearnArray = value?.whatYouWillLearn
+        // form.previewVideo = value?.previewVideo || "";
+        // form.certificateInfo = value.certificateInfo;
+        // certificateInfo
         form.type = value.type;
         form.price = value.price;
         form.currency = resolveCurrency(value.currency);
-        form.level = value.level || '';
-        form.language = value.language || '';
-        form.thumbnailUrl = value.thumbnailUrl || '';
+        form.level = value.level || "";
+        form.language = value.language || "";
+        form.thumbnailUrl = value.thumbnailUrl || "";
         const nextActive = value.active ?? false;
         if (!hasInitializedVisibility.value) {
           form.active = nextActive;
@@ -1227,7 +1879,7 @@ watch(
         } else if (!hasUserAdjustedVisibility.value) {
           form.active = nextActive;
         }
-        thumbnailState.error = '';
+        thumbnailState.error = "";
       } finally {
         syncingVisibilityFromCourse.value = false;
       }
@@ -1264,21 +1916,21 @@ onMounted(async () => {
 });
 
 const resetModuleDialog = () => {
-  moduleDialog.mode = 'create';
+  moduleDialog.mode = "create";
   moduleDialog.moduleId = null;
-  moduleDialog.form.title = '';
+  moduleDialog.form.title = "";
   moduleDialog.form.position = Math.max(sortedModules.value.length + 1, 1);
   moduleDialogAttempt.value = false;
 };
 
 const resetLessonDialog = () => {
-  lessonDialog.mode = 'create';
+  lessonDialog.mode = "create";
   lessonDialog.moduleId = null;
   lessonDialog.lessonId = null;
-  lessonDialog.form.title = '';
-  lessonDialog.form.content = '';
-  lessonDialog.form.ytId = '';
-  lessonDialog.form.pdfUrl = '';
+  lessonDialog.form.title = "";
+  lessonDialog.form.content = "";
+  lessonDialog.form.ytId = "";
+  lessonDialog.form.pdfUrl = "";
   lessonDialog.form.videoUrl = null;
   lessonDialog.form.videoStorageKey = null;
   lessonDialog.form.bunnyVideoId = null;
@@ -1290,19 +1942,19 @@ const resetLessonDialog = () => {
   resetLessonPdfState();
 };
 
-const goBack = () => router.push({ name: 'teacher-dashboard' });
+const goBack = () => router.push({ name: "teacher-dashboard" });
 
 const openModuleDialog = (module?: ModulePayload) => {
   moduleDialogAttempt.value = false;
   if (module) {
-    moduleDialog.mode = 'edit';
+    moduleDialog.mode = "edit";
     moduleDialog.moduleId = module.id;
     moduleDialog.form.title = module.title;
     moduleDialog.form.position = module.position;
   } else {
-    moduleDialog.mode = 'create';
+    moduleDialog.mode = "create";
     moduleDialog.moduleId = null;
-    moduleDialog.form.title = '';
+    moduleDialog.form.title = "";
     moduleDialog.form.position = Math.max(sortedModules.value.length + 1, 1);
   }
   moduleDialog.open = true;
@@ -1319,14 +1971,14 @@ const submitModule = async () => {
   }
   const payload = {
     title: moduleDialog.form.title.trim(),
-    position: sanitizedPosition(moduleDialog.form.position)
+    position: sanitizedPosition(moduleDialog.form.position),
   };
-  if (moduleDialog.mode === 'create') {
+  if (moduleDialog.mode === "create") {
     await store.addModule(courseId, payload);
-    toast.success(t('courses.toast.moduleCreated'));
+    toast.success(t("courses.toast.moduleCreated"));
   } else if (moduleDialog.moduleId !== null) {
     await store.updateModule(courseId, moduleDialog.moduleId, payload);
-    toast.success(t('courses.toast.moduleUpdated'));
+    toast.success(t("courses.toast.moduleUpdated"));
   }
   moduleDialog.open = false;
 };
@@ -1337,12 +1989,12 @@ const openLessonDialog = (module: ModulePayload, lesson?: LessonPayload) => {
   resetLessonPdfState();
   lessonDialog.moduleId = module.id;
   if (lesson) {
-    lessonDialog.mode = 'edit';
+    lessonDialog.mode = "edit";
     lessonDialog.lessonId = lesson.id;
     lessonDialog.form.title = lesson.title;
-    lessonDialog.form.content = lesson.content || '';
-    lessonDialog.form.ytId = formatYoutubeDisplay(lesson.ytId || '');
-    lessonDialog.form.pdfUrl = lesson.pdfUrl || '';
+    lessonDialog.form.content = lesson.content || "";
+    lessonDialog.form.ytId = formatYoutubeDisplay(lesson.ytId || "");
+    lessonDialog.form.pdfUrl = lesson.pdfUrl || "";
     lessonDialog.form.videoUrl = lesson.videoUrl ?? null;
     lessonDialog.form.videoStorageKey = lesson.videoStorageKey ?? null;
     lessonDialog.form.bunnyVideoId = lesson.bunnyVideoId ?? null;
@@ -1350,12 +2002,12 @@ const openLessonDialog = (module: ModulePayload, lesson?: LessonPayload) => {
     lessonDialog.form.duration = lesson.duration ?? null;
     lessonDialog.form.position = lesson.position;
   } else {
-    lessonDialog.mode = 'create';
+    lessonDialog.mode = "create";
     lessonDialog.lessonId = null;
-    lessonDialog.form.title = '';
-    lessonDialog.form.content = '';
-    lessonDialog.form.ytId = '';
-    lessonDialog.form.pdfUrl = '';
+    lessonDialog.form.title = "";
+    lessonDialog.form.content = "";
+    lessonDialog.form.ytId = "";
+    lessonDialog.form.pdfUrl = "";
     lessonDialog.form.videoUrl = null;
     lessonDialog.form.videoStorageKey = null;
     lessonDialog.form.bunnyVideoId = null;
@@ -1376,12 +2028,13 @@ const onLessonVideoChange = async (files: File[]) => {
   }
   const [file] = files;
   if (!file) return;
-  lessonVideoState.error = '';
-  lessonVideoState.warning = '';
+  lessonVideoState.error = "";
+  lessonVideoState.warning = "";
   lessonVideoState.progress = 0;
   if (file.size > LESSON_UPLOAD_MAX_SIZE_BYTES) {
+    console.log("------1----------");
     lessonVideoState.error = formatUploadTooLargeMessage(
-      'courses.lessonVideoTooLarge',
+      "courses.lessonVideoTooLarge",
       LESSON_VIDEO_TOO_LARGE_FALLBACK,
       LESSON_UPLOAD_MAX_SIZE_MB
     );
@@ -1390,12 +2043,15 @@ const onLessonVideoChange = async (files: File[]) => {
   const metadata = await extractVideoMetadata(file).catch(() => ({
     durationSeconds: null,
     width: null,
-    height: null
+    height: null,
   }));
-  if (metadata.durationSeconds && metadata.durationSeconds > maxVideoDurationSeconds.value) {
+  if (
+    metadata.durationSeconds &&
+    metadata.durationSeconds > maxVideoDurationSeconds.value
+  ) {
     const maxMinutes = Math.round(maxVideoDurationSeconds.value / 60);
     lessonVideoState.error = translateCourseString(
-      'courses.lessonVideoTooLong',
+      "courses.lessonVideoTooLong",
       `The video exceeds the ${maxMinutes}-minute limit. Please upload a shorter video.`
     );
     return;
@@ -1405,31 +2061,39 @@ const onLessonVideoChange = async (files: File[]) => {
   }
   lessonVideoState.uploading = true;
   try {
-    const result = await performLessonVideoUpload(file, (progress) => {
-      lessonVideoState.progress = progress;
-    }, metadata);
-    lessonVideoState.warning = result.warning ?? '';
+    const result = await performLessonVideoUpload(
+      file,
+      (progress) => {
+        lessonVideoState.progress = progress;
+      },
+      metadata
+    );
+    lessonVideoState.warning = result.warning ?? "";
     if (lessonVideoState.warning) {
       toast.warning(lessonVideoState.warning);
     }
-    const uploadedUrl = (result.videoUrl ?? result.url ?? '').trim();
+    const uploadedUrl = (result.videoUrl ?? result.url ?? "").trim();
     lessonDialog.form.videoUrl = uploadedUrl || null;
     lessonDialog.form.videoStorageKey = null;
     lessonDialog.form.bunnyVideoId = result.bunnyVideoId ?? null;
-    lessonDialog.form.videoStatus = (result.status as LessonVideoStatus | undefined) ?? 'PROCESSING';
+    lessonDialog.form.videoStatus =
+      (result.status as LessonVideoStatus | undefined) ?? "PROCESSING";
     lessonVideoFiles.value = [];
     await store.fetchCourse(courseId).catch((error) => {
-      console.warn('[CourseEditor] Failed to refresh course after video upload', error);
+      console.warn(
+        "[CourseEditor] Failed to refresh course after video upload",
+        error
+      );
     });
   } catch (error) {
-    console.error('[CourseEditor] Failed to upload lesson video', error);
+    console.error("[CourseEditor] Failed to upload lesson video", error);
     lessonVideoState.error = buildUploadErrorMessage(error, {
-      tooLargeKey: 'courses.lessonVideoTooLarge',
+      tooLargeKey: "courses.lessonVideoTooLarge",
       tooLargeFallback: LESSON_VIDEO_TOO_LARGE_FALLBACK,
       forbiddenMessage: lessonVideoTexts.value.forbidden,
-      uploadFailedMessage: lessonVideoTexts.value.uploadFailed
+      uploadFailedMessage: lessonVideoTexts.value.uploadFailed,
     });
-    lessonVideoState.warning = '';
+    lessonVideoState.warning = "";
     lessonVideoState.progress = 0;
   } finally {
     lessonVideoState.uploading = false;
@@ -1442,11 +2106,11 @@ const onLessonPdfChange = async (files: File[]) => {
   }
   const [file] = files;
   if (!file) return;
-  lessonPdfState.error = '';
+  lessonPdfState.error = "";
   lessonPdfState.progress = 0;
   if (file.size > LESSON_UPLOAD_MAX_SIZE_BYTES) {
     lessonPdfState.error = formatUploadTooLargeMessage(
-      'courses.lessonPdfTooLarge',
+      "courses.lessonPdfTooLarge",
       LESSON_PDF_TOO_LARGE_FALLBACK,
       LESSON_UPLOAD_MAX_SIZE_MB
     );
@@ -1460,15 +2124,18 @@ const onLessonPdfChange = async (files: File[]) => {
     lessonDialog.form.pdfUrl = result.url;
     lessonPdfFiles.value = [];
     await store.fetchCourse(courseId).catch((error) => {
-      console.warn('[CourseEditor] Failed to refresh course after PDF upload', error);
+      console.warn(
+        "[CourseEditor] Failed to refresh course after PDF upload",
+        error
+      );
     });
   } catch (error) {
-    console.error('[CourseEditor] Failed to upload lesson PDF', error);
+    console.error("[CourseEditor] Failed to upload lesson PDF", error);
     lessonPdfState.error = buildUploadErrorMessage(error, {
-      tooLargeKey: 'courses.lessonPdfTooLarge',
+      tooLargeKey: "courses.lessonPdfTooLarge",
       tooLargeFallback: LESSON_PDF_TOO_LARGE_FALLBACK,
       forbiddenMessage: lessonPdfTexts.value.forbidden,
-      uploadFailedMessage: lessonPdfTexts.value.uploadFailed
+      uploadFailedMessage: lessonPdfTexts.value.uploadFailed,
     });
     lessonPdfState.progress = 0;
   } finally {
@@ -1481,16 +2148,17 @@ const clearLessonVideo = () => {
   lessonDialog.form.videoStorageKey = null;
   lessonDialog.form.bunnyVideoId = null;
   lessonDialog.form.videoStatus = null;
-  lessonVideoState.error = '';
-  lessonVideoState.warning = '';
+  lessonVideoState.error = "";
+  lessonVideoState.warning = "";
 };
 
 const clearLessonPdf = () => {
-  lessonDialog.form.pdfUrl = '';
+  lessonDialog.form.pdfUrl = "";
   resetLessonPdfState();
 };
 
-const lessonVideoPlaybackUrl = (url?: string | null) => buildAuthenticatedMediaUrl(url);
+const lessonVideoPlaybackUrl = (url?: string | null) =>
+  buildAuthenticatedMediaUrl(url);
 
 const openLessonVideo = () => {
   if (!lessonDialog.form.videoUrl) {
@@ -1500,8 +2168,8 @@ const openLessonVideo = () => {
   if (!playbackUrl) {
     return;
   }
-  if (typeof window !== 'undefined') {
-    window.open(playbackUrl, '_blank', 'noopener');
+  if (typeof window !== "undefined") {
+    window.open(playbackUrl, "_blank", "noopener");
   }
 };
 
@@ -1513,8 +2181,8 @@ const openLessonPdf = () => {
   if (!pdfUrl) {
     return;
   }
-  if (typeof window !== 'undefined') {
-    window.open(pdfUrl, '_blank', 'noopener');
+  if (typeof window !== "undefined") {
+    window.open(pdfUrl, "_blank", "noopener");
   }
 };
 
@@ -1533,62 +2201,72 @@ const submitLesson = async () => {
     videoUrl: lessonDialog.form.videoUrl,
     videoStorageKey: lessonDialog.form.videoStorageKey,
     bunnyVideoId: lessonDialog.form.bunnyVideoId || undefined,
-    position: sanitizedPosition(lessonDialog.form.position)
+    position: sanitizedPosition(lessonDialog.form.position),
   };
-  if (lessonDialog.mode === 'create') {
+  if (lessonDialog.mode === "create") {
     await store.addLesson(courseId, lessonDialog.moduleId, payload);
-    toast.success(t('courses.toast.lessonCreated'));
+    toast.success(t("courses.toast.lessonCreated"));
   } else if (lessonDialog.lessonId !== null) {
-    await store.updateLesson(courseId, lessonDialog.moduleId, lessonDialog.lessonId, payload);
-    toast.success(t('courses.toast.lessonUpdated'));
+    await store.updateLesson(
+      courseId,
+      lessonDialog.moduleId,
+      lessonDialog.lessonId,
+      payload
+    );
+    toast.success(t("courses.toast.lessonUpdated"));
   }
   lessonDialog.open = false;
 };
 
 const confirmDeleteModule = async (module: ModulePayload) => {
-  if (confirm(t('courses.deleteModuleConfirm', { title: module.title }))) {
+  if (confirm(t("courses.deleteModuleConfirm", { title: module.title }))) {
     await store.removeModule(courseId, module.id);
   }
 };
 
-const confirmDeleteLesson = async (module: ModulePayload, lesson: LessonPayload) => {
-  if (confirm(t('courses.deleteLessonConfirm', { title: lesson.title }))) {
+const confirmDeleteLesson = async (
+  module: ModulePayload,
+  lesson: LessonPayload
+) => {
+  if (confirm(t("courses.deleteLessonConfirm", { title: lesson.title }))) {
     await store.removeLesson(courseId, module.id, lesson.id);
   }
 };
 
 const goToLessonCreate = (module: ModulePayload) => {
-  router.push({ name: 'teacher-lesson-create', params: { courseId, moduleId: module.id } });
+  router.push({
+    name: "teacher-lesson-create",
+    params: { courseId, moduleId: module.id },
+  });
 };
 
 const goToLessonEdit = (module: ModulePayload, lesson: LessonPayload) => {
   router.push({
-    name: 'teacher-lesson-edit',
-    params: { courseId, moduleId: module.id, lessonId: lesson.id }
+    name: "teacher-lesson-edit",
+    params: { courseId, moduleId: module.id, lessonId: lesson.id },
   });
 };
 
- 
 const formatDuration = (duration?: number | null) => {
   if (!duration || duration <= 0) {
-    return t('courses.durationNotSet');
+    return t("courses.durationNotSet");
   }
   const minutes = Math.floor(duration / 60);
   const seconds = duration % 60;
   if (minutes > 0 && seconds > 0) {
-    return t('courses.durationMinutesSeconds', { minutes, seconds });
+    return t("courses.durationMinutesSeconds", { minutes, seconds });
   }
   if (minutes > 0) {
-    return t('courses.durationMinutes', { minutes });
+    return t("courses.durationMinutes", { minutes });
   }
-  return t('courses.durationSeconds', { seconds: duration });
+  return t("courses.durationSeconds", { seconds: duration });
 };
 
 const youtubeEmbed = (value?: string | null) => {
-  if (!value) return '';
+  if (!value) return "";
   const patterns = [
     /youtu\.be\/([\w-]{11})/i,
-    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i
+    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i,
   ];
   let videoId = value.trim();
   for (const pattern of patterns) {
@@ -1602,8 +2280,38 @@ const youtubeEmbed = (value?: string | null) => {
 };
 
 const saveInfo = async () => {
+  const seen = new Set();
+  const unique = whatYouWillLearnArray?.value.filter((item) => {
+    if (seen.has(item.learnText)) return false;
+    seen.add(item.learnText);
+    return true;
+  });
+  console.log(unique);
   const description = form.description?.trim();
   const thumbnail = form.thumbnailUrl.trim();
+  const loggedValue = {
+    title: form.title,
+    description: description && description.length ? description : undefined,
+    type: form.type,
+    price: form.price,
+    currency: form.currency,
+    thumbnailUrl: thumbnail ? thumbnail : null,
+    level: form.level || null,
+    language: form.language || null,
+    active: form.active,
+    // courseOverview: form.courseOverview,
+    instructor: form.instructor,
+    faq: form.faq,
+    certificateInfo: form.certificateInfo,
+    duration: form.duration,
+    targetAudience: form.targetAudience,
+    // previewVideo: form.previewVideo,
+    whatYouWillLearn: unique,
+    courseRequirements: form?.courseRequirements,
+    // refundPolicy: form.refundPolicy,
+    // curriculum: form.curriculum,
+  };
+  console.log(loggedValue);
   await store.updateCourse(courseId, {
     title: form.title,
     description: description && description.length ? description : undefined,
@@ -1613,15 +2321,57 @@ const saveInfo = async () => {
     thumbnailUrl: thumbnail ? thumbnail : null,
     level: form.level || null,
     language: form.language || null,
-    active: form.active
+    active: form.active,
+    // courseOverview: form.courseOverview,
+    instructor: form.instructor,
+    faq: form.faq,
+    certificateInfo: form.certificateInfo,
+    duration: form.duration,
+    targetAudience: form.targetAudience,
+    // previewVideo: form?.previewVideo,
+    whatYouWillLearn: unique,
+    courseRequirements: form?.courseRequirements,
+    // refundPolicy: form.refundPolicy,
+    // curriculum: form.curriculum,
   });
   hasUserAdjustedVisibility.value = false;
-  const toastKey = form.active ? 'courses.toast.courseSaved' : 'courses.toast.courseSavedHidden';
+  const toastKey = form.active
+    ? "courses.toast.courseSaved"
+    : "courses.toast.courseSavedHidden";
   toast.success(t(toastKey));
 };
 </script>
 
 <style scoped>
+.justify-content-spaceB {
+  justify-content: space-between;
+}
+.btn-add-item {
+  background-color: #0d6efd;
+  padding: 8px 20px;
+  border-radius: 50px;
+  color: #fff;
+  font-weight: bold;
+  margin: 0 10px;
+  font-size: 14px;
+}
+.btn-add-item:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.form-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--sakai-border-radius-lg);
+  background: var(--sakai-surface-card);
+  border: 1px solid var(--sakai-border-color);
+  transition: all var(--sakai-transition-duration) var(--sakai-transition-ease);
+  box-shadow: var(--sakai-shadow-sm);
+  padding: 0.7rem 1rem;
+}
 .course-editor {
   display: flex;
   flex-wrap: wrap;
@@ -1677,7 +2427,8 @@ const saveInfo = async () => {
 
 .course-editor__visibility-dot--published {
   background: var(--sakai-success);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--sakai-success) 22%, transparent);
+  box-shadow: 0 0 0 6px
+    color-mix(in srgb, var(--sakai-success) 22%, transparent);
 }
 
 .course-editor__visibility-dot--draft {
@@ -1792,7 +2543,8 @@ const saveInfo = async () => {
   padding: var(--sakai-space-4);
   border-radius: var(--sakai-border-radius-lg);
   background: color-mix(in srgb, var(--sakai-primary) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
 }
 
 @media (min-width: 640px) {
@@ -1875,7 +2627,11 @@ const saveInfo = async () => {
   max-width: 520px;
   padding: var(--sakai-space-4);
   border-radius: var(--sakai-border-radius-md);
-  background: color-mix(in srgb, var(--sakai-border-color) 25%, var(--sakai-surface) 75%);
+  background: color-mix(
+    in srgb,
+    var(--sakai-border-color) 25%,
+    var(--sakai-surface) 75%
+  );
   color: var(--sakai-text-color);
   text-align: center;
   font-weight: var(--sakai-font-weight-medium);
@@ -1982,7 +2738,11 @@ const saveInfo = async () => {
   padding: var(--sakai-space-3);
   border-radius: var(--sakai-border-radius-lg);
   border: 1px solid transparent;
-  background: color-mix(in srgb, var(--sakai-surface) 92%, var(--sakai-text-color) 8%);
+  background: color-mix(
+    in srgb,
+    var(--sakai-surface) 92%,
+    var(--sakai-text-color) 8%
+  );
   color: var(--sakai-text-color-tertiary);
 }
 
@@ -2039,8 +2799,13 @@ const saveInfo = async () => {
   gap: var(--sakai-space-3);
   padding: var(--sakai-space-4);
   border-radius: var(--sakai-border-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 75%, transparent);
-  background: color-mix(in srgb, var(--sakai-surface) 95%, var(--sakai-primary) 5%);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 75%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--sakai-surface) 95%,
+    var(--sakai-primary) 5%
+  );
 }
 
 .course-editor__thumbnail-header {
@@ -2068,8 +2833,13 @@ const saveInfo = async () => {
   gap: var(--sakai-space-2);
   border-radius: var(--sakai-border-radius-md);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
-  background: color-mix(in srgb, var(--sakai-surface) 92%, var(--sakai-primary) 6%);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 65%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--sakai-surface) 92%,
+    var(--sakai-primary) 6%
+  );
 }
 
 .course-editor__thumbnail-image {
@@ -2093,7 +2863,8 @@ const saveInfo = async () => {
   gap: var(--sakai-space-2);
   padding: var(--sakai-space-3);
   border-radius: var(--sakai-border-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 70%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 70%, transparent);
   background: color-mix(in srgb, var(--sakai-primary) 6%, transparent);
 }
 
