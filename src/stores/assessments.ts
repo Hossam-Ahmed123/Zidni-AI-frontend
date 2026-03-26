@@ -23,6 +23,7 @@ import {
   overrideAssessmentAttempt,
   fetchStudentAssessments,
   fetchStudentAssessment,
+  fetchLatestStudentAttempt,
   submitStudentAttempt,
   type AssessmentAttemptResponse,
   type AssessmentAttemptSummary,
@@ -91,6 +92,7 @@ export const useAssessmentsStore = defineStore('assessments', () => {
   // Student view
   const studentAssessments = ref<StudentAssessmentSummary[]>([]);
   const currentStudentAssessment = ref<StudentAssessmentDetailResponse | null>(null);
+  const currentStudentAttempt = ref<AssessmentAttemptResponse | null>(null);
   const lastStudentAttempt = ref<StudentAttemptResult | null>(null);
 
   const hasBanks = computed(() => banks.value.length > 0);
@@ -274,7 +276,9 @@ export const useAssessmentsStore = defineStore('assessments', () => {
       courseTitle: normalized.courseTitle,
       durationMinutes: normalized.durationMinutes,
       maxScore: normalized.type === 'external_form' ? 0 : normalized.maxScore,
-      questionCount: normalized.type === 'external_form' ? 0 : normalized.items.length
+      questionCount: normalized.type === 'external_form' ? 0 : normalized.items.length,
+      maxAttempts: normalized.maxAttempts,
+      revealAnswersAfterGrading: normalized.revealAnswersAfterGrading
     };
     if (existingIndex >= 0) {
       assessments.value.splice(existingIndex, 1, summary);
@@ -372,11 +376,17 @@ export const useAssessmentsStore = defineStore('assessments', () => {
     return currentStudentAssessment.value;
   }
 
+  async function loadLatestStudentAttemptDetail(assessmentId: number) {
+    currentStudentAttempt.value = await fetchLatestStudentAttempt(assessmentId);
+    return currentStudentAttempt.value;
+  }
+
   async function submitStudentAssessmentAttempt(
     assessmentId: number,
     payload: SubmitStudentAttemptPayload
   ) {
     lastStudentAttempt.value = await submitStudentAttempt(assessmentId, payload);
+    currentStudentAttempt.value = null;
     await loadStudentAssessments();
     return lastStudentAttempt.value;
   }
@@ -427,9 +437,11 @@ export const useAssessmentsStore = defineStore('assessments', () => {
     // Student flows
     studentAssessments,
     currentStudentAssessment,
+    currentStudentAttempt,
     lastStudentAttempt,
     loadStudentAssessments,
     loadStudentAssessment: loadStudentAssessmentDetail,
+    loadLatestStudentAttempt: loadLatestStudentAttemptDetail,
     submitStudentAttempt: submitStudentAssessmentAttempt
   };
 });

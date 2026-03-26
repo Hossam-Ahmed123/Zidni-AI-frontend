@@ -64,9 +64,8 @@
               <UiButton
                 variant="link"
                 color="primary"
-                prepend-icon="PlayCircleOutlined"
+                :prepend-icon="isPrimaryAction(item) ? 'PlayCircleOutlined' : 'FileSearchOutlined'"
                 @click="goToAssessment(item)"
-                :disabled="isAttemptLocked(item) && !canViewResults(item)"
               >
                 {{ actionLabel(item) }}
               </UiButton>
@@ -105,6 +104,10 @@
                 </dd>
               </div>
               <div>
+                <dt>{{ t('assessments.attemptsUsedLabel') }}</dt>
+                <dd>{{ formatAttempts(item) }}</dd>
+              </div>
+              <div>
                 <dt>{{ t('assessments.tableScore') }}</dt>
                 <dd>{{ item.latestAttemptStatus ? formatScore(item) : '—' }}</dd>
               </div>
@@ -112,9 +115,8 @@
             <UiButton
               class="student-assessments__list-action"
               color="primary"
-              :variant="isAttemptLocked(item) && !canViewResults(item) ? 'outline' : 'solid'"
-              prepend-icon="PlayCircleOutlined"
-              :disabled="isAttemptLocked(item) && !canViewResults(item)"
+              :variant="isPrimaryAction(item) ? 'solid' : 'outline'"
+              :prepend-icon="isPrimaryAction(item) ? 'PlayCircleOutlined' : 'FileSearchOutlined'"
               @click="goToAssessment(item)"
             >
               {{ actionLabel(item) }}
@@ -301,7 +303,21 @@ const isAttemptLocked = (assessment: StudentAssessmentSummary) => {
   const status = assessment.latestAttemptStatus;
   if (!status) return false;
   const lowered = status.toString().toLowerCase();
-  return lowered === 'submitted' || lowered === 'pending_result' || lowered === 'graded';
+  if (lowered === 'submitted' || lowered === 'pending_result') {
+    return true;
+  }
+  return lowered === 'graded' && assessment.attemptsUsed >= assessment.maxAttempts;
+};
+
+const canOpenAssessment = (assessment: StudentAssessmentSummary) => {
+  const status = assessment.latestAttemptStatus?.toString().toLowerCase();
+  if (!status) {
+    return true;
+  }
+  if (status === 'submitted' || status === 'pending_result' || status === 'graded') {
+    return true;
+  }
+  return !isAttemptLocked(assessment);
 };
 
 /**
@@ -312,7 +328,11 @@ const isAttemptLocked = (assessment: StudentAssessmentSummary) => {
  */
 const canViewResults = (assessment: StudentAssessmentSummary) => {
   const status = assessment.latestAttemptStatus;
-  return Boolean(status && status.toString().toLowerCase() === 'graded');
+  return Boolean(
+    status &&
+    status.toString().toLowerCase() === 'graded' &&
+    assessment.revealAnswersAfterGrading
+  );
 };
 
 /**
@@ -323,6 +343,11 @@ const canViewResults = (assessment: StudentAssessmentSummary) => {
  * @returns localized button copy representing the allowed action.
  */
 const actionLabel = (assessment: StudentAssessmentSummary) => {
+  const graded = assessment.latestAttemptStatus?.toString().toLowerCase() === 'graded';
+  const canRetake = graded && assessment.attemptsUsed < assessment.maxAttempts;
+  if (canRetake) {
+    return t('assessments.retake');
+  }
   if (canViewResults(assessment)) {
     return t('assessments.viewResults');
   }
@@ -330,6 +355,11 @@ const actionLabel = (assessment: StudentAssessmentSummary) => {
     return t('assessments.viewSubmission');
   }
   return t('assessments.start');
+};
+
+const isPrimaryAction = (assessment: StudentAssessmentSummary) => {
+  const graded = assessment.latestAttemptStatus?.toString().toLowerCase() === 'graded';
+  return !(graded || isAttemptLocked(assessment));
 };
 
 /**
@@ -374,16 +404,28 @@ const formatScore = (assessment: StudentAssessmentSummary) => {
   return `${total.toFixed(1)} / ${assessment.maxScore}`;
 };
 
+const formatAttempts = (assessment: StudentAssessmentSummary) =>
+  t('assessments.attemptsUsedValue', {
+    used: assessment.attemptsUsed ?? 0,
+    total: assessment.maxAttempts ?? 1
+  });
+
 /**
  * Routes the student into the assessment player when action is permitted.
  *
  * @param item assessment summary corresponding to the clicked table row.
  */
 const goToAssessment = (item: StudentAssessmentSummary) => {
-  if (isAttemptLocked(item) && !canViewResults(item)) {
+  if (!canOpenAssessment(item)) {
     return;
   }
-  router.push({ name: 'student-assessment-player', params: { assessmentId: item.id } });
+  const graded = item.latestAttemptStatus?.toString().toLowerCase() === 'graded';
+  const canRetake = graded && item.attemptsUsed < item.maxAttempts;
+  router.push({
+    name: 'student-assessment-player',
+    params: { assessmentId: item.id },
+    query: canRetake ? { mode: 'retake' } : undefined
+  });
 };
 
 /**

@@ -40,6 +40,19 @@
               @update:model-value="(value) => (builderForm.durationMinutes = Number(value ?? 0))"
             />
           </div>
+          <div class="assessment-builder__form-row">
+            <UiInput
+              :model-value="builderForm.maxAttempts"
+              type="number"
+              min="1"
+              :label="t('assessments.maxAttempts')"
+              @update:model-value="(value) => (builderForm.maxAttempts = Math.max(1, Number(value ?? 1)))"
+            />
+            <UiCheckbox
+              v-model="builderForm.revealAnswersAfterGrading"
+              :label="t('assessments.revealAnswersAfterGrading')"
+            />
+          </div>
           <UiInput
             v-if="isExternalForm"
             v-model="builderForm.embedUrl"
@@ -380,6 +393,7 @@ import UiSelect from '@/components/ui/UiSelect.vue';
 import UiInput from '@/components/ui/UiInput.vue';
 import UiTextarea from '@/components/ui/UiTextarea.vue';
 import UiToast from '@/components/ui/UiToast.vue';
+import UiCheckbox from '@/components/ui/UiCheckbox.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -402,7 +416,9 @@ const builderForm = reactive({
   title: '',
   durationMinutes: 0,
   type: 'quiz',
-  embedUrl: ''
+  embedUrl: '',
+  maxAttempts: 1,
+  revealAnswersAfterGrading: true
 });
 
 const isExternalForm = computed(() => builderForm.type === 'external_form');
@@ -484,9 +500,11 @@ const assessmentTypes = computed(() => [
 const bankOptions = computed(() => store.banks.map((bank) => ({ id: bank.id, name: bank.name })));
 const questionOptions = computed(() => {
   if (!store.currentBank) return [];
-  return store.currentBank.questions.map((question) => ({
+  return store.currentBank.questions
+    .filter((question) => question.currentVersion)
+    .map((question) => ({
     id: question.id,
-    label: question.currentVersion.stem,
+    label: question.currentVersion!.stem,
     detail: question
   }));
 });
@@ -505,7 +523,7 @@ const selectedQuestion = computed<QuestionDetailResponse | null>(() => {
   return store.currentBank.questions.find((q) => q.id === addForm.questionId) ?? null;
 });
 
-const canAddQuestion = computed(() => Boolean(addForm.bankId && addForm.questionId));
+const canAddQuestion = computed(() => Boolean(addForm.bankId && addForm.questionId && selectedQuestion.value?.currentVersion));
 
 let updateTimer: ReturnType<typeof setTimeout> | undefined;
 let suppressWatch = false;
@@ -520,6 +538,8 @@ const populateForm = () => {
   builderForm.durationMinutes = assessment.value.durationMinutes;
   builderForm.type = assessment.value.type;
   builderForm.embedUrl = assessment.value.embedUrl || '';
+  builderForm.maxAttempts = assessment.value.maxAttempts;
+  builderForm.revealAnswersAfterGrading = assessment.value.revealAnswersAfterGrading;
   itemPointsReset();
   suppressWatch = false;
 };
@@ -565,7 +585,9 @@ watch(
           title: builderForm.title,
           durationMinutes: builderForm.durationMinutes,
           type: builderForm.type,
-          embedUrl: builderForm.embedUrl
+          embedUrl: builderForm.embedUrl,
+          maxAttempts: builderForm.maxAttempts,
+          revealAnswersAfterGrading: builderForm.revealAnswersAfterGrading
         });
         showSaved(t('assessments.autosaveUpdated'));
       } catch (error) {
@@ -596,9 +618,12 @@ const onQuestionChange = (questionId: number | null) => {
     return;
   }
   const question = selectedQuestion.value;
-  if (question) {
+  if (question?.currentVersion) {
     addForm.questionVersionId = question.currentVersion.id;
     addForm.points = Number(question.currentVersion.points ?? 0);
+  } else {
+    addForm.questionVersionId = null;
+    addForm.points = null;
   }
 };
 

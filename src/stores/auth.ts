@@ -3,6 +3,10 @@ import { http } from '@/lib/http';
 import { useFeaturesStore, type FeatureContext } from '@/stores/features';
 import { useTenantStore } from '@/stores/tenant';
 import { useStudentStore } from '@/stores/student';
+import { useAchievementsStore } from '@/stores/achievements';
+import { useNotificationStore } from '@/stores/notifications';
+import { useFeatureSyncStore } from '@/stores/featureSync';
+import { useSubscriptionUpdatesStore } from '@/stores/subscriptionUpdates';
 import {
   clearStoredTenantSlug,
   setStoredTenantSlug,
@@ -288,6 +292,26 @@ export const useAuthStore = defineStore('auth', {
       }
       try {
         useFeaturesStore().reset();
+      } catch (error) {
+        // optional store may not be initialised
+      }
+      try {
+        useAchievementsStore().clear();
+      } catch (error) {
+        // optional store may not be initialised
+      }
+      try {
+        useNotificationStore().disconnect();
+      } catch (error) {
+        // optional store may not be initialised
+      }
+      try {
+        useFeatureSyncStore().disconnect();
+      } catch (error) {
+        // optional store may not be initialised
+      }
+      try {
+        useSubscriptionUpdatesStore().disconnect();
       } catch (error) {
         // optional store may not be initialised
       }

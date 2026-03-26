@@ -229,12 +229,12 @@
                   </div>
                   <div v-if="item.question.currentVersion?.options?.length" class="teacher-banks__options">
                     <div
-                      v-for="option in item.question.currentVersion?.options"
+                      v-for="(option, index) in item.question.currentVersion?.options"
                       :key="option.id"
                       :class="['teacher-banks__option', { 'is-correct': option.correct }]"
                     >
                       <div class="teacher-banks__option-text">
-                        <strong>{{ option.label }}.</strong>
+                        <strong>{{ getDisplayOptionLabel(option.label, option.key, index) }}.</strong>
                         <span>{{ option.text }}</span>
                       </div>
                       <UiTag v-if="option.correct" color="success" size="sm">
@@ -958,6 +958,19 @@ const defaultOptionLabel = (index: number) => {
   return `${String.fromCharCode(65 + prefix - 1)}${String.fromCharCode(65 + suffix)}`;
 };
 
+const getDisplayOptionLabel = (label: string | null | undefined, key: string | null | undefined, index: number) => {
+  if (label && !/^opt_[a-z0-9]+$/i.test(label)) {
+    return label;
+  }
+  if (key === 'true') {
+    return t('assessments.trueLabel');
+  }
+  if (key === 'false') {
+    return t('assessments.falseLabel');
+  }
+  return defaultOptionLabel(index);
+};
+
 const generateOptionKey = () => `opt_${Math.random().toString(36).slice(2, 10)}`;
 
 const ensureQuestionOptionsForType = (type: QuestionType) => {
@@ -1181,7 +1194,7 @@ const openQuestionDialog = (question?: QuestionDetailResponse) => {
   questionDialog.options =
     version?.options?.map((option, index) => ({
       key: option.key,
-      label: option.label || defaultOptionLabel(index),
+      label: getDisplayOptionLabel(option.label, option.key, index),
       text: option.text,
       correct: option.correct
     })) ?? [];

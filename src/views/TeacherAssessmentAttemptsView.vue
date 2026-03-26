@@ -102,7 +102,11 @@
               />
               <div v-if="selectedAttemptQuestion(question.id)?.selectedOptionKeys?.length" class="attempts__question-meta">
                 <span>{{ t('assessments.selectedOptions') }}:</span>
-                <span>{{ selectedAttemptQuestion(question.id)?.selectedOptionKeys?.join(', ') }}</span>
+                <span>{{ formatSelectedOptions(question.id) }}</span>
+              </div>
+              <div v-if="selectedAttemptQuestion(question.id)?.correctOptionKeys?.length" class="attempts__question-meta">
+                <span>{{ t('assessments.correctAnswers') }}:</span>
+                <span>{{ formatCorrectOptions(question.id) }}</span>
               </div>
               <div v-if="selectedAttemptQuestion(question.id)?.textAnswer" class="attempts__question-meta">
                 <span>{{ t('assessments.textAnswer') }}:</span>
@@ -264,6 +268,39 @@ watch(currentAttempt, (attempt) => {
 
 const selectedAttemptQuestion = (questionId: number) =>
   currentAttempt.value?.questions.find((question) => question.id === questionId);
+
+const displayOptionLabel = (
+  option: AssessmentAttemptResponse['questions'][number]['options'][number],
+  index: number
+) => {
+  if (option.label?.trim()) {
+    return option.label.trim();
+  }
+  return String.fromCharCode(65 + index);
+};
+
+const formatOptionKeys = (questionId: number, keys: string[] | null | undefined) => {
+  const question = selectedAttemptQuestion(questionId);
+  if (!question || !keys?.length) {
+    return '—';
+  }
+  return keys
+    .map((key) => {
+      const index = question.options.findIndex((option) => option.key === key);
+      const option = index >= 0 ? question.options[index] : null;
+      if (!option) {
+        return key;
+      }
+      return `${displayOptionLabel(option, index)}. ${option.text}`;
+    })
+    .join(', ');
+};
+
+const formatSelectedOptions = (questionId: number) =>
+  formatOptionKeys(questionId, selectedAttemptQuestion(questionId)?.selectedOptionKeys);
+
+const formatCorrectOptions = (questionId: number) =>
+  formatOptionKeys(questionId, selectedAttemptQuestion(questionId)?.correctOptionKeys);
 
 const openAttempt = async (attemptId: number) => {
   attemptForm.loading = true;

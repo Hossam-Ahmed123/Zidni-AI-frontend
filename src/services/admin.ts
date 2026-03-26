@@ -123,6 +123,7 @@ export interface TeacherAdmin extends TeacherSummary {
   flags: FeatureFlagSummary;
   entitlements: TeacherEntitlements;
   usageOverrides?: TeacherUsageOverrides | null;
+  studentMultiDeviceLoginEnabled: boolean;
   joinDate?: string;
   branding?: Record<string, unknown>;
   bio?: string;
@@ -193,6 +194,7 @@ export async function updateTeacherLifecycle(
     subject?: string;
     phoneCountryCode?: string;
     phoneNumber?: string;
+    studentMultiDeviceLoginEnabled?: boolean;
     usageOverrides?: TeacherUsageOverrides | null;
   }
 ): Promise<TeacherAdmin> {

@@ -91,6 +91,8 @@ export interface AssessmentSummaryResponse {
   durationMinutes: number;
   maxScore: number;
   questionCount: number;
+  maxAttempts: number;
+  revealAnswersAfterGrading: boolean;
 }
 
 export interface AssessmentItemResponse {
@@ -114,6 +116,8 @@ export interface AssessmentDetailResponse {
   durationMinutes: number;
   maxScore: number;
   embedUrl?: string | null;
+  maxAttempts: number;
+  revealAnswersAfterGrading: boolean;
   items: AssessmentItemResponse[];
 }
 
@@ -132,9 +136,14 @@ export interface AttemptQuestionResponse {
   questionId: number;
   questionVersionId: number;
   type: QuestionType;
+  stem: string;
+  points: number;
   autoScore: number;
   manualScore: number;
   selectedOptionKeys: string[];
+  correctOptionKeys: string[];
+  options: QuestionOptionResponse[];
+  correct: boolean;
   textAnswer: string | null;
   gradedAt: string | null;
   feedback: string | null;
@@ -166,10 +175,14 @@ export interface AssessmentPlayQuestionResponse {
 export interface StudentAssessmentSummary {
   id: number;
   title: string;
+  courseTitle: string;
   type: AssessmentType;
   durationMinutes: number;
   maxScore: number;
   questionCount: number;
+  maxAttempts: number;
+  attemptsUsed: number;
+  revealAnswersAfterGrading: boolean;
   latestAttemptId?: number | null;
   latestAttemptStatus?: AttemptStatus | null;
   latestAutoScore?: number | null;
@@ -184,6 +197,8 @@ export interface StudentAssessmentDetailResponse {
   durationMinutes: number;
   maxScore: number;
   embedUrl?: string | null;
+  maxAttempts: number;
+  revealAnswersAfterGrading: boolean;
   questions: AssessmentPlayQuestionResponse[];
 }
 
@@ -202,6 +217,8 @@ export interface CreateAssessmentPayload {
   type?: AssessmentType;
   durationMinutes?: number;
   embedUrl?: string | null;
+  maxAttempts?: number;
+  revealAnswersAfterGrading?: boolean;
 }
 
 export interface UpdateAssessmentPayload {
@@ -209,6 +226,8 @@ export interface UpdateAssessmentPayload {
   type?: AssessmentType;
   durationMinutes?: number;
   embedUrl?: string | null;
+  maxAttempts?: number;
+  revealAnswersAfterGrading?: boolean;
 }
 
 export interface AddAssessmentItemPayload {
@@ -388,6 +407,15 @@ export async function fetchStudentAssessments(): Promise<StudentAssessmentSummar
 
 export async function fetchStudentAssessment(id: number): Promise<StudentAssessmentDetailResponse> {
   const { data } = await api.get<StudentAssessmentDetailResponse>(`/api/v1/student/assessments/${id}`);
+  return data;
+}
+
+export async function fetchLatestStudentAttempt(
+  assessmentId: number
+): Promise<AssessmentAttemptResponse> {
+  const { data } = await api.get<AssessmentAttemptResponse>(
+    `/api/v1/student/assessments/${assessmentId}/attempts/latest`
+  );
   return data;
 }
 

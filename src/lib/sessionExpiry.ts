@@ -287,7 +287,7 @@ export const triggerSessionRedirect = (options: SessionRedirectOptions = {}): vo
   const tenant = resolveTenant(role, options.tenantHint ?? null);
   const target = buildLoginUrl(role, tenant, currentPath);
 
-  const delay = typeof options.delayMs === 'number' ? options.delayMs : 3500;
+  const delay = typeof options.delayMs === 'number' ? options.delayMs : 150;
   if (redirectTimer) {
     clearTimeout(redirectTimer);
   }

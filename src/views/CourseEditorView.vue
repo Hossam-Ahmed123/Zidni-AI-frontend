@@ -347,103 +347,127 @@
               <label class="lesson-editor__field-label">
                 {{ t("courses.CourseIntro") }}</label
               >
-              <UiFileUpload
-                v-model="lessonVideoFiles"
-                :label="lessonVideoTexts.uploadLabel"
-                :hint="lessonVideoTexts.hint"
-                :disabled="lessonVideoState.uploading"
-                :button-label="lessonVideoTexts.browse"
-                accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo"
-                @change="onLessonVideoChange"
+              <UiSelect
+                :model-value="courseIntroVideoSource"
+                :label="t('courses.previewVideo')"
+                @update:model-value="onCourseIntroVideoSourceChange"
+              >
+                <option value="youtube">{{ t("courses.lessonYoutube") }}</option>
+                <option value="bunny">Bunny</option>
+              </UiSelect>
+              <UiInput
+                v-if="courseIntroVideoSource === 'youtube'"
+                v-model="form.previewVideo"
+                :label="t('courses.lessonYoutubeLabel')"
+                placeholder="https://youtu.be/..."
+                :hint="lessonYoutubeHint"
+                @blur="onCourseIntroYoutubeBlur"
               />
-              <UiAlert
-                v-if="lessonVideoState.uploading"
-                color="info"
-                variant="soft"
-              >
-                <div class="lesson-editor__upload-progress">
-                  <span>{{ lessonVideoTexts.uploading }}</span>
-                  <span
-                    v-if="lessonVideoState.progress > 0"
-                    class="lesson-editor__upload-progress-value"
-                  >
-                    {{ lessonVideoState.progress }}%
-                  </span>
-                </div>
-                <UiProgressBar
-                  :value="lessonVideoState.progress"
-                  color="info"
+              <template v-else>
+                <UiFileUpload
+                  v-model="courseIntroVideoFiles"
+                  :label="courseIntroVideoTexts.uploadLabel"
+                  :hint="courseIntroVideoTexts.hint"
+                  :disabled="courseIntroVideoState.uploading"
+                  :button-label="courseIntroVideoTexts.browse"
+                  accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo"
+                  @change="onCourseIntroVideoChange"
                 />
-              </UiAlert>
-              <UiAlert
-                v-else-if="lessonVideoState.error"
-                color="danger"
-                variant="soft"
-              >
-                {{ lessonVideoState.error }}
-              </UiAlert>
-              <UiAlert
-                v-else-if="form.videoUrl"
-                color="success"
-                variant="soft"
-                class="lesson-editor__upload-alert"
-              >
-                <span>{{ lessonVideoTexts.uploaded }}</span>
-                <UiButton
-                  variant="link"
-                  color="primary"
-                  @click.prevent="openLessonVideo"
+                <UiAlert
+                  v-if="courseIntroVideoState.uploading"
+                  color="info"
+                  variant="soft"
                 >
-                  {{ lessonVideoTexts.preview }}
-                </UiButton>
-                <UiButton
-                  variant="link"
+                  <div class="lesson-editor__upload-progress">
+                    <span>{{ courseIntroVideoTexts.uploading }}</span>
+                    <span
+                      v-if="courseIntroVideoState.progress > 0"
+                      class="lesson-editor__upload-progress-value"
+                    >
+                      {{ courseIntroVideoState.progress }}%
+                    </span>
+                  </div>
+                  <UiProgressBar
+                    :value="courseIntroVideoState.progress"
+                    color="info"
+                  />
+                </UiAlert>
+                <UiAlert
+                  v-else-if="courseIntroVideoState.error"
                   color="danger"
-                  @click.prevent="clearLessonVideo"
+                  variant="soft"
                 >
-                  {{ lessonVideoTexts.remove }}
-                </UiButton>
-              </UiAlert>
-              <UiAlert
-                v-else
-                color="info"
-                variant="soft"
-                class="lesson-editor__empty-alert"
-              >
-                {{ lessonVideoTexts.empty }}
-              </UiAlert>
-              <UiAlert
-                v-if="lessonVideoState.warning"
-                color="warning"
-                variant="soft"
-              >
-                {{ lessonVideoState.warning }}
-              </UiAlert>
-              <UiAlert
-                v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
-                :color="
-                  lessonVideoStatusMeta(form.videoStatus)?.color || 'info'
-                "
-                variant="soft"
-                class="lesson-editor__status"
-              >
-                <div class="lesson-editor__status-title">
-                  {{ lessonVideoStatusMeta(form.videoStatus)?.banner?.title }}
-                </div>
-                <p class="lesson-editor__status-description">
+                  {{ courseIntroVideoState.error }}
+                </UiAlert>
+                <UiAlert
+                  v-else-if="form.previewVideoPlaybackUrl"
+                  color="success"
+                  variant="soft"
+                  class="lesson-editor__upload-alert"
+                >
+                  <span>{{ courseIntroVideoTexts.uploaded }}</span>
+                  <UiButton
+                    variant="link"
+                    color="primary"
+                    @click.prevent="openCourseIntroVideo"
+                  >
+                    {{ courseIntroVideoTexts.preview }}
+                  </UiButton>
+                  <UiButton
+                    variant="link"
+                    color="danger"
+                    @click.prevent="clearCourseIntroVideo"
+                  >
+                    {{ courseIntroVideoTexts.remove }}
+                  </UiButton>
+                </UiAlert>
+                <UiAlert
+                  v-else
+                  color="info"
+                  variant="soft"
+                  class="lesson-editor__empty-alert"
+                >
+                  {{ courseIntroVideoTexts.empty }}
+                </UiAlert>
+                <UiAlert
+                  v-if="courseIntroVideoState.warning"
+                  color="warning"
+                  variant="soft"
+                >
+                  {{ courseIntroVideoState.warning }}
+                </UiAlert>
+                <UiAlert
+                  v-if="lessonVideoStatusMeta(form.previewVideoStatus)?.banner"
+                  :color="
+                    lessonVideoStatusMeta(form.previewVideoStatus)?.color ||
+                    'info'
+                  "
+                  variant="soft"
+                  class="lesson-editor__status"
+                >
+                  <div class="lesson-editor__status-title">
+                    {{
+                      lessonVideoStatusMeta(form.previewVideoStatus)?.banner
+                        ?.title
+                    }}
+                  </div>
+                  <p class="lesson-editor__status-description">
+                    {{
+                      lessonVideoStatusMeta(form.previewVideoStatus)?.banner
+                        ?.description
+                    }}
+                  </p>
+                </UiAlert>
+                <div
+                  v-if="lessonVideoStatusMeta(form.previewVideoStatus)?.banner"
+                  class="lesson-editor__video-placeholder"
+                >
                   {{
-                    lessonVideoStatusMeta(form.videoStatus)?.banner?.description
+                    lessonVideoStatusMeta(form.previewVideoStatus)?.banner
+                      ?.placeholder
                   }}
-                </p>
-              </UiAlert>
-              <div
-                v-if="lessonVideoStatusMeta(form.videoStatus)?.banner"
-                class="lesson-editor__video-placeholder"
-              >
-                {{
-                  lessonVideoStatusMeta(form.videoStatus)?.banner?.placeholder
-                }}
-              </div>
+                </div>
+              </template>
             </div>
             <UiInput
               v-model="form.title"
@@ -990,7 +1014,10 @@ const form = reactive({
   certificateInfo: false,
   duration: "",
   targetAudience: "",
-  // previewVideo: "",
+  previewVideo: "",
+  previewVideoPlaybackUrl: "",
+  previewVideoBunnyId: null as string | null,
+  previewVideoStatus: null as LessonVideoStatus | null,
   type: "recorded",
   price: 0,
   currency: resolveCurrency(),
@@ -1070,6 +1097,14 @@ const lessonVideoState = reactive({
   warning: "",
   progress: 0,
 });
+const courseIntroVideoFiles = ref<File[]>([]);
+const courseIntroVideoState = reactive({
+  uploading: false,
+  error: "",
+  warning: "",
+  progress: 0,
+});
+const courseIntroVideoSource = ref<"youtube" | "bunny">("youtube");
 function removeItem(index: any) {
   whatYouWillLearnArray.value.splice(index, 1);
 }
@@ -1206,12 +1241,28 @@ const uploadBinaryWithProgress = async (
   url: string,
   file: File,
   kind: string,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  metadata?: {
+    durationSeconds?: number | null;
+    width?: number | null;
+    height?: number | null;
+  }
 ) => {
   const formData = new FormData();
   formData.append("file", file);
+  if (metadata?.durationSeconds) {
+    formData.append("durationSeconds", String(metadata.durationSeconds));
+  }
+  if (metadata?.width) {
+    formData.append("videoWidth", String(metadata.width));
+  }
+  if (metadata?.height) {
+    formData.append("videoHeight", String(metadata.height));
+  }
 
-  const { data } = await api.post<{ url: string; key?: string }>(
+  const { data } = await api.post<
+    { url?: string; key?: string; videoUrl?: string; bunnyVideoId?: string; status?: string; warning?: string }
+  >(
     url,
     formData,
     {
@@ -1289,6 +1340,11 @@ const lessonVideoTexts = computed(() => ({
     "courses.lessonVideoEmpty",
     "No video uploaded yet. Add one to give learners a walkthrough."
   ),
+}));
+
+const courseIntroVideoTexts = computed(() => ({
+  ...lessonVideoTexts.value,
+  label: t("courses.CourseIntro"),
 }));
 
 const lessonVideoStatusMap = computed(() => {
@@ -1599,6 +1655,34 @@ const onLessonYoutubeBlur = () => {
   lessonDialog.form.ytId = formatYoutubeDisplay(lessonDialog.form.ytId);
 };
 
+const onCourseIntroYoutubeBlur = () => {
+  form.previewVideo = formatYoutubeDisplay(form.previewVideo);
+};
+
+const resetCourseIntroVideoState = () => {
+  courseIntroVideoFiles.value = [];
+  courseIntroVideoState.uploading = false;
+  courseIntroVideoState.error = "";
+  courseIntroVideoState.warning = "";
+  courseIntroVideoState.progress = 0;
+};
+
+const onCourseIntroVideoSourceChange = (value: string | number | null) => {
+  const nextSource = value === "bunny" ? "bunny" : "youtube";
+  if (nextSource === courseIntroVideoSource.value) {
+    return;
+  }
+  courseIntroVideoSource.value = nextSource;
+  resetCourseIntroVideoState();
+  if (nextSource === "youtube") {
+    form.previewVideoPlaybackUrl = "";
+    form.previewVideoBunnyId = null;
+    form.previewVideoStatus = null;
+  } else {
+    form.previewVideo = "";
+  }
+};
+
 const performLessonVideoUpload = async (
   file: File,
   onProgress?: (progress: number) => void,
@@ -1615,29 +1699,50 @@ const performLessonVideoUpload = async (
         : "Please save the lesson before uploading a video";
       throw new Error(message);
     }
-    console.log("------2----------");
-    // return store.uploadLessonVideo(
-    //   courseId,
-    //   lessonDialog.moduleId,
-    //   lessonDialog.lessonId,
-    //   file,
-    //   onProgress,
-    //   metadata
-    // );
+    if (lessonDialog.moduleId === null || lessonDialog.lessonId === null) {
+      const message = te("courses.saveLessonBeforeUpload")
+        ? t("courses.saveLessonBeforeUpload")
+        : "Please save the lesson before uploading a video";
+      throw new Error(message);
+    }
+    return store.uploadLessonVideo(
+      courseId,
+      lessonDialog.moduleId,
+      lessonDialog.lessonId,
+      file,
+      onProgress,
+      metadata
+    );
   }
 
-  // if (lessonDialog.lessonId === null || lessonDialog.moduleId === null) {
-  //   const message = te("courses.saveLessonBeforeUpload")
-  //     ? t("courses.saveLessonBeforeUpload")
-  //     : "Please save the lesson before uploading a video";
-  //   throw new Error(message);
-  // }
-  //`/api/v1/teacher/courses/${props.courseId.courseId}/preview-video`
+  return uploadBinaryWithProgress(
+    `/v1/teacher/courses/${courseId}/modules/${lessonDialog.moduleId}/lessons/${lessonDialog.lessonId}/video`,
+    file,
+    "lesson-video",
+    onProgress,
+    metadata
+  );
+};
+
+const performCourseIntroVideoUpload = async (
+  file: File,
+  onProgress?: (progress: number) => void,
+  metadata?: {
+    durationSeconds?: number | null;
+    width?: number | null;
+    height?: number | null;
+  }
+) => {
+  if (typeof store.uploadCoursePreviewVideo === "function") {
+    return store.uploadCoursePreviewVideo(courseId, file, onProgress, metadata);
+  }
+
   return uploadBinaryWithProgress(
     `/v1/teacher/courses/${courseId}/preview-video`,
     file,
-    "co-video",
-    onProgress
+    "course-preview-video",
+    onProgress,
+    metadata
   );
 };
 
@@ -1857,13 +1962,19 @@ watch(
         form.instructor = value?.instructor || "";
         form.targetAudience = value?.targetAudience || "";
         form.whatYouWillLearn = value?.whatYouWillLearn || [];
+        form.previewVideo = value?.previewVideoBunnyId ? "" : value?.previewVideo || "";
+        form.previewVideoPlaybackUrl = value?.previewVideoBunnyId
+          ? value?.previewVideo || ""
+          : "";
+        form.previewVideoBunnyId = value?.previewVideoBunnyId ?? null;
+        form.previewVideoStatus = value?.previewVideoStatus ?? null;
+        courseIntroVideoSource.value = value?.previewVideoBunnyId ? "bunny" : "youtube";
         console.log(form.whatYouWillLearn);
         for (let i = 0; i < form.whatYouWillLearn?.length; i++) {
           whatYouWillLearnArray.value.push(form.whatYouWillLearn[i]);
         }
         console.log(whatYouWillLearnArray);
         // whatYouWillLearnArray = value?.whatYouWillLearn
-        // form.previewVideo = value?.previewVideo || "";
         // form.certificateInfo = value.certificateInfo;
         // certificateInfo
         form.type = value.type;
@@ -2100,6 +2211,74 @@ const onLessonVideoChange = async (files: File[]) => {
   }
 };
 
+const onCourseIntroVideoChange = async (files: File[]) => {
+  if (!files.length || courseIntroVideoState.uploading) {
+    return;
+  }
+  const [file] = files;
+  if (!file) return;
+  courseIntroVideoState.error = "";
+  courseIntroVideoState.warning = "";
+  courseIntroVideoState.progress = 0;
+  if (file.size > LESSON_UPLOAD_MAX_SIZE_BYTES) {
+    courseIntroVideoState.error = formatUploadTooLargeMessage(
+      "courses.lessonVideoTooLarge",
+      LESSON_VIDEO_TOO_LARGE_FALLBACK,
+      LESSON_UPLOAD_MAX_SIZE_MB
+    );
+    return;
+  }
+  const metadata = await extractVideoMetadata(file).catch(() => ({
+    durationSeconds: null,
+    width: null,
+    height: null,
+  }));
+  if (
+    metadata.durationSeconds &&
+    metadata.durationSeconds > maxVideoDurationSeconds.value
+  ) {
+    const maxMinutes = Math.round(maxVideoDurationSeconds.value / 60);
+    courseIntroVideoState.error = translateCourseString(
+      "courses.lessonVideoTooLong",
+      `The video exceeds the ${maxMinutes}-minute limit. Please upload a shorter video.`
+    );
+    return;
+  }
+  courseIntroVideoState.uploading = true;
+  try {
+    const result = await performCourseIntroVideoUpload(
+      file,
+      (progress) => {
+        courseIntroVideoState.progress = progress;
+      },
+      metadata
+    );
+    courseIntroVideoState.warning = result.warning ?? "";
+    if (courseIntroVideoState.warning) {
+      toast.warning(courseIntroVideoState.warning);
+    }
+    const uploadedUrl = (result.videoUrl ?? result.url ?? "").trim();
+    form.previewVideo = "";
+    form.previewVideoPlaybackUrl = uploadedUrl;
+    form.previewVideoBunnyId = result.bunnyVideoId ?? null;
+    form.previewVideoStatus =
+      (result.status as LessonVideoStatus | undefined) ?? "PROCESSING";
+    courseIntroVideoSource.value = "bunny";
+  } catch (error) {
+    console.error("[CourseEditor] Failed to upload course intro video", error);
+    courseIntroVideoState.error = buildUploadErrorMessage(error, {
+      tooLargeKey: "courses.lessonVideoTooLarge",
+      tooLargeFallback: LESSON_VIDEO_TOO_LARGE_FALLBACK,
+      forbiddenMessage: courseIntroVideoTexts.value.forbidden,
+      uploadFailedMessage: courseIntroVideoTexts.value.uploadFailed,
+    });
+    courseIntroVideoState.warning = "";
+    courseIntroVideoState.progress = 0;
+  } finally {
+    resetCourseIntroVideoState();
+  }
+};
+
 const onLessonPdfChange = async (files: File[]) => {
   if (!files.length || lessonPdfState.uploading) {
     return;
@@ -2152,6 +2331,14 @@ const clearLessonVideo = () => {
   lessonVideoState.warning = "";
 };
 
+const clearCourseIntroVideo = () => {
+  form.previewVideo = "";
+  form.previewVideoPlaybackUrl = "";
+  form.previewVideoBunnyId = null;
+  form.previewVideoStatus = null;
+  resetCourseIntroVideoState();
+};
+
 const clearLessonPdf = () => {
   lessonDialog.form.pdfUrl = "";
   resetLessonPdfState();
@@ -2165,6 +2352,26 @@ const openLessonVideo = () => {
     return;
   }
   const playbackUrl = lessonVideoPlaybackUrl(lessonDialog.form.videoUrl);
+  if (!playbackUrl) {
+    return;
+  }
+  if (typeof window !== "undefined") {
+    window.open(playbackUrl, "_blank", "noopener");
+  }
+};
+
+const openCourseIntroVideo = () => {
+  const target =
+    courseIntroVideoSource.value === "youtube"
+      ? form.previewVideo.trim()
+      : form.previewVideoPlaybackUrl.trim();
+  if (!target) {
+    return;
+  }
+  const playbackUrl =
+    courseIntroVideoSource.value === "youtube"
+      ? target
+      : buildAuthenticatedMediaUrl(target);
   if (!playbackUrl) {
     return;
   }
@@ -2289,6 +2496,14 @@ const saveInfo = async () => {
   console.log(unique);
   const description = form.description?.trim();
   const thumbnail = form.thumbnailUrl.trim();
+  const previewVideo =
+    courseIntroVideoSource.value === "youtube"
+      ? formatYoutubeDisplay(form.previewVideo).trim() || null
+      : null;
+  const previewVideoBunnyId =
+    courseIntroVideoSource.value === "bunny"
+      ? form.previewVideoBunnyId || null
+      : null;
   const loggedValue = {
     title: form.title,
     description: description && description.length ? description : undefined,
@@ -2305,7 +2520,8 @@ const saveInfo = async () => {
     certificateInfo: form.certificateInfo,
     duration: form.duration,
     targetAudience: form.targetAudience,
-    // previewVideo: form.previewVideo,
+    previewVideo,
+    previewVideoBunnyId,
     whatYouWillLearn: unique,
     courseRequirements: form?.courseRequirements,
     // refundPolicy: form.refundPolicy,
@@ -2328,7 +2544,8 @@ const saveInfo = async () => {
     certificateInfo: form.certificateInfo,
     duration: form.duration,
     targetAudience: form.targetAudience,
-    // previewVideo: form?.previewVideo,
+    previewVideo,
+    previewVideoBunnyId,
     whatYouWillLearn: unique,
     courseRequirements: form?.courseRequirements,
     // refundPolicy: form.refundPolicy,

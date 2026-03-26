@@ -79,6 +79,7 @@ import UiInput from '@/components/ui/UiInput.vue';
 import UiBadge from '@/components/ui/UiBadge.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
 import { useStudentCheckoutStore, type CheckoutItem } from '@/stores/studentCheckout';
+import { formatCheckoutMoney, resolveCheckoutCurrency } from '@/utils/checkoutCurrency';
 
 interface Props {
   teacherSlug: string;
@@ -121,20 +122,10 @@ const validation = computed(() => checkoutStore.validation);
 const loading = computed(() => checkoutStore.loading);
 
 const checkoutCurrency = computed(() => {
-  const validationCurrency = validation.value?.currency;
-  if (typeof validationCurrency === 'string') {
-    const trimmed = validationCurrency.trim();
-    if (trimmed) {
-      return trimmed.toUpperCase();
-    }
-  }
   const itemWithCurrency = checkoutStore.items.find(
     (item) => typeof item.currency === 'string' && item.currency.trim().length > 0
   );
-  if (itemWithCurrency?.currency) {
-    return itemWithCurrency.currency.trim().toUpperCase();
-  }
-  return 'EGP';
+  return resolveCheckoutCurrency(itemWithCurrency?.currency, validation.value?.currency);
 });
 
 const errorMessage = computed(() => {
@@ -180,18 +171,7 @@ const currentTotal = computed(() => {
 });
 
 const formatMoney = (value: number) => {
-  const currency = checkoutCurrency.value;
-  try {
-    return new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value ?? 0);
-  } catch (error) {
-    const resolved = Number.isFinite(value) ? value.toFixed(2) : '0.00';
-    return `${currency} ${resolved}`;
-  }
+  return formatCheckoutMoney(value, checkoutCurrency.value, locale.value);
 };
 
 const apply = async () => {

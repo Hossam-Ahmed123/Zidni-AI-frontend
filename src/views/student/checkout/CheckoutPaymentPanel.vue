@@ -38,7 +38,55 @@
       <CouponBox embedded :teacher-slug="teacherSlug" :items="items" :enabled="offersEnabled" />
     </div>
 
-    <div v-if="manualFlowEnabled" class="checkout-payment-panel__manual">
+    <section v-if="isFreeCheckout" class="checkout-payment-panel__free">
+      <header class="checkout-payment-panel__manual-header">
+        <h3>{{ t('student.freeCheckoutTitle') }}</h3>
+        <p>{{ t('student.freeCheckoutSubtitle') }}</p>
+      </header>
+
+      <UiAlert color="success" variant="soft">
+        {{ t('student.freeCheckoutNotice', { code: validation?.code ?? '' }) }}
+      </UiAlert>
+
+      <label class="muse-field">
+        <span>{{ t('student.course') }}</span>
+        <select v-model="paymentForm.courseId" :disabled="paymentLoading || !hasItems" required>
+          <option disabled value="">{{ t('student.course') }}</option>
+          <option v-for="option in courseOptions" :key="option.id" :value="option.id">
+            {{ option.title }}
+          </option>
+        </select>
+      </label>
+
+      <UiTextarea
+        v-model="paymentForm.notes"
+        class="checkout-payment-panel__field"
+        :label="t('student.freeCheckoutNotesLabel')"
+        :rows="3"
+        :disabled="paymentLoading || !hasItems"
+      />
+
+      <div class="muse-form__feedback">
+        <UiAlert v-if="formError" color="danger" variant="soft">
+          {{ formError }}
+        </UiAlert>
+        <UiAlert v-else-if="paymentError" color="danger" variant="soft">
+          {{ t('student.paymentError') }}
+        </UiAlert>
+        <UiAlert v-else-if="paymentSuccess" color="success" variant="soft">
+          {{ t('student.freeCheckoutSuccess') }}
+        </UiAlert>
+      </div>
+
+      <div class="muse-form__actions">
+        <UiButton button-type="button" color="primary" :disabled="paymentLoading || !hasItems" @click="submitPayment">
+          <span v-if="paymentLoading">{{ t('common.loading') }}</span>
+          <span v-else>{{ t('student.freeCheckoutAction') }}</span>
+        </UiButton>
+      </div>
+    </section>
+
+    <div v-else-if="manualFlowEnabled" class="checkout-payment-panel__manual">
       <header class="checkout-payment-panel__manual-header">
         <h3>{{ t('student.checkoutManualTitle') }}</h3>
         <p>{{ t('student.checkoutManualSubtitle') }}</p>
@@ -466,6 +514,11 @@ import UiSkeleton from '@/components/ui/UiSkeleton.vue';
 import CouponBox from '@/views/student/checkout/CouponBox.vue';
 import { useStudentCheckoutStore, type CheckoutItem } from '@/stores/studentCheckout';
 import { useStudentStore } from '@/stores/student';
+import {
+  formatCheckoutMoney,
+  normalizeCheckoutCurrency,
+  resolveCheckoutCurrency
+} from '@/utils/checkoutCurrency';
 import type {
   PaymentGateway,
   ManualPaymentMethod,
@@ -499,7 +552,7 @@ const toast = useToast();
 const paymentForm = reactive({
   courseId: null as number | null,
   amount: 0,
-  currency: 'EGP',
+  currency: resolveCheckoutCurrency(),
   method: 'bank' as ManualPaymentMethod,
   gateway: null as PaymentGateway | null,
   files: [] as File[],
@@ -547,15 +600,7 @@ type CourseOption = {
   currency: string | null;
 };
 
-const normalizeCurrencyCode = (value?: string | null) => {
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (trimmed.length > 0) {
-      return trimmed.toUpperCase();
-    }
-  }
-  return null;
-};
+const normalizeCurrencyCode = normalizeCheckoutCurrency;
 
 const assignRuntimeGatewayCandidate = (
   gateway: PaymentGateway,
@@ -1080,6 +1125,7 @@ const finalAmount = computed(() => {
   const total = validation.value?.total ?? subtotal.value;
   return Number.isFinite(total) ? Number(total) : 0;
 });
+const isFreeCheckout = computed(() => Boolean(validation.value?.valid && validation.value?.code) && finalAmount.value <= 0.005);
 const discount = computed(() => {
   const value = subtotal.value - finalAmount.value;
   return value > 0 ? value : 0;
@@ -1109,14 +1155,11 @@ const firstItemCurrency = computed(() => {
 });
 
 const resolvedCurrency = computed(() => {
-  const validationCurrency = validation.value?.currency;
-  if (typeof validationCurrency === 'string') {
-    const trimmed = validationCurrency.trim();
-    if (trimmed.length > 0) {
-      return trimmed.toUpperCase();
-    }
-  }
-  return selectedCourseCurrency.value ?? firstItemCurrency.value ?? 'EGP';
+  return resolveCheckoutCurrency(
+    selectedCourseCurrency.value,
+    firstItemCurrency.value,
+    validation.value?.currency
+  );
 });
 
 const onlineGatewayLabel = computed(() =>
@@ -1175,18 +1218,7 @@ const vodafoneWalletNumber = computed(() => {
 });
 
 const formatMoney = (value: number) => {
-  const currency = resolvedCurrency.value;
-  const amount = Number.isFinite(value) ? value : 0;
-  try {
-    return new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
-  } catch (error) {
-    return `${currency} ${amount.toFixed(2)}`;
-  }
+  return formatCheckoutMoney(value, resolvedCurrency.value, locale.value);
 };
 
 const vodafoneAmountDisplay = computed(() => formatMoney(paymentForm.amount));
@@ -1444,6 +1476,42 @@ const clearProof = () => {
 };
 
 const submitPayment = async () => {
+  if (isFreeCheckout.value) {
+    if (!hasItems.value || paymentForm.courseId == null) {
+      return;
+    }
+
+    paymentLoading.value = true;
+    resetFeedback();
+    formError.value = '';
+
+    try {
+      await studentStore.submitPayment({
+        courseId: paymentForm.courseId,
+        amount: 0,
+        currency: resolvedCurrency.value,
+        method: 'other',
+        notes: paymentForm.notes || undefined,
+        offerCode: validation.value?.code ?? undefined
+      });
+      paymentSuccess.value = true;
+      paymentError.value = false;
+      paymentForm.notes = '';
+      await Promise.allSettled([
+        studentStore.fetchNotifications(),
+        studentStore.fetchPayments(),
+        studentStore.fetchEnrollments()
+      ]);
+    } catch (error) {
+      formError.value = resolveErrorMessage(error);
+      paymentError.value = true;
+      paymentSuccess.value = false;
+    } finally {
+      paymentLoading.value = false;
+    }
+    return;
+  }
+
   if (manualFlowEnabled) {
     if (!hasItems.value || paymentForm.courseId == null || methodsLoading.value) {
       return;
@@ -1649,6 +1717,12 @@ const submitPayment = async () => {
 .checkout-payment-panel__manual {
   display: grid;
   gap: 1.5rem;
+  padding: 1.75rem;
+}
+
+.checkout-payment-panel__free {
+  display: grid;
+  gap: 1.25rem;
   padding: 1.75rem;
 }
 
@@ -1944,7 +2018,12 @@ const submitPayment = async () => {
 
 @media (max-width: 768px) {
   .checkout-payment-panel__header {
-  .checkout-payment-panel__manual {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .checkout-payment-panel__manual,
+  .checkout-payment-panel__free {
     padding: 1.25rem;
   }
 
@@ -1956,9 +2035,6 @@ const submitPayment = async () => {
 
   .checkout-payment-panel__manual-details {
     padding: 1rem;
-  }
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .checkout-payment-panel__code {

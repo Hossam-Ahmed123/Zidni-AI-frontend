@@ -100,7 +100,7 @@ export const useOffersStore = defineStore('offers', {
     },
     async update(offerId: number, payload: OfferPayload) {
       const updated = await updateOffer(offerId, payload);
-  this.items = this.items.map((item: { id: number }) => (item.id === updated.id ? updated : item));
+      this.items = this.items.map((item) => (item.id === updated.id ? updated : item));
       if (this.current && this.current.id === updated.id) {
         this.current = updated;
       }
@@ -108,7 +108,7 @@ export const useOffersStore = defineStore('offers', {
     },
     async remove(offerId: number) {
       await deleteOffer(offerId);
-  this.items = this.items.filter((item: { id: number }) => item.id !== offerId);
+      this.items = this.items.filter((item) => item.id !== offerId);
       this.total = Math.max(this.total - 1, 0);
       if (this.current && this.current.id === offerId) {
         this.current = null;

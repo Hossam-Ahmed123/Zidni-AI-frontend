@@ -57,6 +57,7 @@ export interface ManualPaymentPayload {
   proofKey?: string;
   notes?: string;
   transferReference?: string;
+  offerCode?: string;
 }
 
 export interface ManualPaymentDecisionPayload {
@@ -101,6 +102,8 @@ export interface ManualPaymentView {
   notes?: string;
   gatewayTxId?: string | null;
   merchantOrderId?: string | null;
+  source?: string | null;
+  offerCode?: string | null;
   studentId?: number | null;
   studentName?: string | null;
   studentEmail?: string | null;
@@ -169,6 +172,8 @@ export interface EnrollmentView {
   teacherPhotoUrl?: string;
   teacherSubject?: string;
   teacherActive?: boolean;
+  source?: string | null;
+  offerCode?: string | null;
   studentId?: number;
   studentName?: string;
   studentEmail?: string;
@@ -235,7 +240,8 @@ export async function submitManualPayment(payload: ManualPaymentPayload) {
     proofImageUrl: payload.proofImageUrl ?? payload.proofUrl,
     proofKey: payload.proofKey,
     notes: payload.notes,
-    transferReference: payload.transferReference
+    transferReference: payload.transferReference,
+    offerCode: payload.offerCode
   };
   const { data } = await api.post<ManualPaymentView>('/v1/students/payments', requestBody);
   return data;

@@ -29,6 +29,8 @@ export interface CourseSummary {
   faq?: string;
   instructor?: string;
   previewVideo?: string;
+  previewVideoBunnyId?: string | null;
+  previewVideoStatus?: LessonVideoStatus | null;
   targetAudience?: string;
   whatYouWillLearn?: [];
 
@@ -73,6 +75,8 @@ export interface CourseTeacher {
 
 export interface CourseDetail extends CourseSummary {
   description?: string;
+  previewVideoBunnyId?: string | null;
+  previewVideoStatus?: LessonVideoStatus | null;
   modules: ModulePayload[];
   teacher?: CourseTeacher | null;
 }
@@ -102,6 +106,8 @@ const normalizeModule = (module: ModulePayload): ModulePayload => ({
 const normalizeCourseDetail = (course: CourseDetail): CourseDetail => ({
   ...course,
   currency: normalizeCurrencyValue(course.currency),
+  previewVideoBunnyId: course.previewVideoBunnyId ?? null,
+  previewVideoStatus: course.previewVideoStatus ?? null,
   modules: (course.modules || [])
     .map(normalizeModule)
     .sort((a, b) => a.position - b.position)
@@ -109,7 +115,9 @@ const normalizeCourseDetail = (course: CourseDetail): CourseDetail => ({
 
 const normalizeCourseSummary = (course: CourseSummary): CourseSummary => ({
   ...course,
-  currency: normalizeCurrencyValue(course.currency)
+  currency: normalizeCurrencyValue(course.currency),
+  previewVideoBunnyId: course.previewVideoBunnyId ?? null,
+  previewVideoStatus: course.previewVideoStatus ?? null
 });
 
 type UploadProgressEvent = { loaded: number; total?: number | null };
@@ -158,6 +166,7 @@ interface CourseWritePayload {
   duration: string | null;
   targetAudience: string | null;
   previewVideo?: string | null;
+  previewVideoBunnyId?: string | null;
   whatYouWillLearn: any | null;
   courseRequirements: string | null;
   // refundPolicy: string | null;
@@ -199,6 +208,9 @@ export const useCoursesStore = defineStore('courses', {
           summary.level = data.level;
           summary.language = data.language;
           summary.active = data.active;
+          summary.previewVideo = data.previewVideo;
+          summary.previewVideoBunnyId = data.previewVideoBunnyId ?? null;
+          summary.previewVideoStatus = data.previewVideoStatus ?? null;
         }
       } finally {
         this.loading = false;
@@ -221,7 +233,9 @@ export const useCoursesStore = defineStore('courses', {
         thumbnailUrl: normalized.thumbnailUrl,
         level: normalized.level,
         language: normalized.language,
-        previewVideo: normalized?.previewVideo
+        previewVideo: normalized?.previewVideo,
+        previewVideoBunnyId: normalized?.previewVideoBunnyId ?? null,
+        previewVideoStatus: normalized?.previewVideoStatus ?? null
       };
       this.list.unshift(summary);
       this.current = normalized;
@@ -257,6 +271,9 @@ export const useCoursesStore = defineStore('courses', {
         summary.level = data.level;
         summary.language = data.language;
         summary.active = data.active;
+        summary.previewVideo = data.previewVideo;
+        summary.previewVideoBunnyId = data.previewVideoBunnyId ?? null;
+        summary.previewVideoStatus = data.previewVideoStatus ?? null;
       }
     },
     async deleteCourse(courseId: number) {
@@ -425,6 +442,45 @@ export const useCoursesStore = defineStore('courses', {
         }
       );
       finalizeUploadProgress('lesson-video', onProgress);
+      return data;
+    },
+
+    async uploadCoursePreviewVideo(
+      courseId: number,
+      file: File,
+      onProgress?: (progress: number) => void,
+      metadata?: LessonVideoMetadata
+    ) {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (metadata?.durationSeconds) {
+        formData.append('durationSeconds', String(metadata.durationSeconds));
+      }
+      if (metadata?.width) {
+        formData.append('videoWidth', String(metadata.width));
+      }
+      if (metadata?.height) {
+        formData.append('videoHeight', String(metadata.height));
+      }
+
+      const { data } = await api.post<{
+        courseId: number;
+        bunnyVideoId: string;
+        videoUrl?: string;
+        status?: string;
+        warning?: string;
+      }>(
+        `/v1/teacher/courses/${courseId}/preview-video`,
+        formData,
+        {
+          timeout: NO_TIMEOUT,
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: createUploadProgressHandler('course-preview-video', onProgress)
+        }
+      );
+
+      finalizeUploadProgress('course-preview-video', onProgress);
       return data;
     },
 

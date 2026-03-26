@@ -179,6 +179,7 @@ export const useAdminStore = defineStore('admin', {
       subject?: string;
       phoneCountryCode?: string;
       phoneNumber?: string;
+      studentMultiDeviceLoginEnabled?: boolean;
       usageOverrides?: import('@/services/admin').TeacherUsageOverrides | null;
     }) {
       if (!this.selectedTeacher) {

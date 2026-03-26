@@ -12,6 +12,16 @@
 
     <UiTextarea v-model="form.description" :label="t('offers.form.description')" :rows="3" />
 
+    <UiSelect
+      :model-value="form.publishMode"
+      :label="t('offers.form.publishMode')"
+      @update:model-value="onPublishModeChange"
+    >
+      <option v-for="option in publishModeOptions" :key="option.value" :value="option.value">
+        {{ option.label }}
+      </option>
+    </UiSelect>
+
     <UiSelect :model-value="form.type" :label="t('offers.form.type')" @update:model-value="onTypeChange">
       <option v-for="option in typeOptions" :key="option.value" :value="option.value">
         {{ option.label }}
@@ -112,6 +122,7 @@ import UiTextarea from '@/components/ui/UiTextarea.vue';
 import type {
   OfferApplicability,
   OfferPayload,
+  OfferPublishMode,
   OfferResponse,
   OfferType
 } from '@/api/offers';
@@ -125,6 +136,7 @@ interface FormState {
   code: string;
   name: string;
   description: string;
+  publishMode: OfferPublishMode;
   type: OfferType;
   applicability: OfferApplicability;
   percentage: number | null;
@@ -153,6 +165,7 @@ const form = reactive<FormState>({
   code: '',
   name: '',
   description: '',
+  publishMode: 'PUBLIC',
   type: 'PERCENTAGE',
   applicability: 'ALL_COURSES',
   percentage: null,
@@ -167,6 +180,11 @@ const typeOptions = computed(() => [
   { value: 'PERCENTAGE', label: t('offers.types.percentage') },
   { value: 'FIXED', label: t('offers.types.fixed') },
   { value: 'BUNDLE', label: t('offers.types.bundle') }
+]);
+
+const publishModeOptions = computed(() => [
+  { value: 'PUBLIC', label: t('offers.publishMode.public') },
+  { value: 'PRIVATE', label: t('offers.publishMode.private') }
 ]);
 
 const applicabilityOptions = computed(() => [
@@ -201,6 +219,7 @@ const resetForm = () => {
   form.code = '';
   form.name = '';
   form.description = '';
+  form.publishMode = 'PUBLIC';
   form.type = 'PERCENTAGE';
   form.applicability = 'ALL_COURSES';
   form.percentage = null;
@@ -215,6 +234,7 @@ const populateFromOffer = (offer: OfferResponse) => {
   form.code = offer.code;
   form.name = offer.name;
   form.description = offer.description || '';
+  form.publishMode = offer.publishMode ?? 'PUBLIC';
   form.type = offer.type;
   form.applicability = offer.type === 'BUNDLE' ? 'SPECIFIC_COURSES' : offer.applicability;
   form.percentage = offer.percentage ?? null;
@@ -256,6 +276,11 @@ const onTypeChange = (value: string | number | string[] | null) => {
   }
 };
 
+const onPublishModeChange = (value: string | number | string[] | null) => {
+  const next = Array.isArray(value) ? (value[0] as OfferPublishMode) : (value as OfferPublishMode);
+  form.publishMode = next ?? 'PUBLIC';
+};
+
 const onApplicabilityChange = (value: string | number | string[] | null) => {
   if (form.type === 'BUNDLE') {
     form.applicability = 'SPECIFIC_COURSES';
@@ -294,6 +319,7 @@ const handleSubmit = () => {
   const payload: OfferPayload & { code?: string } = {
     name: form.name,
     description: form.description || undefined,
+    publishMode: form.publishMode,
     type: form.type,
     applicability: form.applicability,
     percentage: form.type === 'PERCENTAGE' ? form.percentage ?? undefined : undefined,

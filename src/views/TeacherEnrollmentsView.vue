@@ -65,6 +65,14 @@
             </a>
             <span v-else class="teacher-enrollments__empty">—</span>
           </template>
+          <template #item.courseTitle="{ item }">
+            <div class="teacher-enrollments__course-meta">
+              <span>{{ item.courseTitle }}</span>
+              <small v-if="paymentUsageSummary(item)" class="teacher-enrollments__course-helper">
+                {{ paymentUsageSummary(item) }}
+              </small>
+            </div>
+          </template>
           <template #item.method="{ item }">
             {{ formatManualMethod(item.method) }}
           </template>
@@ -93,6 +101,7 @@
               <div class="teacher-enrollments__list-titles">
                 <h3>{{ payment.courseTitle }}</h3>
                 <span>{{ formatManualMethod(payment.method) }}</span>
+                <span v-if="paymentUsageSummary(payment)">{{ paymentUsageSummary(payment) }}</span>
               </div>
               <UiTag :color="statusColor(payment.status)" size="sm">{{ payment.status }}</UiTag>
             </header>
@@ -167,6 +176,9 @@
                 </option>
               </UiSelect>
               <span class="teacher-enrollments__course-helper">{{ currentCourseLabel(item.courseId) }}</span>
+              <span v-if="enrollmentUsageSummary(item)" class="teacher-enrollments__course-helper">
+                {{ enrollmentUsageSummary(item) }}
+              </span>
             </div>
           </template>
           <template #item.status="{ item }">
@@ -211,6 +223,9 @@
                 </option>
               </UiSelect>
               <small class="teacher-enrollments__course-helper">{{ currentCourseLabel(enrollment.courseId) }}</small>
+              <small v-if="enrollmentUsageSummary(enrollment)" class="teacher-enrollments__course-helper">
+                {{ enrollmentUsageSummary(enrollment) }}
+              </small>
             </div>
             <dl class="teacher-enrollments__list-grid">
               <div>
@@ -243,9 +258,11 @@
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/stores/auth';
 import { useCoursesStore } from '@/stores/courses';
 import { useToast } from '@/composables/useToast';
 import api from '@/services/api';
+import { isSessionRedirecting } from '@/lib/sessionExpiry';
 import {
   getTeacherManualPayments,
   reviewManualPayment,
@@ -269,6 +286,7 @@ import UiDialog from '@/components/ui/UiDialog.vue';
 import UiTextarea from '@/components/ui/UiTextarea.vue';
 
 const { t } = useI18n();
+const auth = useAuthStore();
 const toast = useToast();
 const selectedStatus = ref<ManualPaymentStatus>('pending');
 const payments = ref<ManualPaymentView[]>([]);
@@ -402,6 +420,32 @@ const statusColor = (status: string) => {
       return 'danger';
     default:
       return 'info';
+  }
+};
+
+const paymentUsageSummary = (payment: ManualPaymentView) => {
+  if (payment.source === 'FREE_OFFER_CHECKOUT' && payment.offerCode) {
+    return t('teacher.enrollmentSourceFreeOffer', { code: payment.offerCode });
+  }
+  return '';
+};
+
+const enrollmentUsageSummary = (enrollment: EnrollmentView) => {
+  if (enrollment.source === 'FREE_OFFER_CHECKOUT' && enrollment.offerCode) {
+    return t('teacher.enrollmentSourceFreeOffer', { code: enrollment.offerCode });
+  }
+  return '';
+};
+
+const isAuthFailure = (error: unknown) => {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 401 || status === 403 || status === 419;
+};
+
+const stopPolling = () => {
+  if (pollHandle) {
+    window.clearInterval(pollHandle);
+    pollHandle = undefined;
   }
 };
 
@@ -541,15 +585,25 @@ watch(selectedStatus, async () => {
 onMounted(async () => {
   await Promise.all([loadPayments(), loadEnrollments(), ensureCoursesLoaded()]);
   pollHandle = window.setInterval(async () => {
-    await loadPayments();
-    await loadEnrollments();
+    if (!auth.isAuthenticated || !auth.isTeacherLike || isSessionRedirecting()) {
+      stopPolling();
+      return;
+    }
+    try {
+      await loadPayments();
+      await loadEnrollments();
+    } catch (error) {
+      if (isAuthFailure(error)) {
+        stopPolling();
+        return;
+      }
+      console.error(error);
+    }
   }, 5000);
 });
 
 onBeforeUnmount(() => {
-  if (pollHandle) {
-    window.clearInterval(pollHandle);
-  }
+  stopPolling();
 });
 </script>
 
@@ -715,6 +769,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: var(--sakai-space-1);
+}
+
+.teacher-enrollments__course-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .teacher-enrollments__course-select {

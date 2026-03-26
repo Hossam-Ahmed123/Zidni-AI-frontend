@@ -121,6 +121,20 @@
             />
           </div>
 
+          <div class="teacher-assessments__form-grid">
+            <UiInput
+              :model-value="createForm.maxAttempts"
+              type="number"
+              min="1"
+              :label="t('assessments.maxAttempts')"
+              @update:model-value="(value) => (createForm.maxAttempts = Math.max(1, Number(value ?? 1)))"
+            />
+            <UiCheckbox
+              v-model="createForm.revealAnswersAfterGrading"
+              :label="t('assessments.revealAnswersAfterGrading')"
+            />
+          </div>
+
           <UiInput
             v-if="isExternalForm"
             v-model="createForm.embedUrl"
@@ -182,6 +196,7 @@ import UiSelect from '@/components/ui/UiSelect.vue';
 import UiInput from '@/components/ui/UiInput.vue';
 import UiBadge from '@/components/ui/UiBadge.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
+import UiCheckbox from '@/components/ui/UiCheckbox.vue';
 
 const store = useAssessmentsStore();
 const coursesStore = useCoursesStore();
@@ -196,7 +211,9 @@ const createForm = reactive({
   title: '',
   type: 'quiz',
   durationMinutes: 10,
-  embedUrl: ''
+  embedUrl: '',
+  maxAttempts: 1,
+  revealAnswersAfterGrading: true
 });
 
 const headers = computed(() => [
@@ -232,7 +249,9 @@ const createAssessment = async () => {
     title: createForm.title,
     type: createForm.type,
     durationMinutes: createForm.durationMinutes,
-    embedUrl: isExternalForm.value ? createForm.embedUrl.trim() : null
+    embedUrl: isExternalForm.value ? createForm.embedUrl.trim() : null,
+    maxAttempts: createForm.maxAttempts,
+    revealAnswersAfterGrading: createForm.revealAnswersAfterGrading
   });
   showCreate.value = false;
   createForm.courseId = null;
@@ -240,6 +259,8 @@ const createAssessment = async () => {
   createForm.type = 'quiz';
   createForm.durationMinutes = 10;
   createForm.embedUrl = '';
+  createForm.maxAttempts = 1;
+  createForm.revealAnswersAfterGrading = true;
   router.push({ name: 'teacher-assessment-builder', params: { assessmentId: id } });
 };
 

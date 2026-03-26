@@ -269,7 +269,7 @@
                   </div>
                 </div>
               </section>
-              <!-- 
+              
               <section
                 class="teacher-landing-branding__section teacher-landing-branding__section--template"
               >
@@ -317,7 +317,7 @@
                     </button>
                   </div>
                 </div>
-              </section> -->
+              </section>
 
               <section class="teacher-landing-branding__section">
                 <header class="teacher-landing-branding__section-header">

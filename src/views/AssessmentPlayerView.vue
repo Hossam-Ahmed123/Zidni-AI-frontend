@@ -22,7 +22,11 @@
       <div class="assessment-player__meta">
         <UiBadge color="primary" variant="soft">{{ assessment.type.toUpperCase() }}</UiBadge>
         <UiBadge color="secondary" variant="soft">
-          {{ t('assessments.timeRemaining', { time: formattedTime }) }}
+          {{
+            isReadOnly
+              ? t('assessments.reviewMode')
+              : t('assessments.timeRemaining', { time: formattedTime })
+          }}
         </UiBadge>
       </div>
 
@@ -88,19 +92,26 @@
                 <label
                   v-for="option in optionOrder[currentQuestion.itemId] || []"
                   :key="option.id"
-                  class="assessment-player__option"
+                  :class="[
+                    'assessment-player__option',
+                    {
+                      'assessment-player__option--selected': isSelectedOption(currentQuestion.itemId, option.key),
+                      'assessment-player__option--correct': shouldRevealCorrectAnswers && isCorrectOption(currentQuestion.itemId, option.key),
+                      'assessment-player__option--incorrect': shouldRevealCorrectAnswers && isSelectedOption(currentQuestion.itemId, option.key) && !isCorrectOption(currentQuestion.itemId, option.key)
+                    }
+                  ]"
                 >
                   <input
                     type="radio"
                     :name="`question-${currentQuestion.itemId}`"
-                    :value="option.label"
+                    :value="option.key"
                     :checked="
-                      answers[currentQuestion.itemId].selected[0] === option.label
+                      answers[currentQuestion.itemId].selected[0] === option.key
                     "
-                    @change="updateSingleAnswer(currentQuestion.itemId, option.label)"
+                    @change="updateSingleAnswer(currentQuestion.itemId, option.key)"
                     :disabled="isReadOnly"
                   />
-                  <span class="assessment-player__option-text">{{ option.label }}. {{ option.text }}</span>
+                  <span class="assessment-player__option-text">{{ displayOptionLabel(option) }}. {{ option.text }}</span>
                 </label>
               </fieldset>
             </template>
@@ -110,15 +121,22 @@
                 <label
                   v-for="option in optionOrder[currentQuestion.itemId] || []"
                   :key="option.id"
-                  class="assessment-player__option"
+                  :class="[
+                    'assessment-player__option',
+                    {
+                      'assessment-player__option--selected': isSelectedOption(currentQuestion.itemId, option.key),
+                      'assessment-player__option--correct': shouldRevealCorrectAnswers && isCorrectOption(currentQuestion.itemId, option.key),
+                      'assessment-player__option--incorrect': shouldRevealCorrectAnswers && isSelectedOption(currentQuestion.itemId, option.key) && !isCorrectOption(currentQuestion.itemId, option.key)
+                    }
+                  ]"
                 >
                   <input
                     type="checkbox"
-                    :value="option.label"
+                    :value="option.key"
                     v-model="answers[currentQuestion.itemId].selected"
                     :disabled="isReadOnly"
                   />
-                  <span class="assessment-player__option-text">{{ option.label }}. {{ option.text }}</span>
+                  <span class="assessment-player__option-text">{{ displayOptionLabel(option) }}. {{ option.text }}</span>
                 </label>
               </fieldset>
             </template>
@@ -157,6 +175,41 @@
                 :disabled="isReadOnly"
               />
             </template>
+          </div>
+          <div v-if="currentAttemptQuestion" class="assessment-player__review">
+            <UiBadge
+              v-if="latestStatus === 'graded'"
+              :color="currentAttemptQuestion.correct ? 'success' : 'warning'"
+              variant="soft"
+            >
+              {{
+                currentAttemptQuestion.correct
+                  ? t('assessments.questionCorrect')
+                  : t('assessments.questionIncorrect')
+              }}
+            </UiBadge>
+            <p v-if="reviewAnswerSummary" class="assessment-player__review-line">
+              <strong>{{ t('assessments.yourAnswer') }}:</strong> {{ reviewAnswerSummary }}
+            </p>
+            <p
+              v-if="shouldRevealCorrectAnswers && reviewCorrectAnswerSummary"
+              class="assessment-player__review-line"
+            >
+              <strong>{{ t('assessments.correctAnswers') }}:</strong> {{ reviewCorrectAnswerSummary }}
+            </p>
+            <p
+              v-else-if="latestStatus === 'graded' && !shouldRevealCorrectAnswers"
+              class="assessment-player__review-line"
+            >
+              {{ t('assessments.correctAnswersHidden') }}
+            </p>
+            <p v-if="currentAttemptQuestion.feedback" class="assessment-player__review-line">
+              <strong>{{ t('assessments.feedbackLabel') }}:</strong> {{ currentAttemptQuestion.feedback }}
+            </p>
+            <p v-if="latestStatus === 'graded'" class="assessment-player__review-line">
+              <strong>{{ t('assessments.scoreLabel') }}:</strong>
+              {{ questionScore(currentAttemptQuestion) }} / {{ currentAttemptQuestion.points }}
+            </p>
           </div>
         </article>
       </div>
@@ -257,7 +310,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import { useAssessmentsStore } from '@/stores/assessments';
 import { useI18n } from 'vue-i18n';
-import type { AssessmentPlayQuestionResponse } from '@/services/assessments';
+import type { AssessmentPlayQuestionResponse, AttemptQuestionResponse } from '@/services/assessments';
 import UiTextarea from '@/components/ui/UiTextarea.vue';
 import UiDialog from '@/components/ui/UiDialog.vue';
 
@@ -276,13 +329,27 @@ const assessmentSummary = computed(() =>
 const latestStatus = computed(() =>
   assessmentSummary.value?.latestAttemptStatus?.toString().toLowerCase() ?? ''
 );
+const retakeMode = computed(
+  () =>
+    route.query.mode === 'retake' &&
+    latestStatus.value === 'graded' &&
+    (assessmentSummary.value?.attemptsUsed ?? 0) < (assessmentSummary.value?.maxAttempts ?? 1)
+);
+const reviewAttempt = computed(() => store.currentStudentAttempt);
 const isReadOnly = computed(
   () =>
-    latestStatus.value === 'submitted' ||
-    latestStatus.value === 'pending_result' ||
-    latestStatus.value === 'graded'
+    !retakeMode.value &&
+    (latestStatus.value === 'submitted' ||
+      latestStatus.value === 'pending_result' ||
+      latestStatus.value === 'graded')
+);
+const shouldRevealCorrectAnswers = computed(
+  () => !retakeMode.value && latestStatus.value === 'graded' && Boolean(assessment.value?.revealAnswersAfterGrading)
 );
 const statusBanner = computed(() => {
+  if (retakeMode.value) {
+    return t('assessments.bannerRetake');
+  }
   if (latestStatus.value === 'submitted' || latestStatus.value === 'pending_result') {
     return t('assessments.bannerPendingReview');
   }
@@ -298,6 +365,9 @@ const statusBanner = computed(() => {
   return '';
 });
 const statusTone = computed(() => {
+  if (retakeMode.value) {
+    return 'info';
+  }
   if (latestStatus.value === 'submitted' || latestStatus.value === 'pending_result') {
     return 'warning';
   }
@@ -357,6 +427,14 @@ const currentQuestion = computed(
 const currentQuestionNumber = computed(() =>
   currentQuestion.value ? currentQuestionIndex.value + 1 : 0
 );
+const currentAttemptQuestion = computed(() => {
+  if (!currentQuestion.value) {
+    return null;
+  }
+  return reviewAttempt.value?.questions.find(
+    (question) => question.questionVersionId === currentQuestion.value?.questionVersionId
+  ) ?? null;
+});
 const isFirstQuestion = computed(() => currentQuestionIndex.value <= 0);
 const isLastQuestion = computed(() => {
   if (!totalQuestions.value) return true;
@@ -369,6 +447,64 @@ const answerState = (itemId: number) => {
   }
   return answers[itemId];
 };
+
+const displayOptionLabel = (option: AssessmentPlayQuestionResponse['options'][number]) =>
+  option.label?.trim() || option.key;
+
+const optionDisplayText = (
+  option: AssessmentPlayQuestionResponse['options'][number] | AttemptQuestionResponse['options'][number],
+  index: number
+) => `${option.label?.trim() || String.fromCharCode(65 + index)}. ${option.text}`;
+
+const isSelectedOption = (itemId: number, optionKey: string) =>
+  answers[itemId]?.selected.includes(optionKey) ?? false;
+
+const isCorrectOption = (itemId: number, optionKey: string) =>
+  currentAttemptQuestion.value?.correctOptionKeys?.includes(optionKey) ?? false;
+
+const formatOptionKeys = (
+  question: AttemptQuestionResponse | null,
+  keys: string[] | null | undefined
+) => {
+  if (!question || !keys?.length) {
+    return '';
+  }
+  return keys
+    .map((key) => {
+      const index = question.options.findIndex((option) => option.key === key);
+      const option = index >= 0 ? question.options[index] : null;
+      return option ? optionDisplayText(option, index) : key;
+    })
+    .join(', ');
+};
+
+const reviewAnswerSummary = computed(() => {
+  if (!currentAttemptQuestion.value) {
+    return '';
+  }
+  if (currentAttemptQuestion.value.type === 'short') {
+    return currentAttemptQuestion.value.textAnswer?.trim() || t('assessments.notSubmitted');
+  }
+  return formatOptionKeys(currentAttemptQuestion.value, currentAttemptQuestion.value.selectedOptionKeys);
+});
+
+const reviewCorrectAnswerSummary = computed(() => {
+  if (!currentAttemptQuestion.value || currentAttemptQuestion.value.type === 'short') {
+    return '';
+  }
+  return formatOptionKeys(currentAttemptQuestion.value, currentAttemptQuestion.value.correctOptionKeys);
+});
+
+const questionScore = (question: AttemptQuestionResponse) =>
+  (Number(question.autoScore ?? 0) + Number(question.manualScore ?? 0)).toFixed(1);
+
+const itemIdByQuestionVersionId = computed(() => {
+  const map = new Map<number, number>();
+  playerQuestions.value.forEach((question) => {
+    map.set(question.questionVersionId, question.itemId);
+  });
+  return map;
+});
 
 const initializeAnswers = () => {
   if (!playerQuestions.value.length) return;
@@ -388,6 +524,18 @@ const initializeAnswers = () => {
       delete answers[numericKey];
       delete optionOrder[numericKey];
     }
+  });
+};
+
+const applyAttemptAnswers = (attemptQuestions: AttemptQuestionResponse[]) => {
+  attemptQuestions.forEach((question) => {
+    const itemId = itemIdByQuestionVersionId.value.get(question.questionVersionId);
+    if (itemId == null) {
+      return;
+    }
+    const state = answerState(itemId);
+    state.selected = [...(question.selectedOptionKeys ?? [])];
+    state.text = question.textAnswer ?? '';
   });
 };
 
@@ -461,6 +609,9 @@ const startTimer = () => {
     if (timeRemaining.value === 0 && timer) {
       clearInterval(timer);
       timer = null;
+      if (!submitting.value && !isExternalForm.value) {
+        void submit();
+      }
     }
   }, 1000);
 };
@@ -555,8 +706,16 @@ onMounted(async () => {
   try {
     await store.loadStudentAssessments();
     await store.loadStudentAssessment(assessmentId.value);
+    if (!isReadOnly.value) {
+      store.currentStudentAttempt = null;
+    }
     initializeAnswers();
-    loadDraft();
+    if (isReadOnly.value) {
+      const attempt = await store.loadLatestStudentAttempt(assessmentId.value);
+      applyAttemptAnswers(attempt.questions);
+    } else {
+      loadDraft();
+    }
     startTimer();
   } catch (e) {
     console.error('Failed to load assessment', e);
@@ -719,6 +878,20 @@ onBeforeUnmount(() => {
     background var(--sakai-transition-duration) var(--sakai-transition-ease);
 }
 
+.assessment-player__option--selected {
+  border-color: color-mix(in srgb, var(--sakai-primary) 35%, transparent);
+}
+
+.assessment-player__option--correct {
+  border-color: color-mix(in srgb, var(--sakai-success) 50%, transparent);
+  background: color-mix(in srgb, var(--sakai-success) 10%, transparent);
+}
+
+.assessment-player__option--incorrect {
+  border-color: color-mix(in srgb, var(--sakai-warning) 50%, transparent);
+  background: color-mix(in srgb, var(--sakai-warning) 10%, transparent);
+}
+
 .assessment-player__option:hover,
 .assessment-player__option:focus-within {
   border-color: color-mix(in srgb, var(--sakai-primary) 35%, transparent);
@@ -734,6 +907,19 @@ onBeforeUnmount(() => {
 .assessment-player__option-text {
   color: var(--sakai-text-color);
   font-weight: var(--sakai-font-weight-medium);
+}
+
+.assessment-player__review {
+  margin-top: var(--sakai-space-4);
+  padding-top: var(--sakai-space-4);
+  border-top: 1px solid color-mix(in srgb, var(--sakai-border-color) 85%, transparent);
+  display: grid;
+  gap: var(--sakai-space-2);
+}
+
+.assessment-player__review-line {
+  margin: 0;
+  color: var(--sakai-text-color-secondary);
 }
 
 .assessment-player__actions {

@@ -7,12 +7,7 @@
             <div class="footer-widget">
               <div class="footer__about">
                 <h4 class="fw-title">{{ t("footer.about") }}</h4>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Fugit amet numquam iure provident voluptate essequasi,
-                  veritatis totam voluptas nostrum.Lorem ipsum dolor sit amet,
-                  consectetur
-                </p>
+                <p>{{ aboutText }}</p>
               </div>
             </div>
           </div>
@@ -50,7 +45,7 @@
                   :key="index"
                   :href="item.title"
                 >
-                  <a :href="`${teachername}/courses/${item.id}`">{{
+                  <a :href="`/${teacherSlug}/courses/${item.id}`">{{
                     item.title
                   }}</a>
                 </li>
@@ -90,7 +85,7 @@
                   <!-- <a :href="instagram"><i class="pi pi-instagram"></i></a>
                   <a :href="linkedin"><i class="pi pi-linkedin"></i></a> -->
 
-                  <a :href="`tel:/${footerPhoneLink.value}`"
+                  <a v-if="footerPhoneLink?.value" :href="`tel:${footerPhoneLink.value}`"
                     ><i class="pi pi-phone"></i
                   ></a>
                 </li>
@@ -105,7 +100,7 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="copyright__text">
-              <p>Copyright © 2026 {{ teachername }} . All rights reserved.</p>
+              <p>Copyright © 2026 {{ academyName }}. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -114,24 +109,40 @@
   </footer>
 </template>
 
-<script setup>
-// import {
-//   LOCALE_STORAGE_KEY,
-//   loadLocaleMessages,
-//   type SupportedLocale,
-// } from "@/plugins/i18n";
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
-const { t, locale } = useI18n();
-const props = defineProps({
-  footerSocialLinks: Array,
-  footerPhoneLink: {},
-  featuredCourses: Array,
-  teachername: String,
-});
-// defineProps({
-//   footerSocialLinks: [],
-// });
-// console.log(footerSocialLinks);
+
+const { t } = useI18n();
+
+type FooterLink = {
+  href: string;
+  label: string;
+  value: string;
+  key: string;
+  icon?: string;
+  short?: string;
+};
+
+type FooterPhoneLink = {
+  href: string;
+  label: string;
+  value: string;
+  key: string;
+};
+
+type FeaturedCourse = {
+  id?: string | number | null;
+  title?: string;
+};
+
+defineProps<{
+  footerSocialLinks?: FooterLink[];
+  footerPhoneLink?: FooterPhoneLink | null;
+  featuredCourses?: FeaturedCourse[];
+  teacherSlug?: string;
+  academyName?: string;
+  aboutText?: string;
+}>();
 </script>
 <style scoped>
 :root,

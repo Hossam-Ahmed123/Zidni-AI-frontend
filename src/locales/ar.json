@@ -1931,6 +1931,7 @@
       "code": "الكود",
       "name": "الاسم",
       "description": "الوصف",
+      "publishMode": "نشر العرض",
       "type": "نوع العرض",
       "applicability": "نطاق التطبيق",
       "percentage": "النسبة",
@@ -1944,6 +1945,10 @@
       "percentage": "خصم بالنسبة",
       "fixed": "مبلغ ثابت",
       "bundle": "باقة"
+    },
+    "publishMode": {
+      "public": "عام",
+      "private": "خاص"
     },
     "applicability": {
       "all": "جميع الدورات",
@@ -2273,10 +2278,10 @@
       "label": "التنقل داخل صفحة المدرّس",
       "menu": "فتح القائمة",
       "home": "الرئيسية",
-      "about": "عن المدرّس",
+      "about": "عن الاكادمية",
       "courses": "الكورسات",
       "contact": "التواصل",
-      "assistant": "دخول المدرس المساعد",
+      "assistant": "دخول المدرب المساعد",
       "login": "دخول الطلاب",
       "register": "التسجيل",
       "edit": "تعديل الصفحة"
@@ -2311,7 +2316,7 @@
       "viewLanding": "عرض صفحة الهبوط"
     },
     "about": {
-      "badge": "عن المدرّس"
+      "badge": "عن الاكادمية"
     },
     "lessons": {
       "badge": "دروس مميزة",
@@ -2333,7 +2338,7 @@
       "subtitle": "تواصل معنا، استكشف أحدث الدروس وانضم إلى مجتمع التعلّم.",
       "register": "سجّل الآن",
       "login": "دخول الطلاب",
-      "assistant": "دخول المدرس المساعد",
+      "assistant": "دخول المدرب المساعد",
       "explore": "استكشف الدروس",
       "floating": "\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0645\u062f\u0631\u0633"
     },
@@ -2823,6 +2828,7 @@
     "approve": "قبول",
     "reject": "رفض",
     "enrollmentsTitle": "تسجيلات الطلاب",
+    "enrollmentSourceFreeOffer": "تم التسجيل تلقائياً باستخدام الكوبون {code}",
     "registrationsTitle": "تسجيلات الجلسات المباشرة",
     "registrationsSubtitle": "تابع حضور الطلبة في جلساتك المباشرة.",
     "registrationsExportCsv": "تصدير CSV",
@@ -3587,6 +3593,12 @@
     "paymentPendingNotice": "إثبات الدفع قيد المراجعة. يرجى الانتظار قبل الإرسال مرة أخرى.",
     "paymentRejectedNotice": "تم رفض إثبات الدفع. يرجى تصحيح المشكلة وإعادة الإرسال.",
     "paymentRejectedReasonLabel": "السبب",
+    "freeCheckoutTitle": "تفعيل دورتك",
+    "freeCheckoutSubtitle": "الكوبون يغطي سعر الدورة بالكامل، لذلك لا تحتاج إلى إيصال.",
+    "freeCheckoutNotice": "الكوبون {code} يمنحك الوصول الكامل مباشرة بعد التأكيد.",
+    "freeCheckoutAction": "تأكيد التسجيل",
+    "freeCheckoutSuccess": "تم إكمال التسجيل بنجاح.",
+    "freeCheckoutNotesLabel": "ملاحظات للمعلم (اختياري)",
     "emailInvalid": "يرجى إدخال بريد إلكتروني صالح."
   },
   "achievements": {
@@ -3667,7 +3679,7 @@
     }
   },
   "footer": {
-    "about": "عن المدرّس",
+    "about": "عن الاكادمية",
     "Resources": "المصادر",
     "Contact": "اتصل بنا",
     "Help": "مركز المساعدة",
@@ -4183,8 +4195,14 @@
     "refresh": "تحديث",
     "noStudentAssessments": "لم يتم تعيين اختبارات بعد.",
     "start": "ابدأ",
+    "retake": "إعادة المحاولة",
     "viewResults": "عرض النتيجة",
     "viewSubmission": "عرض المحاولة",
+    "reviewMode": "وضع المراجعة",
+    "maxAttempts": "الحد الأقصى للمحاولات",
+    "revealAnswersAfterGrading": "إظهار الإجابات الصحيحة بعد التصحيح",
+    "attemptsUsedLabel": "المحاولات",
+    "attemptsUsedValue": "{used} من {total}",
     "lastAttemptScore": "آخر محاولة: {score} ({status})",
     "playerSubtitle": "أكمل الاختبار خلال {minutes} دقيقة.",
     "timeRemaining": "الوقت المتبقي: {time}",
@@ -4201,6 +4219,12 @@
     "resultTitle": "تم إرسال المحاولة",
     "resultScore": "النتيجة: {score} ({status})",
     "submittedAt": "وقت التسليم",
+    "yourAnswer": "إجابتك",
+    "correctAnswers": "الإجابات الصحيحة",
+    "correctAnswersHidden": "الإجابات الصحيحة مخفية لهذا الاختبار.",
+    "questionCorrect": "صحيحة",
+    "questionIncorrect": "تحتاج مراجعة",
+    "scoreLabel": "الدرجة",
     "loadError": "تعذر تحميل الاختبار، حاول مرة أخرى.",
     "submitError": "تعذر إرسال المحاولة، يرجى المحاولة مرة أخرى.",
     "statusNotStarted": "غير مبدوء",
@@ -4211,6 +4235,7 @@
     "statusVoided": "ملغي",
     "bannerPending": "تم إرسال إجابتك، سيقوم المعلم بالمراجعة قريباً.",
     "bannerPendingReview": "تم إرسال إجابتك، سيقوم المعلم بالمراجعة قريباً.",
+    "bannerRetake": "يمكنك بدء محاولة جديدة لهذا الاختبار.",
     "bannerGraded": "تم تقييم محاولتك: {score} من {max} نقاط.",
     "pendingReviewMessage": "محاولتك قيد المراجعة من قبل المعلم."
   },
@@ -5299,11 +5324,13 @@
       "name": "اسم العرض",
       "subject": "المادة",
       "phoneCountryCode": "مفتاح الدولة",
-      "phoneNumber": "رقم الهاتف",
-      "plan": "الباقة",
-      "active": "المعلم نشط",
-      "save": "حفظ التغييرات",
-      "slug": "معرف المعلم (Slug)",
+        "phoneNumber": "رقم الهاتف",
+        "plan": "الباقة",
+        "active": "المعلم نشط",
+        "studentMultiDeviceLoginEnabled": "السماح للطلاب بتسجيل الدخول من أكثر من جهاز",
+        "studentMultiDeviceLoginHint": "عند التعطيل يبقى تسجيل الدخول محصورًا في جهاز واحد كما هو الآن. فعّل هذا الخيار للسماح لطلاب هذا المعلم بالدخول من أجهزة مختلفة.",
+        "save": "حفظ التغييرات",
+        "slug": "معرف المعلم (Slug)",
       "updateSlug": "تحديث المعرف",
       "joined": "تاريخ الانضمام",
       "studentCount": "عدد الطلاب",

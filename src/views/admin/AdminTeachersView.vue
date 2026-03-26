@@ -170,6 +170,11 @@
               </option>
             </UiSelect>
             <UiSwitch v-model="teacherForm.active" :label="t('adminTeachers.detail.active')" />
+            <UiSwitch
+              v-model="teacherForm.studentMultiDeviceLoginEnabled"
+              :label="t('adminTeachers.detail.studentMultiDeviceLoginEnabled')"
+              :hint="t('adminTeachers.detail.studentMultiDeviceLoginHint')"
+            />
 
             <div class="admin-teachers__dialog-actions">
               <UiButton type="submit" color="primary" :loading="detailDialog.submitting">
@@ -466,7 +471,8 @@ const teacherForm = reactive({
   phoneCountryCode: '+1',
   phoneNumber: '',
   plan: 'free',
-  active: true
+  active: true,
+  studentMultiDeviceLoginEnabled: false
 });
 
 const slugForm = ref('');
@@ -514,6 +520,7 @@ watch(selectedTeacher, (teacher) => {
     teacherForm.phoneNumber = '';
     teacherForm.plan = 'free';
     teacherForm.active = true;
+    teacherForm.studentMultiDeviceLoginEnabled = false;
     slugForm.value = '';
     usageOverridesEnabled.value = false;
     resetUsageOverridesForm();
@@ -525,6 +532,7 @@ watch(selectedTeacher, (teacher) => {
   teacherForm.phoneNumber = teacher.phoneNumber || '';
   teacherForm.plan = teacher.plan ?? 'free';
   teacherForm.active = teacher.active;
+  teacherForm.studentMultiDeviceLoginEnabled = Boolean(teacher.studentMultiDeviceLoginEnabled);
   slugForm.value = teacher.slug;
   const overrides = teacher.usageOverrides ?? null;
   usageOverridesEnabled.value = hasUsageOverrides(overrides);
@@ -674,6 +682,7 @@ async function submitUpdateTeacher() {
       phoneNumber: normalizedPhone.phoneNumber,
       plan: teacherForm.plan,
       active: teacherForm.active,
+      studentMultiDeviceLoginEnabled: teacherForm.studentMultiDeviceLoginEnabled,
       usageOverrides: buildUsageOverridesPayload()
     });
     teacherForm.phoneCountryCode = normalizedPhone.phoneCountryCode;

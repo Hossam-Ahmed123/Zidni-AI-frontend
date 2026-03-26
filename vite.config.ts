@@ -3,13 +3,9 @@ import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 
-export default defineConfig(({ mode }) => {
-  const API_PROXY_TARGET =
-    mode === 'development'
-      ? 'http://app-test.72.61.18.248.nip.io'
-      : 'http://localhost:8080';
+const API_PROXY_TARGET = 'http://localhost:8080';
 
-  return ({
+export default defineConfig(() => ({
   plugins: [vue(), vuetify({ autoImport: true })],
 
   resolve: {
@@ -34,17 +30,15 @@ export default defineConfig(({ mode }) => {
     }
   },
 
-    server: {
+  server: {
     host: true,
     port: 5174,
     allowedHosts: [
       '127.0.0.1.nip.io',
       'app.127.0.0.1.nip.io',
-      'app-test.127.0.0.1.nip.io',
-      'app-test.72.61.18.248.nip.io',
-      'mrhossam.72.61.18.248.nip.io'
+      'app-test.72.61.18.248.nip.io'
     ],
-      proxy: {
+        proxy: {
       '/api': {
         target: API_PROXY_TARGET,
         changeOrigin: true,
@@ -59,7 +53,6 @@ export default defineConfig(({ mode }) => {
               proxyReq.setHeader('X-Forwarded-Host', host);
               proxyReq.setHeader('X-Forwarded-Proto', 'http');
             }
-            proxyReq.setHeader('Origin', API_PROXY_TARGET);
           });
         }
       },
@@ -74,12 +67,11 @@ export default defineConfig(({ mode }) => {
         ws: true,
         secure: false
       }
-      }
-    },
-
-    hmr: {
-      host: 'app-test.127.0.0.1.nip.io',
-      protocol: 'ws'
     }
-  });
-});
+  },
+
+  hmr: {
+    host: 'app.127.0.0.1.nip.io',
+    protocol: 'ws'
+  }
+}));

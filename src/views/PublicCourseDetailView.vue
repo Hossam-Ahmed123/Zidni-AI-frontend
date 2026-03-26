@@ -28,6 +28,11 @@
         </ul> -->
           <ul class="main-menu">
             <li>
+              <RouterLink :to="teacherLandingHref">
+                {{ t("teacherLanding.navigation.home") }}
+              </RouterLink>
+            </li>
+            <li>
               <!-- <RouterLink
                 :to="`/teacher/${routeValue}#courses`"
                 class="topHeaderActionBtn"
@@ -83,6 +88,67 @@
               {{ t("courses.languageNa") }}
             </button>
           </div>
+          <button
+            type="button"
+            class="top-header__menu-toggle"
+            :aria-expanded="topHeaderMenuOpen"
+            :aria-label="t('teacherLanding.navigation.menu')"
+            @click="topHeaderMenuOpen = !topHeaderMenuOpen"
+          >
+            <i :class="topHeaderMenuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
+          </button>
+        </div>
+        <div v-show="topHeaderMenuOpen" class="top-header__mobile-panel">
+          <RouterLink :to="teacherLandingHref" @click="topHeaderMenuOpen = false">
+            {{ t("teacherLanding.navigation.home") }}
+          </RouterLink>
+          <a href="#customFooter" @click="topHeaderMenuOpen = false">{{
+            t("courses.coursesNav")
+          }}</a>
+          <a href="#customFooter" @click="topHeaderMenuOpen = false">{{
+            t("courses.aboutNav")
+          }}</a>
+          <a href="#customFooter" @click="topHeaderMenuOpen = false">{{
+            t("courses.contactNav")
+          }}</a>
+          <RouterLink
+            v-if="assistantLinkAvailable"
+            :to="assistantLoginRoute"
+            @click="topHeaderMenuOpen = false"
+          >
+            {{ t("teacherLanding.navigation.assistant") }}
+          </RouterLink>
+          <button
+            type="button"
+            class="topHeaderActionBtn greenAction"
+            @click="
+              topHeaderMenuOpen = false;
+              onTrackedLoginClick('footer_login');
+            "
+          >
+            {{ t("teacherLanding.navigation.login") }}
+          </button>
+          <RouterLink
+            :to="studentRegisterRoute"
+            class="topHeaderActionBtn"
+            @click="
+              topHeaderMenuOpen = false;
+              trackLandingEvent('footer_register');
+            "
+          >
+            {{ t("teacherLanding.navigation.register") }}
+          </RouterLink>
+          <button
+            type="button"
+            class="landing-header__language top-header__mobile-language"
+            :aria-label="languageToggleAria"
+            @click="
+              topHeaderMenuOpen = false;
+              toggleLanguage();
+            "
+          >
+            {{ t("courses.languageNa") }}
+          </button>
         </div>
       </div>
     </div>
@@ -330,34 +396,45 @@
             </div>
           </div>
           <div class="col-xl-4 col-lg-4 col-md-12">
-            <v-dialog v-model="dialog" max-width="800">
-              <v-card>
-                <v-card-title class="d-flex justify-space-between">
-                  <!-- Video Preview -->
-                  <span icon @click="closeDialog">
+            <v-dialog v-model="dialog" max-width="960">
+              <v-card class="public-course-preview-dialog">
+                <v-card-title class="public-course-preview-dialog__header">
+                  <div class="public-course-preview-dialog__copy">
+                    <h3 class="public-course-preview-dialog__title">
+                      {{ t("courses.CourseIntro") }}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    class="public-course-preview-dialog__close"
+                    @click="closeDialog"
+                  >
                     <i class="pi pi-times"></i>
-                  </span>
+                  </button>
                 </v-card-title>
 
-                <v-card-text>
-                  <!-- <video
-          ref="videoPlayer"
-          width="100%"
-          controls
-        >
-          <source src="/videos/sample.mp4" type="video/mp4" />
-          Your browser does not support video.
-        </video> -->
-                  <iframe
-                    width="100%"
-                    height="400"
-                    :src="
-                      course?.previewVideo ||
-                      'https://www.youtube.com/embed/VIDEO_ID'
-                    "
-                    frameborder="0"
-                    allowfullscreen
-                  ></iframe>
+                <v-card-text class="public-course-preview-dialog__body">
+                  <div class="public-course-preview-dialog__frame">
+                    <iframe
+                      v-if="coursePreviewYoutubeEmbedUrl"
+                      class="public-course-preview-dialog__embed"
+                      :src="coursePreviewYoutubeEmbedUrl"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen
+                    ></iframe>
+                    <MediaVideoPlayer
+                      v-else-if="coursePreviewVideoPlayerUrl"
+                      class="public-course-preview-player public-course-preview-dialog__player"
+                      :src="coursePreviewVideoPlayerUrl"
+                      controls
+                      playsinline
+                      crossorigin="anonymous"
+                    />
+                    <UiAlert v-else color="info" variant="soft">
+                      {{ t("courses.CourseIntro") }}
+                    </UiAlert>
+                  </div>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -377,19 +454,38 @@
               <div class="card">
                 <div class="card-body">
                   <div class="coursePreview">
-                    <div class="courses-video-img">
+                    <div class="courses-video-img public-course-preview-card">
                       <img
+                        class="public-course-preview-card__image"
                         :src="course?.thumbnailUrl || teacherAvatarSrc"
                         alt="Image"
                       />
 
+                      <div class="public-course-preview-card__veil"></div>
+                      <div class="public-course-preview-card__content">
+                        <h4 class="public-course-preview-card__title">
+                          {{ t("courses.CourseIntro") }}
+                        </h4>
+                        <p class="public-course-preview-card__meta">
+                          {{ coursePreviewKindLabel }}
+                        </p>
+                      </div>
+
                       <div class="video-play">
-                        <a
+                        <button
+                          v-if="hasCoursePreviewVideo"
+                          type="button"
                           @click="dialog = true"
-                          class="video-btn popup-youtube"
+                          class="video-btn popup-youtube public-course-preview-card__play"
                         >
                           <i class="pi pi-play"></i>
-                        </a>
+                        </button>
+                        <div
+                          v-else
+                          class="public-course-preview-card__empty"
+                        >
+                          {{ t("courses.CourseIntro") }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -551,143 +647,14 @@
         </div>
       </div>
     </div>
-    <!-- static footer -->
-    <footer
-      data-v-9673ac79=""
-      data-v-cf58bf54=""
-      class="footer-bg"
-      id="customFooter"
-    >
-      <div data-v-9673ac79="" class="footer__top-wrap">
-        <div data-v-9673ac79="" class="container-fluid">
-          <div data-v-9673ac79="" class="row">
-            <div data-v-9673ac79="" class="col-xl-5 col-lg-4 col-sm-6">
-              <div data-v-9673ac79="" class="footer-widget">
-                <div data-v-9673ac79="" class="footer__about">
-                  <h4 data-v-9673ac79="" class="fw-title">About</h4>
-                  <p data-v-9673ac79="">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Fugit amet numquam iure provident voluptate essequasi,
-                    veritatis totam voluptas nostrum.Lorem ipsum dolor sit amet,
-                    consectetur
-                  </p>
-                </div>
-              </div>
-            </div>
-            <!-- <div class="col-xl-3 col-lg-4 col-sm-6">
-            <div class="footer-widget widget_nav_menu">
-              <h4 class="fw-title">{{ t("footer.Resources") }}</h4>
-              <ul class="list-wrap">
-                <li>
-                  <a href="/about-us">{{ t("footer.about") }}</a>
-                </li>
-                <li>
-                  <a href="/contact">{{ t("footer.Contact") }}</a>
-                </li>
-                <li>
-                  <a href="/contact">{{ t("footer.Help") }}</a>
-                </li>
-                <li>
-                  <a href="/#">{{ t("footer.Refund") }}</a>
-                </li>
-                <li>
-                  <a href="/#">{{ t("footer.Conditions") }}</a>
-                </li>
-                <li>
-                  <a href="/#">{{ t("footer.Privacy") }}</a>
-                </li>
-              </ul>
-            </div>
-          </div> -->
-            <div data-v-9673ac79="" class="col-xl-4 col-lg-4 col-sm-6">
-              <div data-v-9673ac79="" class="footer-widget widget_nav_menu">
-                <h4 data-v-9673ac79="" class="fw-title">Courses</h4>
-                <ul data-v-9673ac79="" class="list-wrap">
-                  <li data-v-9673ac79="" href="photoshop">
-                    <a data-v-9673ac79="" href="mrhossam/courses/32"
-                      >photoshop</a
-                    >
-                  </li>
-                  <li data-v-9673ac79="" href="css3">
-                    <a data-v-9673ac79="" href="mrhossam/courses/26">css3</a>
-                  </li>
-                  <li data-v-9673ac79="" href="دورة بدون اسم">
-                    <a data-v-9673ac79="" href="mrhossam/courses/45"
-                      >دورة بدون اسم</a
-                    >
-                  </li>
-                  <!-- <li><a href="/courses">SEO Optimize</a></li>
-                <li><a href="/courses">Development</a></li>
-                <li><a href="/courses">Development</a></li>
-                <li><a href="/courses">Web Design</a></li>
-                <li><a href="/courses">SEO Optimize</a></li> -->
-                </ul>
-              </div>
-            </div>
-            <div data-v-9673ac79="" class="col-xl-3 col-lg-4 col-sm-6">
-              <div data-v-9673ac79="" class="footer-widget">
-                <h4 data-v-9673ac79="" class="fw-title">Contact</h4>
-                <!-- <ul class="list-unstyled mb-0">
-                <li
-                  v-for="item in footerSocialLinks"
-                  :key="`footer-social-${item.href}`"
-                >
-                  <a href="javascript:void(0);">{{ item.href }}</a>
-                </li>
-              </ul> -->
-                <ul data-v-9673ac79="" class="list-wrap m-0 p-0">
-                  <li data-v-9673ac79="" class="socials">
-                    <a
-                      data-v-9673ac79=""
-                      target="_blank"
-                      href="https://wa.me/01118367780"
-                      ><i data-v-9673ac79="" class="pi pi-whatsapp"></i></a
-                    ><a
-                      data-v-9673ac79=""
-                      target="_blank"
-                      href="https://www.facebook.com/sala7ssovetch"
-                      ><i data-v-9673ac79="" class="pi pi-facebook"></i></a
-                    ><a
-                      data-v-9673ac79=""
-                      target="_blank"
-                      href="https://www.instagram.com/salah_sayed_ibrahim/"
-                      ><i data-v-9673ac79="" class="pi pi-instagram"></i></a
-                    ><a
-                      data-v-9673ac79=""
-                      target="_blank"
-                      href="https://www.linkedin.com/in/salah-ibrahim-7a3030b0/"
-                      ><i data-v-9673ac79="" class="pi pi-linkedin"></i></a
-                    ><!-- <a :href="`https://wa.me/${whatsapp}`"
-                    ><i :class="`pi pi-${item.key}`"></i
-                  ></a> --><!-- <a :href="instagram"><i class="pi pi-instagram"></i></a>
-                  <a :href="linkedin"><i class="pi pi-linkedin"></i></a> --><a
-                      data-v-9673ac79=""
-                      href="tel:/012526668556"
-                      ><i data-v-9673ac79="" class="pi pi-phone"></i
-                    ></a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-v-9673ac79="" class="copyright__wrapper">
-        <div data-v-9673ac79="" class="container">
-          <div data-v-9673ac79="" class="row">
-            <div data-v-9673ac79="" class="col-lg-12">
-              <div data-v-9673ac79="" class="copyright__text">
-                <p data-v-9673ac79="">
-                  Copyright © 2026 mrhossam . All rights reserved.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-    <!-- <Footer /> -->
+    <Footer
+      :footerSocialLinks="footerSocialLinks"
+      :footerPhoneLink="footerPhoneLink"
+      :featuredCourses="featuredCourses"
+      :teacherSlug="teacherLandingSlug"
+      :academyName="academyName"
+      :aboutText="footerAboutText"
+    />
   </div>
 
   <!-- <ThemePage>
@@ -1208,9 +1175,17 @@ import { useStudentCheckoutStore } from "@/stores/studentCheckout";
 import { getStudentCourses } from "@/services/student";
 import { withPlaceholder } from "@/utils/placeholders";
 import { withCacheBusting } from "@/utils/cacheBusting";
+import { buildAuthenticatedMediaUrl } from "@/utils/media";
 import { isPreviewEnabled } from "@/utils/preview";
 import { getStoredTenantSlug } from "@/utils/tenantStorage";
 import { useToast } from "@/composables/useToast";
+import MediaVideoPlayer from "@/components/media/MediaVideoPlayer.vue";
+import {
+  fetchPublicTeacherLanding,
+  type TeacherLandingCourse,
+  type TeacherLandingFooterContact,
+  type TeacherLandingPublicResponse,
+} from "@/services/teacherLanding.api";
 
 interface PublicCoursePreviewResponse {
   course: {
@@ -1223,6 +1198,7 @@ interface PublicCoursePreviewResponse {
     language?: string;
     thumbnailUrl?: string;
     description?: string;
+    previewVideo?: string | null;
     stats: { modules: number; lessons: number; durationMinutes: number };
     reviews: { rating: number | null; count: number };
     offers: Array<{
@@ -1279,6 +1255,7 @@ const toast = useToast();
 const rating = ref(3);
 const ratingNew = ref(3);
 const response = ref<PublicCoursePreviewResponse | null>(null);
+const teacherLanding = ref<TeacherLandingPublicResponse | null>(null);
 const loading = ref(false);
 const error = ref(false);
 const enrollmentLoading = ref(false);
@@ -1293,6 +1270,7 @@ let sortedCoursesLast = [];
 const stickyCtaVisible = ref(false);
 const heroInView = ref(true);
 const isStickyBreakpoint = ref(false);
+const topHeaderMenuOpen = ref(false);
 const dialog = ref(false);
 const videoPlayer = ref(null);
 let heroObserver: IntersectionObserver | null = null;
@@ -1459,6 +1437,49 @@ const courseId = computed(() => Number(route.params.courseId));
 const course = computed<PublicCoursePreviewResponse["course"] | null>(
   () => response.value?.course ?? null
 );
+
+function extractYoutubeId(value?: string | null) {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  const patterns = [
+    /youtu\.be\/([\w-]{11})/i,
+    /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([\w-]{11})/i,
+  ];
+  for (const pattern of patterns) {
+    const match = trimmed.match(pattern);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  if (/^[\w-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
+  return "";
+}
+
+const coursePreviewYoutubeId = computed(() =>
+  extractYoutubeId(course.value?.previewVideo ?? null)
+);
+const coursePreviewYoutubeEmbedUrl = computed(() =>
+  coursePreviewYoutubeId.value
+    ? youtubeEmbed(coursePreviewYoutubeId.value)
+    : ""
+);
+const coursePreviewVideoPlayerUrl = computed(() => {
+  if (coursePreviewYoutubeId.value) {
+    return "";
+  }
+  return buildAuthenticatedMediaUrl(course.value?.previewVideo ?? null) ?? "";
+});
+const coursePreviewKindLabel = computed(() =>
+  coursePreviewYoutubeId.value ? "YouTube" : "Bunny Stream"
+);
+const hasCoursePreviewVideo = computed(
+  () =>
+    Boolean(coursePreviewYoutubeEmbedUrl.value) ||
+    Boolean(coursePreviewVideoPlayerUrl.value)
+);
 console.log("66");
 const sortedCourses = computed(() => {
   return course?.value?.whatYouWillLearn;
@@ -1509,8 +1530,102 @@ const teacherLandingHref = computed(() => {
   return router.resolve({
     name: "public-teacher-landing",
     params: { teacherSlug: teacherValue.slug },
-  }).href;
+    }).href;
 });
+const teacherLandingSlug = computed(
+  () => teacherLanding.value?.teacher.slug || teacher.value?.slug || slug.value
+);
+const academyName = computed(
+  () =>
+    teacherLanding.value?.teacher.displayName ||
+    teacher.value?.name ||
+    teacherLandingSlug.value
+);
+const footerAboutText = computed(
+  () =>
+    teacherLanding.value?.teacher.bio ||
+    teacherLanding.value?.sections.find((section) => section.type === "about")
+      ?.description ||
+    teacher.value?.tagline ||
+    ""
+);
+const featuredCourses = computed<TeacherLandingCourse[]>(
+  () => teacherLanding.value?.courses ?? []
+);
+
+const resolveFooterContactHref = (
+  key: keyof TeacherLandingFooterContact,
+  rawValue: unknown
+): string => {
+  const candidate = typeof rawValue === "string" ? rawValue.trim() : "";
+  if (!candidate) {
+    return "";
+  }
+  if (key === "whatsapp") {
+    const digits = candidate.replace(/[^\d]/g, "");
+    return digits ? `https://wa.me/${digits}` : "";
+  }
+  if (key === "phone") {
+    const digits = candidate.replace(/[^\d]/g, "");
+    return digits ? `tel:${digits}` : "";
+  }
+  if (key === "email") {
+    return candidate.includes("@") ? `mailto:${candidate}` : "";
+  }
+  if (/^https?:\/\//i.test(candidate)) {
+    return candidate;
+  }
+  return `https://${candidate.replace(/^\/+/, "")}`;
+};
+
+const footerContactLinks = computed(() => {
+  const contact = teacherLanding.value?.footerContact;
+  if (!contact) {
+    return [] as Array<{
+      href: string;
+      label: string;
+      value: string;
+      key: string;
+    }>;
+  }
+  const map: Array<[keyof TeacherLandingFooterContact, string]> = [
+    ["whatsapp", "teacherLanding.footerContact.whatsapp"],
+    ["phone", "teacherLanding.footerContact.phone"],
+    ["email", "teacherLanding.footerContact.email"],
+    ["website", "teacherLanding.footerContact.website"],
+    ["facebook", "teacherLanding.footerContact.facebook"],
+    ["instagram", "teacherLanding.footerContact.instagram"],
+    ["linkedin", "teacherLanding.footerContact.linkedin"],
+    ["telegram", "teacherLanding.footerContact.telegram"],
+  ];
+  return map
+    .map(([key, labelKey]) => {
+      const value = typeof contact[key] === "string" ? contact[key]!.trim() : "";
+      if (!value) return null;
+      return {
+        href: resolveFooterContactHref(key, value),
+        label: t(labelKey),
+        value,
+        key: String(key),
+      };
+    })
+    .filter(
+      (
+        item
+      ): item is { href: string; label: string; value: string; key: string } =>
+        Boolean(item)
+    );
+});
+
+const footerSocialLinks = computed(() =>
+  footerContactLinks.value.filter((item) =>
+    ["whatsapp", "website", "facebook", "instagram", "linkedin", "telegram"].includes(item.key)
+  )
+);
+
+const footerPhoneLink = computed(
+  () => footerContactLinks.value.find((item) => item.key === "phone") ?? null
+);
 const teacherRegisterHref = computed(
   () =>
     router.resolve({
@@ -2181,6 +2296,19 @@ async function loadCourse() {
   }
 }
 
+async function loadTeacherLandingFooter() {
+  if (!slug.value) {
+    teacherLanding.value = null;
+    return;
+  }
+  try {
+    teacherLanding.value = await fetchPublicTeacherLanding(slug.value);
+  } catch (err) {
+    teacherLanding.value = null;
+    console.warn("Failed to load teacher landing footer", err);
+  }
+}
+
 function applyBranding(branding?: Record<string, unknown>) {
   if (typeof document === "undefined") return;
 
@@ -2273,6 +2401,7 @@ onMounted(async () => {
   if (!tenantStore.branding) {
     await tenantStore.fetchBranding(slug.value);
   }
+  await loadTeacherLandingFooter();
   await loadCourse();
 
   // const stored = localStorage.getItem("footerSocialLinksInStorage");
@@ -2293,6 +2422,7 @@ onBeforeUnmount(() => {
 watch(
   () => route.fullPath,
   async () => {
+    await loadTeacherLandingFooter();
     await loadCourse();
   }
 );
@@ -3222,6 +3352,85 @@ function resetHead() {
   }
 }
 
+@media (max-width: 767px) {
+  .public-course__hero {
+    border-radius: 24px;
+  }
+
+  .public-course__hero-inner {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .public-course__title {
+    font-size: clamp(1.8rem, 8vw, 2.35rem);
+  }
+
+  .public-course__summary {
+    font-size: 0.96rem;
+  }
+
+  .public-course__cta > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .public-course__stats,
+  .public-course__highlights {
+    grid-template-columns: 1fr;
+  }
+
+  .public-course__teacher-card {
+    align-items: flex-start;
+  }
+
+  .public-course__section {
+    padding: 18px 16px;
+  }
+
+  .public-course__sticky-cta {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .public-course__sticky-actions {
+    width: 100%;
+  }
+
+  .public-course__sticky-share,
+  .public-course__sticky-actions > :not(.public-course__sticky-share) {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-course__hero-inner {
+    padding: 18px 14px;
+  }
+
+  .public-course__hero-banner {
+    padding: 12px;
+  }
+
+  .public-course__hero-banner-title {
+    font-size: 0.9rem;
+  }
+
+  .public-course__hero-banner-meta {
+    font-size: 0.8rem;
+  }
+
+  .public-course__teacher-card {
+    flex-direction: column;
+  }
+
+  .public-course__sticky-title {
+    white-space: normal;
+  }
+}
+
 @media (min-width: 992px) {
   .public-course__hero-footer {
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
@@ -3348,6 +3557,75 @@ function resetHead() {
   align-items: center;
   padding: 15px 0;
 }
+.top-header__menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(6, 30, 67, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: #061e43;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.top-header__mobile-panel {
+  display: none;
+}
+@media (max-width: 991px) {
+  .navbar-area .container-fluid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .top-header {
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .top-header .main-menu,
+  .top-header > div:last-of-type {
+    display: none;
+  }
+
+  .top-header__menu-toggle {
+    display: inline-flex;
+  }
+
+  .top-header__mobile-panel {
+    display: grid;
+    gap: 10px;
+    padding: 14px 0 6px;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  .top-header__mobile-panel a,
+  .top-header__mobile-panel .topHeaderActionBtn,
+  .top-header__mobile-panel .top-header__mobile-language {
+    width: 100%;
+    margin: 0;
+  }
+
+  .top-header__mobile-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: #061e43;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .top-header__mobile-language {
+    text-align: center;
+  }
+}
+@media (max-width: 480px) {
+  .top-header__mobile-panel a,
+  .landing-header__language,
+  .topHeaderActionBtn {
+    font-size: 13px;
+  }
+}
 .details-logo {
   height: 80px;
 }
@@ -3425,10 +3703,15 @@ function resetHead() {
 }
 .courses-video-img {
   position: relative;
+  overflow: hidden;
+  border-radius: 28px;
 }
 .courses-video-img img {
+  width: 100%;
   height: 350px;
   margin: auto;
+  object-fit: cover;
+  display: block;
 }
 .courses-video-img .video-play {
   position: absolute;
@@ -3440,6 +3723,74 @@ function resetHead() {
   justify-content: center;
   align-items: center;
   display: flex;
+}
+.public-course-preview-card {
+  min-height: 350px;
+  background: #061e43;
+  box-shadow: 0 24px 60px rgba(6, 30, 67, 0.18);
+}
+.public-course-preview-card__image {
+  transform: scale(1.01);
+  transition: transform 0.45s ease;
+}
+.public-course-preview-card:hover .public-course-preview-card__image {
+  transform: scale(1.06);
+}
+.public-course-preview-card__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(6, 30, 67, 0.08) 0%, rgba(6, 30, 67, 0.7) 100%),
+    linear-gradient(135deg, rgba(13, 110, 253, 0.24), rgba(4, 188, 83, 0.12));
+}
+.public-course-preview-card__content {
+  position: absolute;
+  inset-inline: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 2;
+  color: #fff;
+  display: grid;
+  gap: 0.45rem;
+  max-width: 70%;
+}
+.public-course-preview-card__badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+}
+.public-course-preview-card__title {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fff;
+}
+.public-course-preview-card__meta {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.95rem;
+}
+.public-course-preview-card__play {
+  top: auto;
+  border: 0;
+}
+.public-course-preview-card__empty {
+  position: relative;
+  z-index: 2;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-weight: 700;
+  backdrop-filter: blur(12px);
 }
 .video-btn {
   display: inline-block;
@@ -3484,6 +3835,140 @@ function resetHead() {
   display: flex;
   width: 100%;
   height: 100%;
+}
+.public-course-preview-dialog {
+  border-radius: 28px !important;
+  overflow: hidden;
+  background: #071a38;
+  color: #fff;
+}
+.public-course-preview-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+.public-course-preview-dialog__copy {
+  display: grid;
+  gap: 0.2rem;
+}
+.public-course-preview-dialog__eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.68);
+}
+.public-course-preview-dialog__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+.public-course-preview-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.public-course-preview-dialog__body {
+  padding: 0 1.25rem 1.25rem !important;
+}
+.public-course-preview-dialog__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #000;
+}
+.public-course-preview-dialog__embed,
+.public-course-preview-dialog__player {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .public-course-preview-card__content {
+    max-width: 100%;
+    inset-inline: 1rem;
+    bottom: 1rem;
+  }
+
+  .public-course-preview-card,
+  .courses-video-img img {
+    height: 280px;
+  }
+
+  .video-btn {
+    width: 68px;
+    height: 68px;
+    line-height: 68px;
+  }
+
+  .video-btn i {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 767px) {
+  .public-course-preview-card {
+    min-height: 280px;
+    border-radius: 22px;
+  }
+
+  .public-course-preview-card__title {
+    font-size: 1.15rem;
+  }
+
+  .public-course-preview-card__meta {
+    font-size: 0.88rem;
+  }
+
+  .public-course-preview-dialog {
+    border-radius: 22px !important;
+  }
+
+  .public-course-preview-dialog__header {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .public-course-preview-dialog__body {
+    padding: 0 1rem 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-course-preview-card,
+  .courses-video-img img {
+    height: 220px;
+  }
+
+  .public-course-preview-card__content {
+    inset-inline: 0.85rem;
+    bottom: 0.85rem;
+    gap: 0.35rem;
+  }
+
+  .public-course-preview-dialog__title {
+    font-size: 1.05rem;
+  }
+
+  .video-btn {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+  }
+
+  .video-btn i {
+    font-size: 30px;
+  }
 }
 @keyframes ripple {
   0%,

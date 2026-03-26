@@ -71,6 +71,67 @@
                 {{ t("courses.languageNa") }}
               </button>
             </div>
+            <button
+              type="button"
+              class="top-header__menu-toggle"
+              :aria-expanded="topHeaderMenuOpen"
+              :aria-label="t('teacherLanding.navigation.menu')"
+              @click="topHeaderMenuOpen = !topHeaderMenuOpen"
+            >
+              <i :class="topHeaderMenuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
+            </button>
+          </div>
+          <div
+            v-show="topHeaderMenuOpen"
+            class="top-header__mobile-panel"
+          >
+            <a href="#courses" @click="topHeaderMenuOpen = false">{{
+              t("courses.coursesNav")
+            }}</a>
+            <a href="#features" @click="topHeaderMenuOpen = false">{{
+              t("courses.aboutNav")
+            }}</a>
+            <a href="#inquiry" @click="topHeaderMenuOpen = false">{{
+              t("courses.contactNav")
+            }}</a>
+            <RouterLink
+              v-if="assistantLinkAvailable"
+              :to="assistantLoginRoute"
+              @click="topHeaderMenuOpen = false"
+            >
+              {{ t("teacherLanding.navigation.assistant") }}
+            </RouterLink>
+            <button
+              type="button"
+              class="topHeaderActionBtn greenAction"
+              @click="
+                topHeaderMenuOpen = false;
+                onTrackedLoginClick('footer_login');
+              "
+            >
+              {{ t("teacherLanding.navigation.login") }}
+            </button>
+            <RouterLink
+              :to="studentRegisterRoute"
+              class="topHeaderActionBtn"
+              @click="
+                topHeaderMenuOpen = false;
+                trackLandingEvent('footer_register');
+              "
+            >
+              {{ t("teacherLanding.navigation.register") }}
+            </RouterLink>
+            <button
+              type="button"
+              class="landing-header__language top-header__mobile-language"
+              :aria-label="languageToggleAria"
+              @click="
+                topHeaderMenuOpen = false;
+                toggleLanguage();
+              "
+            >
+              {{ t("courses.languageNa") }}
+            </button>
           </div>
         </div>
       </div>
@@ -195,133 +256,73 @@
                   :aria-expanded="mobileMenuOpen"
                   @click="mobileMenuOpen = !mobileMenuOpen"
                 >
-                  <span
-                    v-if="!mobileMenuOpen"
-                    class="teacher-landing__hamburger-icon"
+                  <i
+                    :class="
+                      mobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'
+                    "
                     aria-hidden="true"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <line x1="4" y1="6" x2="20" y2="6" />
-                      <line x1="4" y1="12" x2="20" y2="12" />
-                      <line x1="4" y1="18" x2="20" y2="18" />
-                    </svg>
-                  </span>
-                  <span
-                    v-else
-                    class="teacher-landing__hamburger-icon teacher-landing__hamburger-icon--close"
-                    aria-hidden="true"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </span>
+                  ></i>
                 </button>
               </div>
-              <Teleport to="body">
-                <Transition name="teacher-landing-drawer-backdrop">
-                  <div
-                    v-show="mobileMenuOpen"
-                    class="teacher-landing__drawer-backdrop"
-                    role="presentation"
-                    @click="mobileMenuOpen = false"
-                  />
-                </Transition>
-                <Transition
-                  :name="
-                    pageDirection === 'rtl'
-                      ? 'teacher-landing-drawer-panel-rtl'
-                      : 'teacher-landing-drawer-panel'
-                  "
-                >
-                  <aside
-                    v-show="mobileMenuOpen"
-                    class="teacher-landing__drawer"
-                    :class="{
-                      'teacher-landing__drawer--rtl': pageDirection === 'rtl',
-                    }"
-                    role="dialog"
-                    :aria-label="t('teacherLanding.navigation.label')"
-                    aria-modal="true"
-                  >
-                    <nav class="teacher-landing__drawer-nav">
-                      <a
-                        href="#hero"
-                        class="teacher-landing__nav-link"
-                        @click="mobileMenuOpen = false"
-                        >{{ t("teacherLanding.navigation.home") }}</a
-                      >
-                      <a
-                        href="#features"
-                        class="teacher-landing__nav-link"
-                        @click="mobileMenuOpen = false"
-                        >{{ t("teacherLanding.navigation.about") }}</a
-                      >
-                      <a
-                        href="#courses"
-                        class="teacher-landing__nav-link"
-                        @click="mobileMenuOpen = false"
-                        >{{ t("teacherLanding.navigation.courses") }}</a
-                      >
-
-                      <a
-                        href="#contact"
-                        class="teacher-landing__nav-link"
-                        @click="mobileMenuOpen = false"
-                        >{{ t("teacherLanding.navigation.contact") }}</a
-                      >
-                      <RouterLink
-                        v-if="assistantLinkAvailable"
-                        :to="assistantLoginRoute"
-                        class="teacher-landing__nav-link"
-                        @click="mobileMenuOpen = false"
-                      >
-                        {{ t("teacherLanding.navigation.assistant") }}
-                      </RouterLink>
-                      <button
-                        type="button"
-                        class="teacher-landing__nav-link"
-                        @click="onMobileLoginClick"
-                      >
-                        {{ t("teacherLanding.navigation.login") }}
-                      </button>
-                      <RouterLink
-                        :to="studentRegisterRoute"
-                        class="teacher-landing__nav-link teacher-landing__nav-link--cta"
-                        @click="mobileMenuOpen = false"
-                      >
-                        {{ t("teacherLanding.navigation.register") }}
-                      </RouterLink>
-                      <RouterLink
-                        v-if="canEditLanding"
-                        :to="editLandingRoute"
-                        class="teacher-landing__nav-link teacher-landing__nav-link--ghost"
-                        @click="mobileMenuOpen = false"
-                      >
-                        {{ t("teacherLanding.navigation.edit") }}
-                      </RouterLink>
-                    </nav>
-                  </aside>
-                </Transition>
-              </Teleport>
+            </div>
+            <div
+              v-show="mobileMenuOpen"
+              class="teacher-landing__mobile-panel teacher-landing__container"
+            >
+              <a
+                href="#hero"
+                class="teacher-landing__nav-link"
+                @click="mobileMenuOpen = false"
+                >{{ t("teacherLanding.navigation.home") }}</a
+              >
+              <a
+                href="#features"
+                class="teacher-landing__nav-link"
+                @click="mobileMenuOpen = false"
+                >{{ t("teacherLanding.navigation.about") }}</a
+              >
+              <a
+                href="#courses"
+                class="teacher-landing__nav-link"
+                @click="mobileMenuOpen = false"
+                >{{ t("teacherLanding.navigation.courses") }}</a
+              >
+              <a
+                href="#contact"
+                class="teacher-landing__nav-link"
+                @click="mobileMenuOpen = false"
+                >{{ t("teacherLanding.navigation.contact") }}</a
+              >
+              <RouterLink
+                v-if="assistantLinkAvailable"
+                :to="assistantLoginRoute"
+                class="teacher-landing__nav-link"
+                @click="mobileMenuOpen = false"
+              >
+                {{ t("teacherLanding.navigation.assistant") }}
+              </RouterLink>
+              <button
+                type="button"
+                class="teacher-landing__nav-link"
+                @click="onMobileLoginClick"
+              >
+                {{ t("teacherLanding.navigation.login") }}
+              </button>
+              <RouterLink
+                :to="studentRegisterRoute"
+                class="teacher-landing__nav-link teacher-landing__nav-link--cta"
+                @click="mobileMenuOpen = false"
+              >
+                {{ t("teacherLanding.navigation.register") }}
+              </RouterLink>
+              <RouterLink
+                v-if="canEditLanding"
+                :to="editLandingRoute"
+                class="teacher-landing__nav-link teacher-landing__nav-link--ghost"
+                @click="mobileMenuOpen = false"
+              >
+                {{ t("teacherLanding.navigation.edit") }}
+              </RouterLink>
             </div>
           </header>
 
@@ -892,7 +893,6 @@
                                   decoding="async"
                                 />
 
-                                <!-- <p >Error occurred</p> -->
                               </div>
                               <div class="teacher-landing__modern-course-body">
                                 <span
@@ -988,7 +988,7 @@
                         </div>
                       </div>
                       <section
-                        v-if="landing.testimonials?.length"
+                        v-if="localizedTestimonials.length"
                         class="teacher-landing__testimonials"
                       >
                         <div
@@ -1008,7 +1008,7 @@
                         </div>
                         <div class="row">
                           <div
-                            v-for="testimonial in landing.testimonials"
+                            v-for="testimonial in localizedTestimonials"
                             :key="testimonial.id"
                             class="col-xl-6 col-lg-6 col-md-6"
                           >
@@ -1209,7 +1209,9 @@
             :footerSocialLinks="footerSocialLinks"
             :footerPhoneLink="footerPhoneLink"
             :featuredCourses="featuredCourses"
-            :teachername="landing?.teacher?.slug"
+            :teacherSlug="landingSlug"
+            :academyName="academyName"
+            :aboutText="footerAboutText"
           />
           <!-- <footer
             class="teacher-landing__footer teacher-landing__modern-footer"
@@ -1250,7 +1252,7 @@
                       v-if="footerPhoneLink"
                       type="button"
                       class="teacher-landing__footer-social teacher-landing__footer-social--phone"
-                      :aria-label="footerPhoneLink.label"
+                      :aria-label="footerPhoneLink?.label"
                       @click="showFooterPhone = !showFooterPhone"
                     >
                       <img
@@ -1264,7 +1266,7 @@
                         v-if="showFooterPhone"
                         class="teacher-landing__footer-social-text"
                       >
-                        {{ footerPhoneLink.value }}
+                        {{ footerPhoneLink?.value }}
                       </span>
                     </button>
                   </div>
@@ -1366,7 +1368,7 @@ const localeReady = ref(false);
 const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
-const { t, locale } = useI18n();
+const { t, te, locale } = useI18n();
 const toast = useToast();
 const footerSSS = [
   { href: "https://wa.me/01118367780" },
@@ -1376,6 +1378,7 @@ const footerSSS = [
 ];
 const brandAvatarError = ref(false);
 const mobileMenuOpen = ref(false);
+const topHeaderMenuOpen = ref(false);
 const copyStatus = ref<"idle" | "success" | "error">("idle");
 const copyResetTimer = ref<number | null>(null);
 const qrPanelOpen = ref(false);
@@ -1856,6 +1859,19 @@ function ensureList(
   return fallback ? [...fallback] : [];
 }
 
+function resolveTranslatableText(
+  value: string | null | undefined,
+  fallback = ""
+): string {
+  const candidate = ensureString(value, "").trim();
+  if (!candidate) {
+    return fallback;
+  }
+  return candidate.startsWith("teacherLanding.") && te(candidate)
+    ? t(candidate)
+    : candidate;
+}
+
 function ensureStats(
   values: TeacherLandingSection["stats"] | undefined,
   fallback?: TeacherLandingSection["stats"]
@@ -2256,6 +2272,20 @@ const profileBio = computed(() =>
       ensureString(heroSection.value?.description, "")
     )
   )
+);
+
+const footerAboutText = computed(() =>
+  ensureString(
+    landing.value.teacher.bio,
+    ensureString(
+      aboutSection.value?.description,
+      ensureString(heroSection.value?.description, "")
+    )
+  )
+);
+
+const academyName = computed(() =>
+  ensureString(landing.value.teacher.displayName, landing.value.teacher.slug)
 );
 
 const heroTitle = computed(() =>
@@ -2737,6 +2767,14 @@ const mentorsList = computed(() => {
   return [...mentors, ...testimonialMentors].slice(0, 3);
 });
 
+const localizedTestimonials = computed(() =>
+  (landing.value.testimonials ?? []).map((testimonial) => ({
+    ...testimonial,
+    author: resolveTranslatableText(testimonial.author, ""),
+    quote: resolveTranslatableText(testimonial.quote, ""),
+  }))
+);
+
 type LandingFaqItem = {
   id?: number;
   question?: string;
@@ -3004,9 +3042,7 @@ const footerSocialLinks = computed(() => {
 const footerPhoneLink = computed(
   () => footerContactLinks.value.find((item) => item.key === "phone") ?? null
 );
-console.log(footerPhoneLink);
 const showFooterPhone = ref(false);
-console.log(footerSocialLinks);
 
 // localStorage.setItem(
 //   "footerSocialLinksInStorage",
@@ -5175,25 +5211,18 @@ onBeforeUnmount(() => {
   width: 3rem;
   height: 3rem;
   padding: 0;
-  border: none;
-  border-radius: 0.5rem;
-  background: color-mix(
-    in srgb,
-    var(--teacher-color-primary, #2563eb) 12%,
-    transparent
-  );
-  color: var(--teacher-color-primary, #2563eb);
+  border: 1px solid rgba(6, 30, 67, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: #061e43;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .teacher-landing__hamburger:hover,
 .teacher-landing__hamburger:focus-visible {
-  background: color-mix(
-    in srgb,
-    var(--teacher-color-primary, #2563eb) 20%,
-    transparent
-  );
+  background: rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.24);
 }
 
 .teacher-landing__hamburger:focus-visible {
@@ -5206,74 +5235,8 @@ onBeforeUnmount(() => {
   line-height: 0;
 }
 
-.teacher-landing__drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-}
-
-.teacher-landing__drawer {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 9999;
-  width: min(320px, 85vw);
-  padding: 1.5rem;
-  background: var(--teacher-color-surface, #fff);
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
-  overflow-y: auto;
-}
-
-.teacher-landing__drawer--rtl {
-  right: auto;
-  left: 0;
-  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.12);
-}
-
-.teacher-landing__drawer-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 2rem;
-}
-
-.teacher-landing__drawer-nav .teacher-landing__nav-link {
-  display: flex;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-}
-
-.teacher-landing-drawer-backdrop-enter-active,
-.teacher-landing-drawer-backdrop-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.teacher-landing-drawer-backdrop-enter-from,
-.teacher-landing-drawer-backdrop-leave-to {
-  opacity: 0;
-}
-
-.teacher-landing-drawer-panel-enter-active,
-.teacher-landing-drawer-panel-leave-active {
-  transition: transform 0.25s ease;
-}
-
-.teacher-landing-drawer-panel-enter-from,
-.teacher-landing-drawer-panel-leave-to {
-  transform: translateX(100%);
-}
-
-.teacher-landing-drawer-panel-rtl-enter-active,
-.teacher-landing-drawer-panel-rtl-leave-active {
-  transition: transform 0.25s ease;
-}
-
-.teacher-landing-drawer-panel-rtl-enter-from,
-.teacher-landing-drawer-panel-rtl-leave-to {
-  transform: translateX(-100%);
+.teacher-landing__mobile-panel {
+  display: none;
 }
 
 @media (max-width: 1024px) {
@@ -5282,7 +5245,7 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .teacher-landing__section {
     padding-block: var(--teacher-section-padding-mobile);
   }
@@ -5296,16 +5259,15 @@ onBeforeUnmount(() => {
   }
 
   .teacher-landing__header-inner {
-    flex-direction: column;
-    align-items: stretch;
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: 0.75rem;
   }
 
   .teacher-landing__header-actions {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
@@ -5313,6 +5275,20 @@ onBeforeUnmount(() => {
   .teacher-landing__language {
     width: 3rem;
     height: 3rem;
+  }
+
+  .teacher-landing__mobile-panel {
+    display: grid;
+    gap: 10px;
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  .teacher-landing__mobile-panel .teacher-landing__nav-link {
+    width: 100%;
+    margin: 0;
+    justify-content: flex-start;
+    min-height: 44px;
   }
 
   .teacher-landing {
@@ -6101,24 +6077,26 @@ onBeforeUnmount(() => {
 }
 
 .teacher-landing__modern-course-card {
+  display: grid;
+  grid-template-rows: 180px auto;
   background: white;
   border-radius: var(--teacher-radius-card);
-  overflow: visible;
+  overflow: hidden;
   text-align: left;
-  box-shadow: var(--teacher-shadow);
+  box-shadow: var(--sakai-shadow-sm, 0 10px 24px rgba(15, 23, 42, 0.08));
   transition: transform 220ms ease, box-shadow 220ms ease;
   position: relative;
   z-index: 1;
   margin-bottom: 30px;
-  border: 1px solid #e8e8e8;
-  padding: 10px;
-  box-shadow: none !important;
-  border-radius: 5px;
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color, #d9e2ec) 65%, transparent);
+  border-radius: 18px;
+  padding: 0;
 }
 
 .teacher-landing__modern-course-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--teacher-shadow-hover);
+  box-shadow: var(--sakai-shadow-md, 0 18px 38px rgba(15, 23, 42, 0.14));
 }
 
 .teacher-landing__modern-course-card--skeleton {
@@ -6160,9 +6138,15 @@ onBeforeUnmount(() => {
 }
 
 .teacher-landing__modern-course-media {
-  height: 230px;
+  min-height: 180px;
   overflow: hidden;
   position: relative;
+  border-radius: 0;
+  background: color-mix(
+    in srgb,
+    var(--teacher-color-primary, #2563eb) 10%,
+    #f8fafc
+  );
 }
 
 .teacher-landing__modern-course-badge {
@@ -6210,14 +6194,23 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  transition: transform 320ms ease;
+}
+
+.teacher-landing__modern-course-card:hover .teacher-landing__modern-course-image {
+  transform: scale(1.02);
 }
 
 .teacher-landing__modern-course-body {
-  padding: 2rem 10px;
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem;
 }
 
 .teacher-landing__modern-course-level {
   display: inline-block;
+  width: fit-content;
   padding: 0.4rem 0.95rem;
   border-radius: 999px;
   background: color-mix(
@@ -6231,19 +6224,22 @@ onBeforeUnmount(() => {
 }
 
 .teacher-landing__modern-course-title {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--teacher-color-text-primary, #0f172a);
 }
 
 .teacher-landing__modern-course-subtitle {
+  margin: 0;
   color: var(--teacher-color-text-secondary, #64748b);
-  margin-bottom: 0.8rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 48px;
+  min-height: 4.2em;
 }
 
 .teacher-landing__modern-course-tooltip {
@@ -6316,7 +6312,7 @@ onBeforeUnmount(() => {
   align-items: baseline;
   gap: 0.5rem;
   color: #fbbf24;
-  margin-bottom: 1.2rem;
+  margin: 0;
 }
 
 .teacher-landing__modern-course-rating {
@@ -6330,8 +6326,9 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 0.9rem;
-  border-top: 1px solid #e8e8e8;
-  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  padding-top: 0.9rem;
+  margin-top: 0.2rem;
 }
 
 .teacher-landing__testimonials {
@@ -6858,6 +6855,7 @@ onBeforeUnmount(() => {
   .teacher-landing__modern-hero {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 1.5rem;
   }
 
   .teacher-landing__modern-hero-text {
@@ -6875,8 +6873,10 @@ onBeforeUnmount(() => {
 
   .teacher-landing__modern-hero--below {
     justify-content: flex-start;
-    margin-top: -32px;
+    margin-top: 0;
     flex-wrap: wrap;
+    gap: 1.25rem;
+    padding-top: 0;
   }
 
   .teacher-landing__modern-heading {
@@ -6892,6 +6892,20 @@ onBeforeUnmount(() => {
   .teacher-landing__about-card {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .teacher-landing__hero-aside {
+    margin-top: 0;
+    gap: 1.25rem;
+  }
+
+  .teacher-landing__hero-top {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  [dir="rtl"] .teacher-landing__hero-top {
+    align-items: flex-start;
   }
 }
 
@@ -7008,6 +7022,241 @@ onBeforeUnmount(() => {
 @media (max-width: 767px) {
   .teacher-landing__inquiry-form {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navbar-area .container-fluid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .top-header {
+    gap: 12px;
+    justify-content: space-between;
+    text-align: initial;
+  }
+
+  .top-header .main-menu,
+  .top-header > div:last-of-type {
+    display: none;
+  }
+
+  .top-header__menu-toggle {
+    display: inline-flex;
+  }
+
+  .top-header__mobile-panel {
+    display: grid;
+    gap: 10px;
+    padding: 14px 0 6px;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  .top-header__mobile-panel a,
+  .top-header__mobile-panel .topHeaderActionBtn,
+  .top-header__mobile-panel .top-header__mobile-language {
+    width: 100%;
+    margin: 0;
+  }
+
+  .top-header__mobile-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: #061e43;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .top-header__mobile-language {
+    text-align: center;
+  }
+
+  .teacher-landing__footer-grid {
+    align-items: stretch;
+  }
+
+  .teacher-landing__footer-brand {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .teacher-landing__section--hero {
+    padding: 5rem 0 2.5rem;
+    min-height: auto;
+  }
+
+  .teacher-landing__hero-cover {
+    min-height: 220px;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .teacher-landing__modern-hero {
+    gap: 24px;
+  }
+
+  .teacher-landing__modern-hero--below,
+  [dir="rtl"] .teacher-landing__modern-hero--below,
+  [dir="ltr"] .teacher-landing__modern-hero--below {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .teacher-landing__hero-aside,
+  .teacher-landing__hero-top {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  [dir="rtl"] .teacher-landing__hero-aside,
+  [dir="rtl"] .teacher-landing__hero-top {
+    align-items: flex-end;
+  }
+
+  .teacher-landing__hero-avatar--standalone {
+    flex: 0 0 auto;
+  }
+
+  .teacher-landing__hero-avatar {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 0;
+  }
+
+  .teacher-landing__modern-hero-text,
+  .teacher-landing__hero-top .teacher-landing__modern-hero-text {
+    flex: 1 1 auto;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .teacher-landing__modern-hero-content {
+    padding: 24px 18px;
+    border-radius: 24px;
+  }
+
+  .teacher-landing__modern-title {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    line-height: 1.1;
+  }
+
+  .teacher-landing__modern-description {
+    font-size: 0.95rem;
+  }
+
+  .teacher-landing__hero-actions {
+    width: 100%;
+    margin-inline: 0;
+    justify-content: stretch;
+  }
+
+  .teacher-landing__modern-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .teacher-landing__hero-actions,
+  .teacher-landing__modern-actions,
+  .teacher-landing__contact-actions,
+  .teacher-landing__footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .teacher-landing__hero-actions > *,
+  .teacher-landing__modern-actions > *,
+  .teacher-landing__contact-actions > *,
+  .teacher-landing__footer-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .teacher-landing__modern-courses {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .teacher-landing__modern-course-media {
+    min-height: 210px;
+  }
+
+  .teacher-landing__modern-course-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .teacher-landing__modern-course-price {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .teacher-landing__modern-course-cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .teacher-landing__testimonials-grid,
+  .teacher-landing__modern-mentors,
+  .teacher-landing__footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .teacher-landing__testimonial-card,
+  .teacher-landing__contact,
+  .teacher-landing__inquiry {
+    padding-inline: 18px;
+  }
+
+  .teacher-landing__footer-social--phone {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .teacher-landing__copyright {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    padding: 12px 0;
+  }
+
+  .top-header__mobile-panel a,
+  .landing-header__language,
+  .topHeaderActionBtn {
+    font-size: 13px;
+  }
+
+  .teacher-landing__modern-course-media {
+    min-height: 190px;
+  }
+
+  .teacher-landing__modern-course-body {
+    padding: 0.9rem;
+  }
+
+  .teacher-landing__testimonial-card {
+    padding: 1.1rem 1rem 1.2rem;
+  }
+
+  .teacher-landing__inquiry,
+  .teacher-landing__contact {
+    padding: 18px 14px;
+  }
+
+  .teacher-landing__footer-socials {
+    gap: 0.45rem;
   }
 }
 </style>
@@ -7141,6 +7390,21 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   align-items: center;
   padding: 15px 0;
+}
+.top-header__menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(6, 30, 67, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  color: #061e43;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.top-header__mobile-panel {
+  display: none;
 }
 .details-logo {
   height: 80px;

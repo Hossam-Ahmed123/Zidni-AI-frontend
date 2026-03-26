@@ -42,6 +42,7 @@ import UiIcon from '@/components/ui/UiIcon.vue';
 import UiBadge from '@/components/ui/UiBadge.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
 import type { CheckoutItem } from '@/stores/studentCheckout';
+import { formatCheckoutMoney, resolveCheckoutCurrency } from '@/utils/checkoutCurrency';
 
 interface Props {
   items: CheckoutItem[];
@@ -61,49 +62,20 @@ const subtotal = computed(() =>
 );
 
 const resolvedCurrency = computed(() => {
-  if (typeof props.currency === 'string') {
-    const trimmed = props.currency.trim();
-    if (trimmed.length > 0) {
-      return trimmed.toUpperCase();
-    }
-  }
   const withCurrency = props.items.find(
     (item) => typeof item.currency === 'string' && item.currency.trim().length > 0
   );
-  if (withCurrency?.currency) {
-    return withCurrency.currency.trim().toUpperCase();
-  }
-  return 'EGP';
+  return resolveCheckoutCurrency(props.currency, withCurrency?.currency);
 });
 
 const fallbackTitle = computed(() => t('student.course'));
 
-const formatMoney = (amount?: number | null, currencyOverride?: string | null) => {
-  if (typeof amount !== 'number' || Number.isNaN(amount)) {
-    return '—';
-  }
-  const currency = (() => {
-    if (typeof currencyOverride === 'string') {
-      const trimmed = currencyOverride.trim();
-      if (trimmed.length > 0) {
-        return trimmed.toUpperCase();
-      }
-    }
-    return resolvedCurrency.value;
-  })();
-
-  try {
-    return new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
-  } catch (error) {
-    const fallbackValue = Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
-    return `${currency} ${fallbackValue}`;
-  }
-};
+const formatMoney = (amount?: number | null, currencyOverride?: string | null) =>
+  formatCheckoutMoney(
+    amount,
+    resolveCheckoutCurrency(currencyOverride, resolvedCurrency.value),
+    locale.value
+  );
 </script>
 
 <style scoped>

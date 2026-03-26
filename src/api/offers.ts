@@ -3,6 +3,7 @@ import api from '@/services/api';
 export type OfferStatus = 'CURRENT' | 'UPCOMING' | 'EXPIRED';
 export type OfferType = 'PERCENTAGE' | 'FIXED' | 'BUNDLE';
 export type OfferApplicability = 'ALL_COURSES' | 'SPECIFIC_COURSES';
+export type OfferPublishMode = 'PUBLIC' | 'PRIVATE';
 
 export interface OfferCourseSummary {
   id: number;
@@ -14,6 +15,7 @@ export interface OfferResponse {
   code: string;
   name: string;
   description?: string | null;
+  publishMode: OfferPublishMode;
   type: OfferType;
   applicability: OfferApplicability;
   percentage?: number | null;
@@ -44,6 +46,7 @@ export interface OfferPage {
 export interface OfferPayload {
   name: string;
   description?: string;
+  publishMode: OfferPublishMode;
   type: OfferType;
   applicability: OfferApplicability;
   percentage?: number;
