@@ -1276,6 +1276,11 @@ const videoPlayer = ref(null);
 let heroObserver: IntersectionObserver | null = null;
 let stickyMediaQuery: MediaQueryList | null = null;
 let removeMediaListener: (() => void) | null = null;
+
+function isDisabledTenantError(error: unknown) {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 403 || status === 404;
+}
 let mediaQueryChangeListener: ((event: MediaQueryListEvent) => void) | null =
   null;
 const assistantLinkAvailable = computed(() => Boolean(slug.value.trim()));
@@ -2283,9 +2288,9 @@ async function loadCourse() {
   } catch (err: any) {
     console.warn("Failed to load public course", err);
     response.value = null;
-    if (err?.response?.status === 404) {
-      notFound.value = true;
-      error.value = false;
+    if (isDisabledTenantError(err)) {
+      await router.replace({ name: "not-found" });
+      return;
     } else {
       error.value = true;
     }

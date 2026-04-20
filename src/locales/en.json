@@ -2801,6 +2801,7 @@
     "planUsageUnlimited": "Unlimited",
     "planUsageDefault": "Default",
     "planUsageVideoStorage": "Video storage",
+    "planUsageVideoStorageSize": "Video storage size",
     "planUsageStreamingMinutes": "Streaming minutes",
     "planUsageRemaining": "{value} remaining",
     "planUsageRemainingThisMonth": "{value} remaining this month",
@@ -5418,12 +5419,14 @@
     },
     "actions": {
       "addTeacher": "Add teacher",
+      "payments": "Payments overview",
       "manage": "Manage",
       "delete": "Delete"
     },
     "columns": {
       "teacher": "Teacher",
       "plan": "Plan",
+      "usage": "Usage",
       "status": "Status",
       "actions": "Actions"
     },
@@ -5463,6 +5466,81 @@
       "deviceCount": "Devices",
       "deleteTeacher": "Delete teacher",
       "empty": "Select a teacher to view details."
+    },
+    "usage": {
+      "title": "Usage",
+      "subtitle": "Current video storage and streaming usage for this teacher.",
+      "error": "We couldn't load usage for this teacher right now.",
+      "empty": "No usage data is available yet."
+    },
+    "payments": {
+      "title": "Teacher payments overview",
+      "subtitle": "Review manual course payments across teachers with teacher, course, and date filters.",
+      "filtersTitle": "Filters",
+      "filtersSubtitle": "Narrow results by teacher, course, payment method, status, and date range.",
+      "tableTitle": "Manual payments",
+      "tableSubtitle": "{count} rows loaded from {total} matching payments.",
+      "empty": "No teacher payments match the current filters.",
+      "unknownTeacher": "Unknown teacher",
+      "viewProof": "View proof",
+      "emptyValue": "Not available",
+      "zeroAmount": "EGP 0.00",
+      "proofDialogTitle": "Payment proof #{id}",
+      "proofDialogFallback": "Payment proof",
+      "filters": {
+        "teacher": "Teacher",
+        "teacherAll": "All teachers",
+        "course": "Course",
+        "courseAll": "All courses",
+        "status": "Status",
+        "statusAll": "All statuses",
+        "method": "Method",
+        "methodAll": "All methods",
+        "search": "Search",
+        "searchPlaceholder": "Student name or email",
+        "dateFrom": "From date",
+        "dateTo": "To date",
+        "reset": "Reset",
+        "apply": "Apply filters",
+        "none": "No active filters"
+      },
+      "stats": {
+        "totalRows": "Matching payments",
+        "visibleAmount": "Visible amount",
+        "visibleTeachers": "Visible teachers",
+        "visibleCourses": "Visible courses",
+        "pendingRows": "Pending",
+        "approvedRows": "Approved",
+        "rejectedRows": "Rejected"
+      },
+      "columns": {
+        "teacher": "Teacher",
+        "student": "Student",
+        "course": "Course",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "createdAt": "Created",
+        "reviewedAt": "Reviewed",
+        "proof": "Proof"
+      },
+      "actions": {
+        "export": "Export CSV",
+        "previewProof": "Preview",
+        "openProofNewTab": "Open in new tab"
+      },
+      "pagination": {
+        "summary": "Showing {from}–{to} of {total}",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {current} of {total}",
+        "pageSize": "Rows"
+      },
+      "errors": {
+        "load": "We couldn't load teacher payments right now.",
+        "init": "We couldn't initialize the teacher payments page.",
+        "export": "We couldn't export teacher payments right now."
+      }
     },
     "overrides": {
       "title": "Usage overrides",
@@ -5763,22 +5841,33 @@
     "alerts": {
       "title": "Manual teacher alerts",
       "subtitle": "Send urgent announcements that take over the teacher workspace.",
-      "form": {
-        "title": "Compose alert",
-        "subtitle": "Write the alert message and choose who should receive it.",
-        "messageLabel": "Alert message",
-        "messagePlaceholder": "Describe the urgent issue or update",
-        "sendToAll": "Send to all active teachers",
-        "recipientsLabel": "Specific teachers",
-        "recipientsPlaceholder": "Select one or more teachers",
-        "recipientsHint": "Choose which teachers should see this alert.",
-        "allTeachersHint": "Will notify all {count} active teachers.",
-        "noTeachers": "No active teachers are available to receive alerts.",
-        "selectedHint": "Selected {count} teachers.",
-        "messageRequired": "Write a message before sending the alert.",
-        "recipientsRequired": "Select at least one teacher or send to all.",
-        "selectedTitle": "Selected teachers ({count})"
-      },
+        "form": {
+          "title": "Compose alert",
+          "subtitle": "Write the alert message and choose who should receive it.",
+          "messageLabel": "Alert message",
+          "messagePlaceholder": "Describe the urgent issue or update",
+          "sendToAll": "Send to all active teachers",
+          "recipientsLabel": "Specific teachers",
+          "filterLabel": "Filter teachers",
+          "filterPlaceholder": "Search by name, slug, subject, or plan",
+          "recipientsPlaceholder": "Select one or more teachers",
+          "recipientsHint": "Choose which teachers should see this alert.",
+          "allTeachersHint": "Will notify all {count} active teachers.",
+          "noTeachers": "No active teachers are available to receive alerts.",
+          "noFilteredTeachers": "No active teachers match this filter.",
+          "filteredCount": "{count} active teachers",
+          "noSubject": "No subject",
+          "selectedHint": "Selected {count} teachers.",
+          "messageRequired": "Write a message before sending the alert.",
+          "recipientsRequired": "Select at least one teacher or send to all.",
+          "selectedTitle": "Selected teachers ({count})",
+          "columns": {
+            "select": "Select",
+            "teacher": "Teacher",
+            "subject": "Subject",
+            "plan": "Plan"
+          }
+        },
       "actions": {
         "send": "Send alert",
         "reset": "Reset"

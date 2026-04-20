@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import type { TeacherVideoUsageSummary } from '@/services/teacherUsage';
 import type {
   AssistantAccount,
   AssistantPayload,
@@ -181,6 +182,11 @@ export async function createTeacher(payload: CreateTeacherPayload): Promise<Teac
 
 export async function fetchTeacherDetail(id: number): Promise<TeacherAdmin> {
   const { data } = await api.get<TeacherAdmin>(`/v1/platform/teachers/${id}`);
+  return data;
+}
+
+export async function fetchTeacherVideoUsageSummary(id: number): Promise<TeacherVideoUsageSummary> {
+  const { data } = await api.get<TeacherVideoUsageSummary>(`/v1/platform/teachers/${id}/usage/video`);
   return data;
 }
 

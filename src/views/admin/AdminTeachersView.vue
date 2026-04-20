@@ -1,5 +1,11 @@
 <template>
   <ThemePage :title="t('adminTeachers.title')" :subtitle="t('adminTeachers.subtitle')">
+    <template #actions>
+      <UiButton to="/admin/teachers/payments" variant="outline">
+        {{ t('adminTeachers.actions.payments') }}
+      </UiButton>
+    </template>
+
     <section class="admin-teachers">
       <UiCard hover>
         <template #title>{{ t('adminTeachers.tableTitle') }}</template>
@@ -60,6 +66,50 @@
               <small class="admin-teachers__teacher-meta">
                 {{ (item as any).slug }} · {{ (item as any).plan.toUpperCase() }}
                 <template v-if="(item as any).subject"> · {{ (item as any).subject }}</template>
+              </small>
+            </div>
+          </template>
+
+          <template #item.usage="{ item }">
+            <div class="admin-teachers__usage-summary">
+              <template v-if="teacherUsageLoading[(item as any).id]">
+                <small class="admin-teachers__usage-summary-text">{{ t('common.loading') }}</small>
+              </template>
+              <template v-else-if="teacherUsageMap[(item as any).id]">
+                <div class="admin-teachers__usage-summary-tags">
+                  <UiTag
+                    size="sm"
+                    :color="usageToneForStorage(teacherUsageMap[(item as any).id]!)"
+                  >
+                    {{ t('teacher.planUsageVideoStorage') }} {{ formatPercent(storagePercentForSummary(teacherUsageMap[(item as any).id]!)) }}
+                  </UiTag>
+                  <UiTag
+                    size="sm"
+                    :color="usageToneForStreaming(teacherUsageMap[(item as any).id]!)"
+                  >
+                    {{ t('teacher.planUsageStreamingMinutes') }} {{ formatPercent(streamingPercentForSummary(teacherUsageMap[(item as any).id]!)) }}
+                  </UiTag>
+                </div>
+                <small class="admin-teachers__usage-summary-text admin-teachers__usage-summary-text--muted">
+                  {{ formatCompactDuration(teacherUsageMap[(item as any).id]!.storageSecondsUsed) }}
+                  /
+                  {{
+                    teacherUsageMap[(item as any).id]!.storageSecondsLimit !== null
+                      ? formatCompactDuration(teacherUsageMap[(item as any).id]!.storageSecondsLimit!)
+                      : t('teacher.planUsageUnlimited')
+                  }}
+                  ·
+                  {{ formatCompactMinutes(teacherUsageMap[(item as any).id]!.streamingMinutesUsed) }}
+                  /
+                  {{
+                    teacherUsageMap[(item as any).id]!.streamingMinutesLimit !== null
+                      ? formatCompactMinutes(teacherUsageMap[(item as any).id]!.streamingMinutesLimit!)
+                      : t('teacher.planUsageUnlimited')
+                  }}
+                </small>
+              </template>
+              <small v-else class="admin-teachers__usage-summary-text admin-teachers__usage-summary-text--muted">
+                {{ t('adminTeachers.usage.empty') }}
               </small>
             </div>
           </template>
@@ -219,6 +269,90 @@
         </section>
 
         <section class="admin-teachers__section">
+          <header class="admin-teachers__section-header admin-teachers__section-header--stacked">
+            <h3>{{ t('adminTeachers.usage.title') }}</h3>
+            <p class="admin-teachers__section-subtitle">{{ t('adminTeachers.usage.subtitle') }}</p>
+          </header>
+          <UiAlert v-if="usageError" color="warning" variant="soft">
+            {{ t('adminTeachers.usage.error') }}
+          </UiAlert>
+          <div v-else-if="usageLoading" class="admin-teachers__usage-skeleton">
+            <UiSkeleton v-for="n in 3" :key="`usage-${n}`" height="72px" />
+          </div>
+          <div v-else-if="usageSummary" class="admin-teachers__usage">
+            <div class="admin-teachers__usage-header">
+              <span class="admin-teachers__usage-plan">
+                {{ usageSummary.planName || usageSummary.planCode || t('teacher.planUsagePlanFallback') }}
+              </span>
+              <span class="admin-teachers__usage-meta">
+                {{ t('teacher.planUsageMaxResolution') }}
+                {{ usageSummary.maxResolutionHeight ? `${usageSummary.maxResolutionHeight}p` : t('teacher.planUsageUnlimited') }}
+              </span>
+              <span class="admin-teachers__usage-meta">
+                {{ t('teacher.planUsageMaxDuration') }}
+                {{
+                  usageSummary.maxVideoDurationMinutes
+                    ? formatMinutes(usageSummary.maxVideoDurationMinutes)
+                    : t('teacher.planUsageDefault')
+                }}
+              </span>
+            </div>
+
+            <div class="admin-teachers__usage-item">
+              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageVideoStorage') }}</div>
+              <UiProgressBar :value="storageUsagePercent" color="primary">
+                <div class="admin-teachers__usage-progress">
+                  <span>{{ formatDurationSeconds(usageSummary.storageSecondsUsed) }}</span>
+                  <span>
+                    /
+                    {{
+                      usageSummary.storageSecondsLimit !== null
+                        ? formatDurationSeconds(usageSummary.storageSecondsLimit)
+                        : t('teacher.planUsageUnlimited')
+                    }}
+                  </span>
+                </div>
+              </UiProgressBar>
+            </div>
+
+            <div class="admin-teachers__usage-item">
+              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageVideoStorageSize') }}</div>
+              <UiProgressBar :value="storageSizeUsagePercent" color="secondary">
+                <div class="admin-teachers__usage-progress">
+                  <span>{{ formatBytes(usageSummary.storageBytesUsed) }}</span>
+                  <span>
+                    /
+                    {{
+                      usageSummary.storageBytesLimit !== null
+                        ? formatBytes(usageSummary.storageBytesLimit)
+                        : t('teacher.planUsageUnlimited')
+                    }}
+                  </span>
+                </div>
+              </UiProgressBar>
+            </div>
+
+            <div class="admin-teachers__usage-item">
+              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageStreamingMinutes') }}</div>
+              <UiProgressBar :value="streamingUsagePercent" color="info">
+                <div class="admin-teachers__usage-progress">
+                  <span>{{ formatMinutes(usageSummary.streamingMinutesUsed) }}</span>
+                  <span>
+                    /
+                    {{
+                      usageSummary.streamingMinutesLimit !== null
+                        ? formatMinutes(usageSummary.streamingMinutesLimit)
+                        : t('teacher.planUsageUnlimited')
+                    }}
+                  </span>
+                </div>
+              </UiProgressBar>
+            </div>
+          </div>
+          <p v-else class="admin-teachers__help">{{ t('adminTeachers.usage.empty') }}</p>
+        </section>
+
+        <section class="admin-teachers__section">
           <header class="admin-teachers__section-header">
             <h3>{{ t('adminTeachers.overrides.title') }}</h3>
             <UiSwitch v-model="usageOverridesEnabled" :label="t('adminTeachers.overrides.switch')" />
@@ -369,6 +503,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 import { useAdminStore } from '@/stores/admin';
 import { useToast } from '@/composables/useToast';
 import UiCard from '@/components/ui/UiCard.vue';
@@ -381,13 +516,18 @@ import UiDialog from '@/components/ui/UiDialog.vue';
 import UiSkeleton from '@/components/ui/UiSkeleton.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
 import UiSwitch from '@/components/ui/UiSwitch.vue';
+import UiProgressBar from '@/components/ui/UiProgressBar.vue';
 import AdminTeacherAssistantsPanel from '@/components/admin/AdminTeacherAssistantsPanel.vue';
 import { formatDateTime } from '@/utils/formatters';
+import { fetchTeacherVideoUsageSummary } from '@/services/admin';
 import type { TeacherAccount, TeacherUsageOverrides } from '@/services/admin';
+import type { TeacherVideoUsageSummary } from '@/services/teacherUsage';
 import { PHONE_COUNTRY_CODES } from '@/constants/countryCodes';
 import { normalizePhoneInput, PhoneNumberValidationError } from '@/utils/phoneNumber';
 
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 const store = useAdminStore();
 const toast = useToast();
 
@@ -409,6 +549,7 @@ const filters = reactive({
 const headers = computed<UiTableHeader[]>(() => [
   { key: 'teacher', title: t('adminTeachers.columns.teacher') },
   { key: 'plan', title: t('adminTeachers.columns.plan') },
+  { key: 'usage', title: t('adminTeachers.columns.usage'), sortable: false },
   { key: 'status', title: t('adminTeachers.columns.status') },
   { key: 'actions', title: t('adminTeachers.columns.actions'), sortable: false, align: 'end' }
 ]);
@@ -485,6 +626,11 @@ const usageOverridesForm = reactive({
   storageGraceDays: null as number | null,
   streamingGraceDays: null as number | null
 });
+const usageSummary = ref<TeacherVideoUsageSummary | null>(null);
+const usageLoading = ref(false);
+const usageError = ref(false);
+const teacherUsageMap = reactive<Record<number, TeacherVideoUsageSummary>>({});
+const teacherUsageLoading = reactive<Record<number, boolean>>({});
 
 const selectedTeacher = computed(() => store.selectedTeacher);
 const detailTitle = computed(() => selectedTeacher.value?.name || t('adminTeachers.detail.title'));
@@ -524,6 +670,9 @@ watch(selectedTeacher, (teacher) => {
     slugForm.value = '';
     usageOverridesEnabled.value = false;
     resetUsageOverridesForm();
+    usageSummary.value = null;
+    usageError.value = false;
+    usageLoading.value = false;
     return;
   }
   teacherForm.name = teacher.name ?? '';
@@ -537,7 +686,21 @@ watch(selectedTeacher, (teacher) => {
   const overrides = teacher.usageOverrides ?? null;
   usageOverridesEnabled.value = hasUsageOverrides(overrides);
   applyUsageOverridesForm(overrides);
+  void loadTeacherUsage(teacher.id);
 });
+
+watch(
+  () => store.teachers.map((teacher) => teacher.id),
+  (teacherIds) => {
+    for (const teacherId of teacherIds) {
+      if (teacherUsageMap[teacherId] || teacherUsageLoading[teacherId]) {
+        continue;
+      }
+      void loadTeacherUsageSummaryForTable(teacherId);
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   if (!store.teachers.length) {
@@ -545,7 +708,25 @@ onMounted(async () => {
       /* ignore */
     });
   }
+  const teacherId = typeof route.query.teacherId === 'string' ? Number(route.query.teacherId) : 0;
+  if (teacherId > 0) {
+    await openDetail(teacherId);
+  }
 });
+
+watch(
+  () => route.query.teacherId,
+  async (value) => {
+    const teacherId = typeof value === 'string' ? Number(value) : 0;
+    if (teacherId <= 0 || !Number.isFinite(teacherId)) {
+      return;
+    }
+    if (detailDialog.open && store.selectedTeacher?.id === teacherId) {
+      return;
+    }
+    await openDetail(teacherId);
+  }
+);
 
 async function applyFilters() {
   await store
@@ -645,6 +826,10 @@ async function submitCreate() {
 }
 
 async function openDetail(id: number) {
+  await router.replace({
+    name: 'admin-teachers',
+    query: { ...route.query, teacherId: String(id) }
+  });
   detailDialog.open = true;
   detailDialog.submitting = false;
   detailDialog.slugSubmitting = false;
@@ -654,8 +839,14 @@ async function openDetail(id: number) {
 }
 
 function closeDetail() {
+  const nextQuery = { ...route.query } as Record<string, unknown>;
+  delete nextQuery.teacherId;
+  void router.replace({ name: 'admin-teachers', query: nextQuery });
   detailDialog.open = false;
   store.selectedTeacher = null;
+  usageSummary.value = null;
+  usageError.value = false;
+  usageLoading.value = false;
 }
 
 async function submitUpdateTeacher() {
@@ -725,6 +916,139 @@ function formatDate(value?: string | null) {
   }
   return formatDateTime(value);
 }
+
+async function loadTeacherUsage(teacherId: number) {
+  usageLoading.value = true;
+  usageError.value = false;
+  try {
+    const summary = await fetchTeacherVideoUsageSummary(teacherId);
+    usageSummary.value = summary;
+    teacherUsageMap[teacherId] = summary;
+  } catch {
+    usageSummary.value = null;
+    usageError.value = true;
+  } finally {
+    usageLoading.value = false;
+  }
+}
+
+async function loadTeacherUsageSummaryForTable(teacherId: number) {
+  teacherUsageLoading[teacherId] = true;
+  try {
+    teacherUsageMap[teacherId] = await fetchTeacherVideoUsageSummary(teacherId);
+  } catch {
+    delete teacherUsageMap[teacherId];
+  } finally {
+    teacherUsageLoading[teacherId] = false;
+  }
+}
+
+const formatNumber = (value: number) => new Intl.NumberFormat().format(Math.max(0, Math.round(value)));
+
+const formatMinutes = (value: number) => `${formatNumber(value)} ${t('teacher.planUsageMinuteShort')}`;
+
+const formatCompactMinutes = (value: number) => `${formatNumber(value)} ${t('teacher.planUsageMinuteShort')}`;
+
+const formatDurationSeconds = (seconds: number) => {
+  const safe = Math.max(0, Math.round(seconds));
+  const totalMinutes = Math.round(safe / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) {
+    return `${formatNumber(hours)}${t('teacher.planUsageHourShort')} ${formatNumber(minutes)}${t('teacher.planUsageMinuteShort')}`;
+  }
+  return `${formatNumber(minutes)}${t('teacher.planUsageMinuteShort')}`;
+};
+
+const formatCompactDuration = (seconds: number) => {
+  const safe = Math.max(0, Math.round(seconds));
+  const totalMinutes = Math.round(safe / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  if (hours > 0) {
+    return `${formatNumber(hours)}${t('teacher.planUsageHourShort')}`;
+  }
+  return `${formatNumber(totalMinutes)}${t('teacher.planUsageMinuteShort')}`;
+};
+
+const formatBytes = (bytes: number) => {
+  const safe = Math.max(0, bytes);
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let value = safe;
+  let index = 0;
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index += 1;
+  }
+  const rounded = value >= 10 || index === 0 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${new Intl.NumberFormat().format(rounded)} ${units[index]}`;
+};
+
+function calculateUsagePercent(used: number, limit: number | null | undefined) {
+  if (limit == null || limit <= 0) {
+    return 0;
+  }
+  return Math.max(0, Math.min(100, (used / limit) * 100));
+}
+
+function resolveThreshold(value: number | null | undefined, fallback: number) {
+  if (value == null || Number.isNaN(value)) {
+    return fallback;
+  }
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function formatPercent(value: number) {
+  return `${Math.round(Math.max(0, Math.min(100, value)))}%`;
+}
+
+function usageTone(percent: number, warningThreshold: number, criticalThreshold: number) {
+  if (percent >= 100) {
+    return 'danger' as const;
+  }
+  if (percent >= criticalThreshold) {
+    return 'danger' as const;
+  }
+  if (percent >= warningThreshold) {
+    return 'warning' as const;
+  }
+  return 'success' as const;
+}
+
+function storagePercentForSummary(summary: TeacherVideoUsageSummary) {
+  return calculateUsagePercent(summary.storageSecondsUsed, summary.storageSecondsLimit);
+}
+
+function streamingPercentForSummary(summary: TeacherVideoUsageSummary) {
+  return calculateUsagePercent(summary.streamingMinutesUsed, summary.streamingMinutesLimit);
+}
+
+function usageToneForStorage(summary: TeacherVideoUsageSummary) {
+  return usageTone(
+    storagePercentForSummary(summary),
+    resolveThreshold(summary.storageWarningPercent, 80),
+    resolveThreshold(summary.storageCriticalPercent, 90)
+  );
+}
+
+function usageToneForStreaming(summary: TeacherVideoUsageSummary) {
+  return usageTone(
+    streamingPercentForSummary(summary),
+    resolveThreshold(summary.streamingWarningPercent, 80),
+    resolveThreshold(summary.streamingCriticalPercent, 90)
+  );
+}
+
+const storageUsagePercent = computed(() =>
+  usageSummary.value ? calculateUsagePercent(usageSummary.value.storageSecondsUsed, usageSummary.value.storageSecondsLimit) : 0
+);
+
+const storageSizeUsagePercent = computed(() =>
+  usageSummary.value ? calculateUsagePercent(usageSummary.value.storageBytesUsed, usageSummary.value.storageBytesLimit) : 0
+);
+
+const streamingUsagePercent = computed(() =>
+  usageSummary.value ? calculateUsagePercent(usageSummary.value.streamingMinutesUsed, usageSummary.value.streamingMinutesLimit) : 0
+);
 
 function lastActivity(account: TeacherAccount) {
   if (!account.lastActivity) {
@@ -970,6 +1294,27 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
   justify-content: flex-end;
 }
 
+.admin-teachers__usage-summary {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 12rem;
+}
+
+.admin-teachers__usage-summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.admin-teachers__usage-summary-text {
+  color: var(--sakai-text-color);
+  line-height: 1.35;
+}
+
+.admin-teachers__usage-summary-text--muted {
+  color: var(--sakai-text-color-secondary);
+}
+
 .admin-teachers__section {
   display: flex;
   flex-direction: column;
@@ -985,10 +1330,21 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
   margin-bottom: var(--sakai-space-2);
 }
 
+.admin-teachers__section-header--stacked {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
 .admin-teachers__section-header h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+.admin-teachers__section-subtitle {
+  margin: 0;
+  color: var(--sakai-text-color-secondary);
+  font-size: 0.92rem;
 }
 
 .admin-teachers__form {
@@ -1038,6 +1394,43 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
   margin: 0.125rem 0 0;
   font-weight: 600;
   color: var(--sakai-text-color);
+}
+
+.admin-teachers__usage-skeleton,
+.admin-teachers__usage {
+  display: grid;
+  gap: var(--sakai-space-4);
+}
+
+.admin-teachers__usage-header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-teachers__usage-plan {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-teachers__usage-meta {
+  color: var(--sakai-text-color-secondary);
+  font-size: 0.92rem;
+}
+
+.admin-teachers__usage-item {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.admin-teachers__usage-label {
+  font-weight: 600;
+}
+
+.admin-teachers__usage-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sakai-space-3);
+  width: 100%;
 }
 
 .admin-teachers__accounts {

@@ -87,6 +87,7 @@ const AdminAnalyticsExportView = () => import('@/views/admin/analytics/AdminAnal
 const AdminPaymentLogsView = () => import('@/views/admin/ops/AdminPaymentLogs.vue');
 const AdminAlertsView = () => import('@/views/admin/ops/AdminAlerts.vue');
 const AdminTeachersView = () => import('@/views/admin/AdminTeachersView.vue');
+const AdminTeacherPaymentsView = () => import('@/views/admin/AdminTeacherPaymentsView.vue');
 const AdminStudentsView = () => import('@/views/admin/AdminStudentsView.vue');
 const AdminPlanBuilder = () => import('@/views/admin/AdminPlanBuilder.vue');
 const SubscriptionPaypalSuccessView = () => import('@/views/subscription/PaypalSuccessView.vue');
@@ -821,6 +822,13 @@ const router = createRouter({
       component: AdminTeachersView,
       meta: { requiresAuth: true, roles: ['PLATFORM_ADMIN'] },
       alias: '/platform/teachers/manage'
+    },
+    {
+      path: '/admin/teachers/payments',
+      name: 'admin-teacher-payments',
+      component: AdminTeacherPaymentsView,
+      meta: { requiresAuth: true, roles: ['PLATFORM_ADMIN'] },
+      alias: ['/admin/teachers/payment']
     },
     {
       path: '/admin/students',

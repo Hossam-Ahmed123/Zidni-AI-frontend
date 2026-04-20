@@ -47,6 +47,7 @@ export interface TeacherTutoringPaymentItem {
 }
 
 export interface TeacherManualPaymentsQuery {
+  teacherId?: number | null;
   studentId?: number | null;
   courseId?: number | null;
   status?: ManualPaymentStatus | '' | null;
@@ -82,6 +83,9 @@ const buildManualParams = (query: TeacherManualPaymentsQuery = {}, format?: 'csv
 
   if (query.courseId) {
     params.courseId = query.courseId;
+  }
+  if (query.teacherId) {
+    params.teacherId = query.teacherId;
   }
   if (query.studentId) {
     params.studentId = query.studentId;
@@ -215,6 +219,36 @@ export async function exportManualPaymentsCsv(query: TeacherManualPaymentsQuery 
     }
   });
   return data as Blob;
+}
+
+export interface AdminTeacherCourseOption {
+  id: number;
+  title: string;
+}
+
+export async function listAdminTeacherManualPayments(query: TeacherManualPaymentsQuery = {}) {
+  const params = buildManualParams(query);
+  const { data } = await api.get<PagedResult<TeacherManualPaymentItem>>('/admin/teachers/payments/manual', {
+    params
+  });
+  return data;
+}
+
+export async function exportAdminTeacherManualPaymentsCsv(query: TeacherManualPaymentsQuery = {}) {
+  const params = buildManualParams(query, 'csv');
+  const { data } = await api.get('/admin/teachers/payments/manual', {
+    params,
+    responseType: 'blob',
+    headers: {
+      Accept: 'text/csv'
+    }
+  });
+  return data as Blob;
+}
+
+export async function listAdminTeacherCourses(teacherId: number) {
+  const { data } = await api.get<AdminTeacherCourseOption[]>(`/admin/teachers/payments/${teacherId}/courses`);
+  return data;
 }
 
 export type AdminPaymentMethod = 'vodafone_cash' | 'paypal' | (string & Record<never, never>);

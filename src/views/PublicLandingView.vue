@@ -93,6 +93,11 @@ const pageKey = computed(() => {
 
 const isPreview = computed(() => isPreviewEnabled(route.query.preview));
 
+function isDisabledTenantError(error: unknown) {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 403 || status === 404;
+}
+
 const displaySections = computed(() => {
   if (!landing.value) return [] as PublicLandingResponse['sections'];
   const sections = landing.value.sections || [];
@@ -122,7 +127,9 @@ async function loadLanding() {
     }
   } catch (error) {
     console.warn('Failed to load landing page', error);
-    if (route.name !== 'tenant-public-landing') {
+    if (isDisabledTenantError(error)) {
+      router.replace({ name: 'not-found' });
+    } else if (route.name !== 'tenant-public-landing') {
       router.replace({ name: 'tenant-public-landing' });
     }
   } finally {

@@ -5293,12 +5293,14 @@
     },
     "actions": {
       "addTeacher": "إضافة معلم",
+      "payments": "نظرة عامة على المدفوعات",
       "manage": "إدارة",
       "delete": "حذف"
     },
     "columns": {
       "teacher": "المعلم",
       "plan": "الباقة",
+      "usage": "الاستخدام",
       "status": "الحالة",
       "actions": "الإجراءات"
     },
@@ -5338,6 +5340,81 @@
       "deviceCount": "الأجهزة",
       "deleteTeacher": "حذف المعلم نهائيًا",
       "empty": "اختر معلماً لعرض التفاصيل"
+    },
+    "usage": {
+      "title": "الاستخدام",
+      "subtitle": "استخدام تخزين الفيديو والبث الحالي لهذا المعلم.",
+      "error": "تعذر تحميل استخدام هذا المعلم حاليًا.",
+      "empty": "لا توجد بيانات استخدام بعد."
+    },
+    "payments": {
+      "title": "نظرة عامة على مدفوعات المعلمين",
+      "subtitle": "مراجعة مدفوعات الكورسات اليدوية عبر المعلمين مع فلاتر المعلم والكورس والتاريخ.",
+      "filtersTitle": "الفلاتر",
+      "filtersSubtitle": "حدد النتائج حسب المعلم والكورس وطريقة الدفع والحالة والفترة الزمنية.",
+      "tableTitle": "المدفوعات اليدوية",
+      "tableSubtitle": "تم تحميل {count} سجلات من أصل {total} عملية دفع مطابقة.",
+      "empty": "لا توجد مدفوعات تطابق الفلاتر الحالية.",
+      "unknownTeacher": "معلم غير معروف",
+      "viewProof": "عرض الإثبات",
+      "emptyValue": "غير متاح",
+      "zeroAmount": "EGP 0.00",
+      "proofDialogTitle": "إثبات الدفع #{id}",
+      "proofDialogFallback": "إثبات الدفع",
+      "filters": {
+        "teacher": "المعلم",
+        "teacherAll": "جميع المعلمين",
+        "course": "الكورس",
+        "courseAll": "جميع الكورسات",
+        "status": "الحالة",
+        "statusAll": "جميع الحالات",
+        "method": "طريقة الدفع",
+        "methodAll": "جميع الطرق",
+        "search": "بحث",
+        "searchPlaceholder": "اسم الطالب أو بريده",
+        "dateFrom": "من تاريخ",
+        "dateTo": "إلى تاريخ",
+        "reset": "إعادة تعيين",
+        "apply": "تطبيق الفلاتر",
+        "none": "لا توجد فلاتر مفعلة"
+      },
+      "stats": {
+        "totalRows": "إجمالي المدفوعات",
+        "visibleAmount": "مبلغ السجلات المعروضة",
+        "visibleTeachers": "المعلمون المعروضون",
+        "visibleCourses": "الكورسات المعروضة",
+        "pendingRows": "قيد المراجعة",
+        "approvedRows": "مقبولة",
+        "rejectedRows": "مرفوضة"
+      },
+      "columns": {
+        "teacher": "المعلم",
+        "student": "الطالب",
+        "course": "الكورس",
+        "amount": "المبلغ",
+        "method": "طريقة الدفع",
+        "status": "الحالة",
+        "createdAt": "تاريخ الإنشاء",
+        "reviewedAt": "تاريخ المراجعة",
+        "proof": "الإثبات"
+      },
+      "actions": {
+        "export": "تصدير CSV",
+        "previewProof": "معاينة",
+        "openProofNewTab": "فتح في تبويب جديد"
+      },
+      "pagination": {
+        "summary": "عرض {from}–{to} من {total}",
+        "prev": "السابق",
+        "next": "التالي",
+        "page": "الصفحة {current} من {total}",
+        "pageSize": "عدد الصفوف"
+      },
+      "errors": {
+        "load": "تعذر تحميل مدفوعات المعلمين الآن.",
+        "init": "تعذر تجهيز صفحة مدفوعات المعلمين.",
+        "export": "تعذر تصدير مدفوعات المعلمين الآن."
+      }
     },
     "overrides": {
       "title": "تجاوزات الاستخدام",
@@ -5645,14 +5722,25 @@
         "messagePlaceholder": "اكتب المشكلة أو التحديث العاجل",
         "sendToAll": "إرسال إلى جميع المعلمين النشطين",
         "recipientsLabel": "معلمون محددون",
+        "filterLabel": "فلتر المعلمين",
+        "filterPlaceholder": "ابحث بالاسم أو المعرف أو المادة أو الخطة",
         "recipientsPlaceholder": "اختر معلماً أو أكثر",
         "recipientsHint": "حدد المعلمين الذين يجب أن يروا هذا التنبيه.",
         "allTeachersHint": "سيصل إلى {count} من المعلمين النشطين.",
         "noTeachers": "لا يوجد معلمون نشطون لاستقبال التنبيه.",
+        "noFilteredTeachers": "لا يوجد معلمون نشطون مطابقون للفلتر.",
+        "filteredCount": "{count} معلم نشط",
+        "noSubject": "بدون مادة",
         "selectedHint": "تم اختيار {count} من المعلمين.",
         "messageRequired": "أدخل نص التنبيه قبل الإرسال.",
         "recipientsRequired": "اختر المعلمين أو أرسل للجميع.",
-        "selectedTitle": "المعلمون المحددون ({count})"
+        "selectedTitle": "المعلمون المحددون ({count})",
+        "columns": {
+          "select": "تحديد",
+          "teacher": "المعلم",
+          "subject": "المادة",
+          "plan": "الخطة"
+        }
       },
       "actions": {
         "send": "إرسال التنبيه",

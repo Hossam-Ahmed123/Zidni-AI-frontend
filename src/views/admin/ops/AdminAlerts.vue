@@ -26,22 +26,58 @@
           </div>
 
           <div class="admin-alerts__select-group">
-            <label class="admin-alerts__select-label" :class="{ 'is-disabled': form.sendToAll }">
-              {{ t('adminOps.alerts.form.recipientsLabel') }}
-            </label>
-            <UiSkeleton v-if="loadingTeachers" height="42px" radius="12px" />
-            <UiSelect
-              v-else
-              v-model="form.teacherIds"
-              multiple
-              :disabled="form.sendToAll"
-              :placeholder="t('adminOps.alerts.form.recipientsPlaceholder')"
-              class="admin-alerts__select"
+            <div class="admin-alerts__select-header">
+              <label class="admin-alerts__select-label" :class="{ 'is-disabled': form.sendToAll }">
+                {{ t('adminOps.alerts.form.recipientsLabel') }}
+              </label>
+              <span class="admin-alerts__filter-count">
+                {{ t('adminOps.alerts.form.filteredCount', { count: filteredTeachers.length }) }}
+              </span>
+            </div>
+
+            <UiInput
+              v-model="teacherFilter"
+              :label="t('adminOps.alerts.form.filterLabel')"
+              :placeholder="t('adminOps.alerts.form.filterPlaceholder')"
+              appearance="search"
+              clearable
+              :disabled="form.sendToAll || loadingTeachers"
+            />
+
+            <UiTable
+              :headers="teacherHeaders"
+              :items="filteredTeachers"
+              :loading="loadingTeachers"
+              :empty-text="
+                teacherFilter.trim()
+                  ? t('adminOps.alerts.form.noFilteredTeachers')
+                  : t('adminOps.alerts.form.noTeachers')
+              "
+              bordered
+              sticky-header
+              max-height="320px"
+              class="admin-alerts__table"
             >
-              <option v-for="option in teacherOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </UiSelect>
+              <template #item.select="{ item }">
+                <UiCheckbox
+                  :model-value="form.teacherIds.includes(item.id)"
+                  :disabled="form.sendToAll"
+                  @update:model-value="toggleTeacher(item.id, $event)"
+                />
+              </template>
+              <template #item.name="{ item }">
+                <div class="admin-alerts__teacher-cell">
+                  <span class="admin-alerts__teacher-name">{{ item.name }}</span>
+                  <small class="admin-alerts__teacher-meta">{{ item.slug }}</small>
+                </div>
+              </template>
+              <template #item.subject="{ item }">
+                {{ item.subject || t('adminOps.alerts.form.noSubject') }}
+              </template>
+              <template #item.plan="{ item }">
+                {{ item.plan }}
+              </template>
+            </UiTable>
           </div>
 
           <div v-if="selectedTeachers.length" class="admin-alerts__selected">
@@ -75,10 +111,11 @@ import ThemePage from '@/layout/theme/ThemePage.vue';
 import UiCard from '@/components/ui/UiCard.vue';
 import UiTextarea from '@/components/ui/UiTextarea.vue';
 import UiSwitch from '@/components/ui/UiSwitch.vue';
-import UiSelect from '@/components/ui/UiSelect.vue';
 import UiButton from '@/components/ui/UiButton.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
-import UiSkeleton from '@/components/ui/UiSkeleton.vue';
+import UiInput from '@/components/ui/UiInput.vue';
+import UiTable, { type UiTableHeader } from '@/components/ui/UiTable.vue';
+import UiCheckbox from '@/components/ui/UiCheckbox.vue';
 import { fetchTeacherSummaries, type TeacherSummary } from '@/services/admin';
 import { sendAdminAlert, type AdminAlertRequest } from '@/api/adminOps';
 import { useToast } from '@/composables/useToast';
@@ -96,25 +133,41 @@ const formError = ref('');
 const submitting = ref(false);
 const loadingTeachers = ref(false);
 const teachers = ref<TeacherSummary[]>([]);
+const teacherFilter = ref('');
 
-const teacherOptions = computed(() =>
+const activeTeachers = computed(() =>
   teachers.value
+    .filter((teacher) => teacher.active)
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map((teacher) => ({
-      value: teacher.id,
-      label: `${teacher.name} (${teacher.slug})`
-    }))
 );
 
-const activeTeacherCount = computed(() => teachers.value.filter((teacher) => teacher.active).length);
+const filteredTeachers = computed(() => {
+  const query = teacherFilter.value.trim().toLowerCase();
+  if (!query) {
+    return activeTeachers.value;
+  }
+  return activeTeachers.value.filter((teacher) =>
+    [teacher.name, teacher.slug, teacher.subject ?? '', teacher.plan]
+      .some((value) => value.toLowerCase().includes(query))
+  );
+});
+
+const teacherHeaders = computed<UiTableHeader[]>(() => [
+  { title: t('adminOps.alerts.form.columns.select'), key: 'select', align: 'center' },
+  { title: t('adminOps.alerts.form.columns.teacher'), key: 'name' },
+  { title: t('adminOps.alerts.form.columns.subject'), key: 'subject' },
+  { title: t('adminOps.alerts.form.columns.plan'), key: 'plan' }
+]);
+
+const activeTeacherCount = computed(() => activeTeachers.value.length);
 
 const selectedTeachers = computed(() => {
   if (form.sendToAll) {
     return [] as TeacherSummary[];
   }
   const selectedIds = new Set(form.teacherIds);
-  return teachers.value.filter((teacher) => selectedIds.has(teacher.id));
+  return activeTeachers.value.filter((teacher) => selectedIds.has(teacher.id));
 });
 
 const audienceSummary = computed(() => {
@@ -132,7 +185,7 @@ const loadTeachers = async () => {
   loadingTeachers.value = true;
   formError.value = '';
   try {
-    teachers.value = await fetchTeacherSummaries();
+    teachers.value = await fetchTeacherSummaries({ status: 'active' });
   } catch (error) {
     console.warn('[admin-alerts] failed to load teachers', error);
     toast.error({ detail: t('adminOps.alerts.errors.loadTeachers') });
@@ -145,7 +198,21 @@ const resetForm = () => {
   form.message = '';
   form.teacherIds = [];
   form.sendToAll = true;
+  teacherFilter.value = '';
   formError.value = '';
+};
+
+const toggleTeacher = (teacherId: number, checked: boolean) => {
+  if (form.sendToAll) {
+    return;
+  }
+  if (checked) {
+    if (!form.teacherIds.includes(teacherId)) {
+      form.teacherIds = [...form.teacherIds, teacherId];
+    }
+    return;
+  }
+  form.teacherIds = form.teacherIds.filter((id) => id !== teacherId);
 };
 
 const submit = async () => {
@@ -249,6 +316,13 @@ onMounted(loadTeachers);
   gap: 8px;
 }
 
+.admin-alerts__select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .admin-alerts__select-label {
   font-weight: 600;
   color: rgba(17, 24, 39, 0.85);
@@ -258,8 +332,28 @@ onMounted(loadTeachers);
   opacity: 0.6;
 }
 
-.admin-alerts__select {
-  min-height: 42px;
+.admin-alerts__filter-count {
+  font-size: 0.85rem;
+  color: rgba(30, 41, 59, 0.65);
+}
+
+.admin-alerts__table {
+  margin-top: 4px;
+}
+
+.admin-alerts__teacher-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-alerts__teacher-name {
+  font-weight: 600;
+}
+
+.admin-alerts__teacher-meta {
+  font-size: 0.8rem;
+  color: rgba(30, 41, 59, 0.65);
 }
 
 .admin-alerts__selected {

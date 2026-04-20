@@ -1475,6 +1475,7 @@ const adminNavItems = computed<NavItem[]>(() => {
   const items: NavItem[] = [
     { label: t('nav.platformPlansWorkspace'), to: '/admin/plans', icon: 'SettingOutlined' },
     { label: t('nav.adminTeachers'), to: '/admin/teachers', icon: 'IdcardOutlined' },
+    { label: t('adminTeachers.actions.payments'), to: '/admin/teachers/payments', icon: 'CreditCardOutlined' },
     { label: t('nav.adminStudents'), to: '/admin/students', icon: 'TeamOutlined' },
     { label: t('nav.adminMessages'), to: '/admin/platform-messages', icon: 'MailOutlined' },
     { label: t('nav.adminFeedback'), to: '/admin/feedback', icon: 'MessageOutlined' }

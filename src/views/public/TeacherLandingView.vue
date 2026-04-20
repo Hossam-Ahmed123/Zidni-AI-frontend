@@ -1385,6 +1385,15 @@ const qrPanelOpen = ref(false);
 const offers = ref<OfferResponse[]>([]);
 const offersLoading = ref(false);
 
+function isDisabledTenantError(error: unknown) {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 403 || status === 404;
+}
+
+async function redirectToNotFound() {
+  await router.replace({ name: "not-found" }).catch(() => undefined);
+}
+
 type PublicCourseOffer = {
   code: string;
   type: "PERCENTAGE" | "FIXED" | "BUNDLE";
@@ -3374,6 +3383,10 @@ async function load() {
     await store.load(slug.value, { force: true });
   } catch (error) {
     console.warn("[TeacherLandingView] failed to load landing", error);
+    if (isDisabledTenantError(error)) {
+      await redirectToNotFound();
+      return;
+    }
   }
 
   try {
@@ -3394,6 +3407,10 @@ async function load() {
     await applyPreferredLocale();
   } catch (error) {
     console.warn("[TeacherLandingView] failed to load tenant branding", error);
+    if (isDisabledTenantError(error)) {
+      await redirectToNotFound();
+      return;
+    }
   } finally {
     localeReady.value = true;
   }
