@@ -20,6 +20,15 @@ export interface TeacherLiveSession {
   joinUrl?: string | null;
   registeredCount: number;
   attendedCount: number;
+  assignedInstructorId: number;
+  assignedInstructorName: string;
+  registrationMode: string;
+  repeatGroupId?: string | null;
+  parentSessionId?: number | null;
+  repeatSource?: boolean;
+  repeatedCopy?: boolean;
+  studentIds?: number[] | null;
+  isRecurring?: boolean | null;
 }
 
 export interface TeacherLiveSessionsPage {
@@ -27,6 +36,29 @@ export interface TeacherLiveSessionsPage {
   total: number;
   page: number;
   size: number;
+}
+
+export interface InstructorLiveSession {
+  sessionId: number;
+  type: string;
+  courseId: number;
+  moduleId: number;
+  title: string;
+  studentCount: number;
+  registrationMode: string;
+  repeatGroupId?: string | null;
+  parentSessionId?: number | null;
+  repeatSource?: boolean;
+  repeatedCopy?: boolean;
+  scheduledAt: string;
+  durationMinutes: number;
+  provider: string;
+  joinUrl?: string | null;
+  status: LiveSessionStatus;
+}
+
+export interface InstructorLiveSessionsPage {
+  items: InstructorLiveSession[];
 }
 
 export interface TeacherLiveSessionCreatePayload {
@@ -38,6 +70,12 @@ export interface TeacherLiveSessionCreatePayload {
   scheduledAt: string;
   durationMinutes: number;
   joinUrl?: string | null;
+  assignedInstructorId?: number | null;
+  studentIds: number[];
+  repeatEnabled?: boolean;
+  repeatCount?: number;
+  repeatInterval?: 'WEEKLY' | 'DAILY' | 'MONTHLY';
+  isRecurring?: boolean;
 }
 
 export interface TeacherLiveSessionUpdatePayload {
@@ -48,6 +86,9 @@ export interface TeacherLiveSessionUpdatePayload {
   scheduledAt?: string | null;
   durationMinutes?: number | null;
   joinUrl?: string | null;
+  assignedInstructorId?: number | null;
+  studentIds?: number[] | null;
+  isRecurring?: boolean;
 }
 
 export interface LiveSessionRegistration {
@@ -97,6 +138,13 @@ export interface StudentLiveSession {
   attended: boolean;
   firstJoinedAt?: string | null;
   lastJoinedAt?: string | null;
+  assignedInstructorId: number;
+  assignedInstructorName: string;
+  registrationMode: string;
+  repeatGroupId?: string | null;
+  parentSessionId?: number | null;
+  repeatSource?: boolean;
+  repeatedCopy?: boolean;
   joinCount: number;
 }
 
@@ -121,6 +169,13 @@ export interface StudentLiveSessionView {
   firstJoinedAt?: string | null;
   lastJoinedAt?: string | null;
   lastLeftAt?: string | null;
+  assignedInstructorId: number;
+  assignedInstructorName: string;
+  registrationMode: string;
+  repeatGroupId?: string | null;
+  parentSessionId?: number | null;
+  repeatSource?: boolean;
+  repeatedCopy?: boolean;
   joinCount: number;
 }
 
@@ -146,6 +201,11 @@ export async function listTeacherSessions(query: TeacherLiveSessionsQuery = {}) 
   return data;
 }
 
+export async function listInstructorLiveSessions(query: { from?: string, to?: string, page?: number, size?: number } = {}) {
+  const { data } = await api.get<InstructorLiveSessionsPage>('/v1/instructors/me/live-sessions', { params: query });
+  return data;
+}
+
 export async function createTeacherSession(payload: TeacherLiveSessionCreatePayload) {
   const { data } = await api.post<TeacherLiveSession>('/teacher/live/sessions', payload);
   return data;
@@ -162,6 +222,11 @@ export async function deleteTeacherSession(sessionId: number) {
 
 export async function getTeacherSession(sessionId: number) {
   const { data } = await api.get<TeacherLiveSession>(`/teacher/live/sessions/${sessionId}`);
+  return data;
+}
+
+export async function repeatTeacherSession(sessionId: number, payload: { repeatCount: number; repeatInterval: string }) {
+  const { data } = await api.post(`/teacher/live/sessions/${sessionId}/repeat`, payload);
   return data;
 }
 
@@ -185,7 +250,7 @@ export async function getAttendanceSummary(sessionId: number) {
 }
 
 export async function listStudentSessions(query: StudentLiveSessionsQuery = {}) {
-  const { data } = await api.get<StudentLiveSessionsPage>('/student/live/sessions', { params: query });
+  const { data } = await api.get<StudentLiveSessionsPage>('/v1/students/me/live-sessions', { params: query });
   return data;
 }
 
@@ -215,6 +280,7 @@ export default {
   updateTeacherSession,
   deleteTeacherSession,
   getTeacherSession,
+  repeatTeacherSession,
   listTeacherRegistrations,
   summarizeAttendance,
   getAttendanceSummary,
@@ -222,5 +288,6 @@ export default {
   getStudentSession,
   registerForSession,
   joinSession,
-  leaveSession
+  leaveSession,
+  listInstructorLiveSessions
 };

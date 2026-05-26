@@ -1,6 +1,8 @@
 {
   "common": {
     "save": "حفظ",
+    "done": "تم",
+    "view": "عرض",
     "delete": "حذف",
     "cancel": "إلغاء",
     "apply": "تطبيق",
@@ -15,13 +17,17 @@
     "confirm": "تأكيد",
     "previous": "السابق",
     "next": "التالي",
+    "more": "المزيد",
+    "noOptions": "لا توجد خيارات",
+    "remove": "إزالة",
     "all": "الكل",
     "actions": "إجراءات",
     "preview": "معاينة",
     "loading": "جاري التحميل",
     "deleting": "جارٍ الحذف...",
     "maintenanceNotice": "النظام يخضع حالياً للصيانة. يرجى المحاولة لاحقاً.",
-    "back": "رجوع"
+    "back": "رجوع",
+    "select": "اختر"
   },
   "auth": {
     "sessionExpired": "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى.",
@@ -129,6 +135,21 @@
     "testimonials": {
       "title": "آراء المتعلمين",
       "empty": "ستظهر الشهادات هنا عند نشرها."
+    }
+  },
+  "pagination": {
+    "showing": "عرض {from} إلى {to} من {total} {entity}"
+  },
+  "liveSession": {
+    "editor": {
+      "title": "إعداد تفاصيل الجلسة المباشرة",
+      "subtitle": "حدّد تفاصيل الجلسة المباشرة وجدولتها وإعدادات البث.",
+      "basicInfoSection": "المعلومات الأساسية",
+      "schedulingSection": "الجدولة والتكرار",
+      "broadcastSection": "إعدادات البث",
+      "instructorSection": "المدرب والصلاحيات",
+      "scheduleSession": "جدولة الجلسة",
+      "updateSession": "تحديث الجلسة"
     }
   },
   "publicLandingTabs": {
@@ -844,7 +865,8 @@
     "adminOps": "لوحة العمليات",
     "adminOpsAlerts": "تنبيهات المعلمين",
     "adminOpsPayments": "سجلات المدفوعات",
-    "adminOpsAudit": "سجل التدقيق"
+    "adminOpsAudit": "سجل التدقيق",
+    "teacherAssignments": "الواجبات"
   },
   "feedback": {
     "cardTitle": "أرسل ملاحظاتك",
@@ -1906,6 +1928,7 @@
   "offers": {
     "title": "عروض التسويق",
     "subtitle": "أنشئ خصومات وباقات ترويجية لدوراتك.",
+    "offersEntity": "عرض ترويجي",
     "new": "عرض جديد",
     "createTitle": "إنشاء عرض",
     "editTitle": "تعديل العرض",
@@ -2323,10 +2346,10 @@
       "title": "انطلق في رحلتك التعليمية",
       "subtitle": "جلسات مختارة بعناية لتجربة تعلّم ممتعة.",
       "empty": "لا توجد دروس عامة بعد - عد لاحقًا!",
-      "detailDuration": "\u0627\u0644\u0645\u062f\u0629",
-      "detailLectures": "\u0627\u0644\u0645\u062d\u0627\u0636\u0631\u0627\u062a",
-      "cta": "\u0639\u0631\u0636 \u0627\u0644\u062f\u0648\u0631\u0629",
-      "ctaFree": "\u0627\u0628\u062f\u0623 \u0645\u062c\u0627\u0646\u0627\u064b"
+      "detailDuration": "المدة",
+      "detailLectures": "المحاضرات",
+      "cta": "عرض الدورة",
+      "ctaFree": "ابدأ مجاناً"
     },
     "testimonials": {
       "badge": "آراء الطلاب",
@@ -2340,7 +2363,7 @@
       "login": "دخول الطلاب",
       "assistant": "دخول المدرب المساعد",
       "explore": "استكشف الدروس",
-      "floating": "\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0645\u062f\u0631\u0633"
+      "floating": "تواصل مع المدرس"
     },
     "inquiry": {
       "title": "الاستفسار عن الدورة",
@@ -2753,8 +2776,43 @@
     "loginError": "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى.",
     "dashboard": "لوحة المدرب",
     "welcome": "مرحباً {name}",
+    "welcomeBack": "مرحباً بك مرة أخرى يا {name}!",
+    "welcomeBackAnonymous": "مرحباً بك مرة أخرى!",
+    "welcomeTagline": "إليك نظرة عامة على أداء منصتك اليوم.",
     "profileCompleteness": "اكتمال الملف الشخصي",
     "profileCompletenessHint": "أكمل السيرة والتخصص والصورة لبناء الثقة مع الطلاب.",
+    "planUsageTitle": "استخدام الخطة",
+    "planUsageSubtitle": "تابع حدود التخزين والبث الخاصة بخطتك.",
+    "planUsageError": "تعذّر تحميل بيانات الاستخدام. حدّث الصفحة وحاول مرة أخرى.",
+    "planUsagePlanFallback": "الخطة",
+    "planUsageMaxDuration": "المدة القصوى:",
+    "planUsageUnlimited": "غير محدود",
+    "planUsageVideoStorage": "تخزين الفيديو",
+    "planUsageVideoStorageSize": "حجم تخزين الفيديو",
+    "planUsageStreamingMinutes": "دقائق البث",
+    "planUsageRemaining": "متبقّي {value}",
+    "planUsageRemainingThisMonth": "متبقّي {value} هذا الشهر",
+    "planUsageTrendsTitle": "اتجاهات الاستخدام (آخر {months} أشهر)",
+    "planUsageTrendsError": "تعذّر تحميل اتجاهات الاستخدام.",
+    "planUsageTrendsEmpty": "لا توجد بيانات اتجاه بعد.",
+    "planUsageStorageTrendLabel": "التخزين (ساعات)",
+    "planUsageStreamingTrendLabel": "البث (دقائق)",
+    "planUsageLimitReached": "تم بلوغ حد {label} (مستخدم {percent})",
+    "planUsageCritical": "استخدام {label} مرتفع جدًا (مستخدم {percent})",
+    "planUsageWarning": "استخدام {label} يقترب من الحد (مستخدم {percent})",
+    "planUsageMinuteShort": "د",
+    "planUsageHourShort": "س",
+    "viewsCardTitle": "مشاهدات الملف والدورات",
+    "viewsCardSubtitle": "نشاط المشاهدات الفوري خلال آخر 30 يومًا.",
+    "viewsTotalLabel": "إجمالي المشاهدات",
+    "viewsLandingLabel": "صفحة الهبوط",
+    "viewsProfileLabel": "الملف الشخصي",
+    "viewsCourseLabel": "صفحات الدورات",
+    "viewsTopCoursesTitle": "الدورات الأكثر تفاعلًا",
+    "viewsEmpty": "لا توجد مشاهدات بعد.",
+    "viewsUnauthorized": "سجّل الدخول مرة أخرى لعرض إحصائيات المشاهدات.",
+    "viewsLoadError": "تعذّر تحميل إحصائيات المشاهدات. حاول مرة أخرى.",
+    "viewsRetry": "إعادة المحاولة",
     "subjectFocus": "مجال التدريس",
     "subjectUnset": "لم يتم تحديد التخصص",
     "subjectSetHint": "عرّف طلابك باختصاصك التعليمي.",
@@ -2779,6 +2837,8 @@
     "newEnrollmentsHint": "المتعلمون الذين انضموا إلى الدورات خلال هذا الشهر.",
     "completionRate": "معدل الإكمال",
     "completionRateHint": "متوسط إكمال الدورات بين الطلاب النشطين.",
+    "totalViews": "مشاهدات الصفحة",
+    "totalViewsHint": "إجمالي المشاهدات خلال آخر 30 يوماً.",
     "paymentMethodsConfigured": "طرق الدفع",
     "paymentMethodsConfiguredHint": "فعّل طريقة دفع واحدة على الأقل ليعرف الطلاب كيفية السداد.",
     "paymentMethodsConfiguredWarning": "أضف بيانات الدفع حتى يتمكن الطلاب من إرسال المدفوعات إليك.",
@@ -2895,6 +2955,12 @@
     "paymentsSubmittedAt": "تاريخ التقديم",
     "paymentsViewProof": "عرض الإثبات",
     "paymentRejectDialogTitle": "رفض الدفع",
+    "paymentApproveDialogTitle": "قبول الدفع",
+    "paymentApproveDialogPrompt": "يرجى تحديد نوع الوصول الممنوح للطالب.",
+    "accessTypeModules": "وحدات محددة",
+    "accessTypeFullCourse": "الدورة كاملة",
+    "selectModules": "حدد الوحدات لفتحها للطالب",
+    "paymentApproveDialogNotesLabel": "ملاحظات (اختياري)",
     "paymentRejectDialogPrompt": "اشرح للطالب سبب رفض إثبات الدفع وما الذي يجب تعديله.",
     "paymentRejectDialogReasonLabel": "سبب الرفض",
     "paymentRejectReasonRequired": "يرجى إدخال سبب الرفض قبل الإرسال.",
@@ -3150,6 +3216,9 @@
           "email": "البريد الإلكتروني",
           "username": "اسم المستخدم",
           "password": "كلمة المرور",
+          "phone": "رقم الهاتف (اختياري)",
+          "bio": "نبذة (اختياري)",
+          "avatar": "الصورة (اختياري)",
           "role": "الدور",
           "rolePlaceholder": "اختر دوراً",
           "requiredError": "الاسم والبريد الإلكتروني واسم المستخدم حقول مطلوبة.",
@@ -3296,7 +3365,121 @@
       "قدّم تعليمات لكل لغة لتهيئة الطالب قبل الدفع.",
       "عطّل الطريقة في حال توقف صفحة الدفع مؤقتًا."
     ],
-    "paymentSettingsLeaveConfirm": "لديك تغييرات غير محفوظة. هل تريد مغادرة الصفحة؟"
+    "paymentSettingsLeaveConfirm": "لديك تغييرات غير محفوظة. هل تريد مغادرة الصفحة؟",
+    "assignments": {
+      "title": "الواجبات",
+      "titleForLesson": "واجبات الدرس: {lesson}",
+      "subtitle": "أدر الواجبات والتصحيح وتسليمات الطلاب عبر جميع دوراتك.",
+      "add": "إضافة واجب",
+      "edit": "تعديل الواجب",
+      "delete": "حذف الواجب",
+      "empty": "لا توجد واجبات لهذا الدرس بعد.",
+      "emptyCrossCourse": "لم تقم بإنشاء أي واجبات بعد.",
+      "confirmDelete": "هل تريد حذف «{title}»؟ سيتم حذف جميع تسليمات الطلاب أيضًا.",
+      "backToCourse": "العودة إلى الدورة",
+      "viewSubmissions": "عرض التسليمات",
+      "submissionsCount": "لا توجد تسليمات | تسليم واحد | تسليمان | {count} تسليمات | {count} تسليمًا | {count} تسليم",
+      "attachmentsCount": "لا توجد مرفقات | مرفق واحد | مرفقان | {count} مرفقات | {count} مرفقًا | {count} مرفق",
+      "dueAt": "موعد التسليم {date}",
+      "noDueDate": "بدون موعد تسليم",
+      "maxScoreShort": "الدرجة القصوى {score}",
+      "columns": {
+        "title": "العنوان",
+        "lesson": "الدرس",
+        "course": "الدورة",
+        "dueAt": "موعد التسليم",
+        "maxScore": "الدرجة القصوى",
+        "attachments": "المرفقات",
+        "createdAt": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "fields": {
+        "title": "العنوان",
+        "titlePlaceholder": "مثال: الفصل الثالث — ورقة عمل",
+        "description": "الوصف",
+        "descriptionPlaceholder": "اشرح المطلوب، المخرجات المتوقعة، ومعايير التقييم...",
+        "dueAt": "موعد التسليم",
+        "maxScore": "الدرجة القصوى",
+        "attachments": "المرفقات",
+        "course": "الدورة",
+        "coursePlaceholder": "اختر دورة",
+        "lesson": "الدرس",
+        "lessonPlaceholder": "اختر درسًا",
+        "lessonLoading": "جارٍ تحميل الدروس...",
+        "lessonPickCourseFirst": "اختر دورة أولًا"
+      },
+      "editor": {
+        "createTitle": "إنشاء واجب جديد",
+        "editTitle": "تعديل الواجب",
+        "save": "حفظ الواجب",
+        "saving": "جارٍ الحفظ...",
+        "cancel": "إلغاء",
+        "detailsSectionTitle": "تفاصيل الواجب",
+        "contextSectionTitle": "الدورة والدرس",
+        "lessonHeading": "واجب للدرس: {lesson}"
+      },
+      "validation": {
+        "titleRequired": "الرجاء إدخال عنوان الواجب.",
+        "descriptionRequired": "الرجاء كتابة وصف للواجب.",
+        "dueAtRequired": "الرجاء اختيار موعد التسليم.",
+        "maxScoreRequired": "الرجاء إدخال درجة قصوى أكبر من الصفر."
+      },
+      "upload": {
+        "label": "المرفقات",
+        "dropHint": "اسحب الملفات هنا أو انقر للرفع",
+        "browse": "اختيار الملفات",
+        "uploading": "جارٍ رفع {name}...",
+        "success": "تم رفع المرفق.",
+        "failed": "تعذّر رفع {name}. حاول مرة أخرى.",
+        "remove": "إزالة",
+        "empty": "لم يتم إرفاق أي ملفات بعد.",
+        "sizeHint": "يتم رفع كل ملف فور اختياره. يمكنك إزالة الملفات قبل الحفظ."
+      },
+      "submissions": {
+        "title": "التسليمات",
+        "titleFor": "التسليمات — {assignment}",
+        "empty": "لا توجد تسليمات بعد.",
+        "studentName": "الطالب",
+        "status": "الحالة",
+        "submittedAt": "تاريخ التسليم",
+        "score": "الدرجة",
+        "grade": "تصحيح",
+        "attachments": "المرفقات",
+        "attachmentsNone": "لم يتم تسليم ملفات",
+        "loadFailed": "تعذّر تحميل التسليمات."
+      },
+      "status": {
+        "submitted": "تم التسليم",
+        "resubmissionRequested": "مطلوب إعادة التسليم",
+        "graded": "تم التصحيح",
+        "notSubmitted": "لم يُسلَّم"
+      },
+      "grade": {
+        "title": "تصحيح التسليم",
+        "titleFor": "تصحيح {student}",
+        "status": "الحالة",
+        "score": "الدرجة",
+        "scoreHint": "من أصل {max}",
+        "feedback": "الملاحظات",
+        "feedbackPlaceholder": "شارك ملاحظاتك أو التصحيحات أو الخطوات التالية...",
+        "save": "حفظ التصحيح"
+      },
+      "toast": {
+        "created": "تم إنشاء الواجب.",
+        "updated": "تم تحديث الواجب.",
+        "deleted": "تم حذف الواجب.",
+        "graded": "تم حفظ التصحيح.",
+        "uploadFailed": "تعذّر رفع الملف. حاول مرة أخرى.",
+        "loadFailed": "تعذّر تحميل الواجبات."
+      },
+      "errors": {
+        "generic": "حدث خطأ ما. حاول مرة أخرى.",
+        "notFound": "تعذّر العثور على الواجب.",
+        "permissionDenied": "ليست لديك صلاحية لتنفيذ هذا الإجراء.",
+        "conflict": "تم تحديث هذا الواجب من قِبل شخص آخر. أعِد التحميل وحاول مجددًا."
+      },
+      "backToList": "العودة إلى الواجبات"
+    }
   },
   "assistant": {
     "login": "تسجيل دخول المساعد",
@@ -3599,7 +3782,63 @@
     "freeCheckoutAction": "تأكيد التسجيل",
     "freeCheckoutSuccess": "تم إكمال التسجيل بنجاح.",
     "freeCheckoutNotesLabel": "ملاحظات للمعلم (اختياري)",
-    "emailInvalid": "يرجى إدخال بريد إلكتروني صالح."
+    "emailInvalid": "يرجى إدخال بريد إلكتروني صالح.",
+    "assignments": {
+      "title": "الواجبات",
+      "empty": "لا توجد واجبات لهذه الدورة بعد.",
+      "loadFailed": "تعذّر تحميل الواجبات. حاول مرة أخرى.",
+      "accessDenied": "لا يمكنك الوصول إلى واجبات هذه الدورة.",
+      "actions": {
+        "submit": "تسليم الواجب",
+        "resubmit": "إعادة التسليم"
+      },
+      "status": {
+        "notSubmitted": "لم يُسلَّم",
+        "submitted": "تم التسليم",
+        "resubmissionRequested": "مطلوب إعادة التسليم",
+        "graded": "تم التصحيح"
+      },
+      "columns": {
+        "title": "العنوان",
+        "lesson": "الدرس",
+        "dueAt": "موعد التسليم",
+        "maxScore": "الدرجة القصوى",
+        "status": "الحالة",
+        "score": "الدرجة",
+        "attachments": "المرفقات",
+        "actions": "الإجراءات"
+      },
+      "submit": {
+        "title": "تسليم الواجب",
+        "resubmitTitle": "إعادة تسليم الواجب",
+        "notes": "ملاحظات (اختياري)",
+        "notesPlaceholder": "أضف ملاحظات لمعلمك...",
+        "attachments": "ملفاتك",
+        "attachmentsRequired": "الرجاء إرفاق ملف واحد على الأقل قبل التسليم.",
+        "send": "إرسال التسليم",
+        "sending": "جارٍ الإرسال...",
+        "cancel": "إلغاء",
+        "teacherFeedbackHeading": "ملاحظات المعلم على تسليمك السابق"
+      },
+      "result": {
+        "submittedAt": "تاريخ التسليم",
+        "feedback": "ملاحظات المعلم"
+      },
+      "due": {
+        "label": "موعد التسليم {date}",
+        "passed": "انقضى موعد التسليم",
+        "noDueDate": "بدون موعد تسليم"
+      },
+      "toast": {
+        "submitted": "تم تسليم الواجب.",
+        "resubmitted": "تم إرسال التسليم.",
+        "uploadFailed": "تعذّر رفع الملف. حاول مرة أخرى."
+      },
+      "errors": {
+        "alreadySubmitted": "تم تسليم هذا الواجب بالفعل أو لا يمكن إعادة تسليمه الآن.",
+        "generic": "حدث خطأ ما. حاول مرة أخرى."
+      }
+    }
   },
   "achievements": {
     "title": "الإنجازات",
@@ -3688,8 +3927,11 @@
     "Privacy": "سياسة الخصوصية"
   },
   "courses": {
+    "useModulePricingLabel": "استخدام نظام التسعير بالوحدات",
+    "modulePricedLabel": "الوحدة لها سعر مخصص",
     "title": "دوراتي",
     "coursesNav": "الدورات",
+    "perLevel": "/ المستوى",
     "aboutNav": "عن المدرس",
     "contactNav": "اتصل بنا",
     "languageNa": "English",
@@ -3715,7 +3957,7 @@
     "courseOverview": "نظرة عامة على الدورة",
     "instructor": "المدرب",
     "pricing": "الاسعار",
-    "faq": "التعليمات",
+    "faq": "الأسئلة الشائعة",
     "certificateInfo": "معلومات الشهادة",
     "duration": "المدة",
     "targetAudience": "الجمهور المستهدف",
@@ -3773,6 +4015,9 @@
     "lessonTitleRequired": "يرجى إدخال اسم الدرس.",
     "lessonDetailsSectionTitle": "تفاصيل الدرس",
     "lessonMediaSectionTitle": "الوسائط والمرفقات",
+    "lessonVideoSectionTitle": "الفيديو",
+    "lessonAiAssistantSectionTitle": "المساعد الذكي",
+    "lessonVideoTooLong": "مدة الفيديو تتجاوز الحد المسموح به في خطتك",
     "lessonSchedulingSectionTitle": "النشر والترتيب",
     "lessonProgressHeading": "جاهزية الدرس",
     "lessonProgressDetails": "معلومات أساسية عن الدرس",
@@ -3811,6 +4056,8 @@
     "toast": {
       "courseSaved": "تم حفظ تفاصيل الدورة بنجاح.",
       "courseSavedHidden": "تم حفظ تفاصيل الدورة. الدورة مخفية عن الطلاب حتى تقوم بنشرها.",
+      "coursePublished": "تم نشر الدورة",
+      "draftSaved": "تم حفظ المسودة",
       "moduleCreated": "تم إضافة الوحدة بنجاح.",
       "moduleUpdated": "تم تحديث الوحدة بنجاح.",
       "lessonCreated": "تم إضافة الدرس بنجاح.",
@@ -3952,6 +4199,20 @@
     "deleteConfirm": "هل أنت متأكد أنك تريد حذف \"{title}\"؟ لا يمكن التراجع عن هذا الإجراء.",
     "lessonDurationLabel": "المدة (بالثواني)",
     "lessonDurationHelp": "استخدم الثواني حتى يتمكن الطلاب من متابعة التقدم بدقة.",
+    "lessonDurationSystemHint": "يتم تحديد المدة تلقائياً عند رفع الفيديو.",
+    "basicInfoSection": "المعلومات الأساسية",
+    "courseTitle": "عنوان الدورة",
+    "whatYouWillLearnPlaceholder": "مثال: بناء ونشر تطبيق ويب متكامل",
+    "addLearnItem": "إضافة",
+    "removeLearnItem": "حذف العنصر",
+    "goalsRequirementsSection": "الأهداف والمتطلبات",
+    "visualMediaSection": "الوسائط المرئية",
+    "courseContentSection": "محتوى الدورة والمنهج",
+    "pricingSection": "التسعير",
+    "additionalSettingsSection": "إعدادات إضافية",
+    "publishCourse": "نشر الدورة",
+    "saveAsDraft": "حفظ كمسودة",
+    "cancelConfirmUnsaved": "لديك تغييرات غير محفوظة. هل تريد المغادرة؟",
     "deleteModuleConfirm": "حذف الوحدة \"{title}\"؟ سيؤدي ذلك إلى إزالة جميع الدروس بداخلها.",
     "deleteLessonConfirm": "حذف الدرس \"{title}\"؟ لن يتمكن الطلاب من رؤيته بعد الآن.",
     "durationNotSet": "لم يتم تحديد المدة",
@@ -3996,7 +4257,8 @@
     "visibilityDraftLabel": "الدورة مخفية",
     "visibilityDraftNotice": "الدورة غير ظاهرة للطلاب. انشرها عندما تكون جاهزًا.",
     "visibilityPublishedLabel": "الدورة منشورة",
-    "visibilityPublishedNotice": "الدورة منشورة للطلاب."
+    "visibilityPublishedNotice": "الدورة منشورة للطلاب.",
+    "assignmentsCount": "عدد الواجبات: {count}"
   },
   "assessments": {
     "banksTitle": "بنوك الأسئلة",
@@ -4118,6 +4380,8 @@
     },
     "title": "الاختبارات",
     "subtitle": "أنشئ اختبارات واختبارات نهائية من بنوك الأسئلة لديك.",
+    "assessmentsEntity": "اختبار",
+    "searchPlaceholder": "ابحث عن اختبار...",
     "createAssessment": "إنشاء اختبار",
     "tableName": "الاسم",
     "tableCourse": "الدورة",
@@ -4456,6 +4720,7 @@
       "startAt": "وقت البدء",
       "endAt": "وقت الانتهاء",
       "timeZone": "المنطقة الزمنية",
+      "isRecurring": "موعد متكرر",
       "currencyLabel": "العملة",
       "hourlyRate": "الأجر بالساعة",
       "currencyRequired": "يرجى اختيار العملة.",
@@ -4472,6 +4737,7 @@
       "durationLabel": "{minutes} دقيقة",
       "viewSession": "عرض التفاصيل",
       "statusHeader": "الحالة",
+      "assistantLabel": "المحاضر",
       "sessionStudent": "الطالب",
       "slotHeader": "الوقت",
       "paymentsTitle": "المدفوعات",
@@ -4852,7 +5118,6 @@
       "embeddedDialogHint": "سيتم تحميل النموذج بالأسفل لتجيب دون مغادرة المنصة.",
       "submissionUrl": "رابط التسليم",
       "submissionKey": "مفتاح التخزين",
-      "submissionNotes": "ملاحظات",
       "submitAction": "إرسال",
       "assignmentSubmitted": "تم إرسال الواجب.",
       "assignmentFailed": "تعذر إرسال الواجب.",
@@ -5293,14 +5558,12 @@
     },
     "actions": {
       "addTeacher": "إضافة معلم",
-      "payments": "نظرة عامة على المدفوعات",
       "manage": "إدارة",
       "delete": "حذف"
     },
     "columns": {
       "teacher": "المعلم",
       "plan": "الباقة",
-      "usage": "الاستخدام",
       "status": "الحالة",
       "actions": "الإجراءات"
     },
@@ -5326,13 +5589,13 @@
       "name": "اسم العرض",
       "subject": "المادة",
       "phoneCountryCode": "مفتاح الدولة",
-        "phoneNumber": "رقم الهاتف",
-        "plan": "الباقة",
-        "active": "المعلم نشط",
-        "studentMultiDeviceLoginEnabled": "السماح للطلاب بتسجيل الدخول من أكثر من جهاز",
-        "studentMultiDeviceLoginHint": "عند التعطيل يبقى تسجيل الدخول محصورًا في جهاز واحد كما هو الآن. فعّل هذا الخيار للسماح لطلاب هذا المعلم بالدخول من أجهزة مختلفة.",
-        "save": "حفظ التغييرات",
-        "slug": "معرف المعلم (Slug)",
+      "phoneNumber": "رقم الهاتف",
+      "plan": "الباقة",
+      "active": "المعلم نشط",
+      "studentMultiDeviceLoginEnabled": "السماح للطلاب بتسجيل الدخول من أكثر من جهاز",
+      "studentMultiDeviceLoginHint": "عند التعطيل يبقى تسجيل الدخول محصورًا في جهاز واحد كما هو الآن. فعّل هذا الخيار للسماح لطلاب هذا المعلم بالدخول من أجهزة مختلفة.",
+      "save": "حفظ التغييرات",
+      "slug": "معرف المعلم (Slug)",
       "updateSlug": "تحديث المعرف",
       "joined": "تاريخ الانضمام",
       "studentCount": "عدد الطلاب",
@@ -5340,81 +5603,6 @@
       "deviceCount": "الأجهزة",
       "deleteTeacher": "حذف المعلم نهائيًا",
       "empty": "اختر معلماً لعرض التفاصيل"
-    },
-    "usage": {
-      "title": "الاستخدام",
-      "subtitle": "استخدام تخزين الفيديو والبث الحالي لهذا المعلم.",
-      "error": "تعذر تحميل استخدام هذا المعلم حاليًا.",
-      "empty": "لا توجد بيانات استخدام بعد."
-    },
-    "payments": {
-      "title": "نظرة عامة على مدفوعات المعلمين",
-      "subtitle": "مراجعة مدفوعات الكورسات اليدوية عبر المعلمين مع فلاتر المعلم والكورس والتاريخ.",
-      "filtersTitle": "الفلاتر",
-      "filtersSubtitle": "حدد النتائج حسب المعلم والكورس وطريقة الدفع والحالة والفترة الزمنية.",
-      "tableTitle": "المدفوعات اليدوية",
-      "tableSubtitle": "تم تحميل {count} سجلات من أصل {total} عملية دفع مطابقة.",
-      "empty": "لا توجد مدفوعات تطابق الفلاتر الحالية.",
-      "unknownTeacher": "معلم غير معروف",
-      "viewProof": "عرض الإثبات",
-      "emptyValue": "غير متاح",
-      "zeroAmount": "EGP 0.00",
-      "proofDialogTitle": "إثبات الدفع #{id}",
-      "proofDialogFallback": "إثبات الدفع",
-      "filters": {
-        "teacher": "المعلم",
-        "teacherAll": "جميع المعلمين",
-        "course": "الكورس",
-        "courseAll": "جميع الكورسات",
-        "status": "الحالة",
-        "statusAll": "جميع الحالات",
-        "method": "طريقة الدفع",
-        "methodAll": "جميع الطرق",
-        "search": "بحث",
-        "searchPlaceholder": "اسم الطالب أو بريده",
-        "dateFrom": "من تاريخ",
-        "dateTo": "إلى تاريخ",
-        "reset": "إعادة تعيين",
-        "apply": "تطبيق الفلاتر",
-        "none": "لا توجد فلاتر مفعلة"
-      },
-      "stats": {
-        "totalRows": "إجمالي المدفوعات",
-        "visibleAmount": "مبلغ السجلات المعروضة",
-        "visibleTeachers": "المعلمون المعروضون",
-        "visibleCourses": "الكورسات المعروضة",
-        "pendingRows": "قيد المراجعة",
-        "approvedRows": "مقبولة",
-        "rejectedRows": "مرفوضة"
-      },
-      "columns": {
-        "teacher": "المعلم",
-        "student": "الطالب",
-        "course": "الكورس",
-        "amount": "المبلغ",
-        "method": "طريقة الدفع",
-        "status": "الحالة",
-        "createdAt": "تاريخ الإنشاء",
-        "reviewedAt": "تاريخ المراجعة",
-        "proof": "الإثبات"
-      },
-      "actions": {
-        "export": "تصدير CSV",
-        "previewProof": "معاينة",
-        "openProofNewTab": "فتح في تبويب جديد"
-      },
-      "pagination": {
-        "summary": "عرض {from}–{to} من {total}",
-        "prev": "السابق",
-        "next": "التالي",
-        "page": "الصفحة {current} من {total}",
-        "pageSize": "عدد الصفوف"
-      },
-      "errors": {
-        "load": "تعذر تحميل مدفوعات المعلمين الآن.",
-        "init": "تعذر تجهيز صفحة مدفوعات المعلمين.",
-        "export": "تعذر تصدير مدفوعات المعلمين الآن."
-      }
     },
     "overrides": {
       "title": "تجاوزات الاستخدام",
@@ -5722,25 +5910,14 @@
         "messagePlaceholder": "اكتب المشكلة أو التحديث العاجل",
         "sendToAll": "إرسال إلى جميع المعلمين النشطين",
         "recipientsLabel": "معلمون محددون",
-        "filterLabel": "فلتر المعلمين",
-        "filterPlaceholder": "ابحث بالاسم أو المعرف أو المادة أو الخطة",
         "recipientsPlaceholder": "اختر معلماً أو أكثر",
         "recipientsHint": "حدد المعلمين الذين يجب أن يروا هذا التنبيه.",
         "allTeachersHint": "سيصل إلى {count} من المعلمين النشطين.",
         "noTeachers": "لا يوجد معلمون نشطون لاستقبال التنبيه.",
-        "noFilteredTeachers": "لا يوجد معلمون نشطون مطابقون للفلتر.",
-        "filteredCount": "{count} معلم نشط",
-        "noSubject": "بدون مادة",
         "selectedHint": "تم اختيار {count} من المعلمين.",
         "messageRequired": "أدخل نص التنبيه قبل الإرسال.",
         "recipientsRequired": "اختر المعلمين أو أرسل للجميع.",
-        "selectedTitle": "المعلمون المحددون ({count})",
-        "columns": {
-          "select": "تحديد",
-          "teacher": "المعلم",
-          "subject": "المادة",
-          "plan": "الخطة"
-        }
+        "selectedTitle": "المعلمون المحددون ({count})"
       },
       "actions": {
         "send": "إرسال التنبيه",
@@ -5833,6 +6010,27 @@
     "PLAN_QUOTA_COURSES": "تم بلوغ حد الدورات لهذه الخطة (حد أقصى {limit} دورة)."
   },
   "live": {
+    "calendar": {
+      "today": "اليوم",
+      "month": "شهر",
+      "week": "أسبوع",
+      "day": "يوم",
+      "fiveDays": "5 أيام",
+      "prev": "السابق",
+      "next": "التالي"
+    },
+    "details": {
+      "course": "الدورة",
+      "instructor": "المعلم",
+      "module": "الوحدة",
+      "students": "الطلاب",
+      "duration": "المدة",
+      "durationMins": "دقيقة",
+      "provider": "المزوّد",
+      "status": "الحالة",
+      "joinLink": "رابط الانضمام",
+      "close": "إغلاق"
+    },
     "teacher": {
       "titlePage": "الجلسات المباشرة",
       "subtitle": "جدول الجلسات المباشرة، إدارة التسجيل والحضور.",
@@ -5843,12 +6041,23 @@
       "scheduledAt": "موعد البداية",
       "status": "الحالة",
       "registered": "المسجلون",
+      "assignedStudents": "الطلاب المعينون",
+      "repeatSource": "الأصل",
+      "repeatedCopy": "نسخة مكررة",
+      "assignedInstructor": "المعلم المعين",
       "unscheduled": "لم يحدد",
       "viewRegistrations": "عرض المسجلين",
       "summarizeAttendance": "تجميع الحضور",
       "emptyState": "لا توجد جلسات مباشرة بعد. قم بجدولة جلسة للبدء.",
       "loadError": "تعذر تحميل الجلسات المباشرة، حاول لاحقاً.",
       "newSession": "جدولة جلسة",
+      "searchPlaceholder": "ابحث عن جلسة...",
+      "filterStatus": "حالة الجلسة",
+      "allStatuses": "جميع الحالات",
+      "duplicateCopyTooltip": "نسخة مكررة",
+      "repeatSourceTooltip": "جلسة أصلية لها نسخ",
+      "studentsPlaceholder": "اختر الطلاب",
+      "sessionsEntity": "جلسة",
       "createTitle": "جدولة جلسة مباشرة",
       "editTitle": "تعديل جلسة مباشرة",
       "courseLabel": "الدورة",
@@ -5863,6 +6072,15 @@
       "zoomPasscode": "رمز دخول زووم",
       "meetCode": "رمز Google Meet",
       "meetEventId": "معرّف حدث Google Calendar",
+      "moduleId": "معرف الوحدة (اختياري)",
+      "repeatEnabled": "تكرار هذه الجلسة",
+      "repeatCount": "عدد مرات التكرار",
+      "repeatInterval": "فترة التكرار",
+      "repeatDaily": "يومياً",
+      "repeatWeekly": "أسبوعياً",
+      "repeatMonthly": "شهرياً",
+      "studentRequired": "يجب اختيار طالب واحد على الأقل.",
+      "instructorRequired": "يجب تعيين معلم للجلسة.",
       "createSuccess": "تم جدولة الجلسة بنجاح.",
       "createError": "تعذر جدولة الجلسة.",
       "updateSuccess": "تم تحديث الجلسة بنجاح.",

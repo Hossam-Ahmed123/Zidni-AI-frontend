@@ -10,14 +10,18 @@ function toDate(value: DateLike): Date | null {
 
 export function formatDateTime(
   value: DateLike,
-  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' }
+  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' },
+  locale?: string
 ): string {
   const date = toDate(value);
   if (!date) {
     return '';
   }
 
-  const formatter = new Intl.DateTimeFormat(undefined, options);
+  // `locale` defaults to undefined, which preserves the prior runtime-default
+  // behaviour for every existing caller. Pass an explicit BCP-47 tag (e.g.
+  // 'ar-u-nu-latn') to render in a specific locale with a chosen numbering system.
+  const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
 }
 
@@ -50,4 +54,20 @@ export function formatRelativeTimeToNow(value: DateLike): string {
   }
 
   return '';
+}
+
+const FILE_SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB'] as const;
+
+export function formatFileSize(bytes: number | null | undefined): string {
+  if (bytes == null || !Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B';
+  }
+  let value = bytes;
+  let unitIndex = 0;
+  while (value >= 1024 && unitIndex < FILE_SIZE_UNITS.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+  const rounded = value >= 10 || unitIndex === 0 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${rounded} ${FILE_SIZE_UNITS[unitIndex]}`;
 }

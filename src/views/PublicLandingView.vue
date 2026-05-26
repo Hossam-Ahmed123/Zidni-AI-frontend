@@ -1,5 +1,5 @@
 <template>
-  <ThemePage class="public-landing__page">
+  <ThemePage class="public-landing__page" :style="{'--theme-page-bg': '#f4f5fe'}">
   <div class="public-landing">
     <template v-if="landing">
       <TeacherPublicTabs
@@ -93,11 +93,6 @@ const pageKey = computed(() => {
 
 const isPreview = computed(() => isPreviewEnabled(route.query.preview));
 
-function isDisabledTenantError(error: unknown) {
-  const status = (error as { response?: { status?: number } })?.response?.status;
-  return status === 403 || status === 404;
-}
-
 const displaySections = computed(() => {
   if (!landing.value) return [] as PublicLandingResponse['sections'];
   const sections = landing.value.sections || [];
@@ -127,9 +122,7 @@ async function loadLanding() {
     }
   } catch (error) {
     console.warn('Failed to load landing page', error);
-    if (isDisabledTenantError(error)) {
-      router.replace({ name: 'not-found' });
-    } else if (route.name !== 'tenant-public-landing') {
+    if (route.name !== 'tenant-public-landing') {
       router.replace({ name: 'tenant-public-landing' });
     }
   } finally {
@@ -378,10 +371,6 @@ watch(
   --landing-shadow-hover: 0 16px 30px rgba(4, 6, 24, 0.12);
   --landing-radius: 1.5rem;
   min-height: 100vh;
-}
-
-.public-landing__page :deep(.theme-page) {
-  background: #f4f5fe;
 }
 
 .public-landing__page :deep(.ui-card) {

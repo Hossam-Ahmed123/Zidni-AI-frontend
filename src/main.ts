@@ -4,9 +4,11 @@ import App from './App.vue';
 import router from './router';
 import vuetify from './plugins/vuetify';
 import i18n, { loadLocaleMessages, resolveStartingLocale } from './plugins/i18n';
+import VueApexCharts from './plugins/apexcharts';
 import '@/theme/sakai/index.scss';
 import './styles/main.scss';
 import '@/assets/css/overlays.css';
+import './styles/tailwind-base.css';
 import 'primeicons/primeicons.css';
 import ThemePage from '@/layout/theme/ThemePage.vue';
 import UiButton from '@/components/ui/UiButton.vue';
@@ -34,6 +36,7 @@ const bootstrap = async () => {
 
   app.use(router);
   app.use(vuetify);
+  app.use(VueApexCharts);
 
   const startingLocale = resolveStartingLocale();
   await loadLocaleMessages(startingLocale);

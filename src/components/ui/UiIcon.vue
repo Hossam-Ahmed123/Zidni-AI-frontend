@@ -1,6 +1,6 @@
 <template>
-  <i v-if="iconClass" :class="['ui-icon', iconClass]" :style="iconStyle"></i>
-  <span v-else class="ui-icon__fallback" :style="iconStyle">{{ fallbackLabel }}</span>
+  <i v-if="iconClass" :class="['ui-icon', 'inline-flex items-center justify-center', iconClass]" :style="iconStyle"></i>
+  <span v-else class="ui-icon__fallback inline-flex items-center justify-center w-[1em] h-[1em] text-content-secondary" :style="iconStyle">{{ fallbackLabel }}</span>
 </template>
 
 <script setup lang="ts">
@@ -80,7 +80,10 @@ const iconMap: Record<IconKey, string> = {
   StarOutlined: 'pi pi-star',
   StarFilled: 'pi pi-star-fill',
   SunOutlined: 'pi pi-sun',
-  MoonOutlined: 'pi pi-moon'
+  MoonOutlined: 'pi pi-moon',
+  CopyOutlined: 'pi pi-copy',
+  EllipsisOutlined: 'pi pi-ellipsis-v',
+  ShareAltOutlined: 'pi pi-share-alt'
 };
 
 const props = withDefaults(
@@ -134,20 +137,3 @@ const scaledSize = computed(() => `calc(${props.size}px * var(--sakai-scale-fact
 const iconStyle = computed(() => ({ fontSize: scaledSize.value }));
 const fallbackLabel = computed(() => props.name?.charAt(0)?.toUpperCase() ?? '?');
 </script>
-
-<style scoped>
-.ui-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ui-icon__fallback {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;
-  color: var(--sakai-text-color-secondary);
-}
-</style>

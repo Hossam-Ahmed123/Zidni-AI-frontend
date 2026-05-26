@@ -122,6 +122,11 @@ export const buildTeacherNavModel = ({
 
   if (can('courses.manage')) {
     items.push({ label: t('courses.title'), to: '/teacher/courses', icon: 'ReadOutlined' });
+    items.push({
+      label: t('nav.teacherAssignments'),
+      to: '/teacher/learning',
+      icon: 'FileTextOutlined'
+    });
   } else {
     recordSuppressed('courses', 'courses.title', 'missing-permission', 'courses.manage');
   }
@@ -138,6 +143,9 @@ export const buildTeacherNavModel = ({
 
   if (isTeacher && allows(liveSessionsCoreEnabled)) {
     items.push({ label: t('nav.teacherLiveSessions'), to: '/teacher/live-sessions', icon: 'VideoCameraOutlined' });
+  }
+  if (isAssistant) {
+    items.push({ label: t('nav.teacherLiveSessions'), to: '/assistant/live-sessions', icon: 'VideoCameraOutlined' });
   }
   if (isTeacher && allows(liveSessionsChatEnabled)) {
     items.push({ label: t('nav.teacherLiveModeration'), to: '/teacher/live-moderation', icon: 'MessageOutlined' });

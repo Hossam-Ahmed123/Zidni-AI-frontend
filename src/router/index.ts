@@ -12,6 +12,7 @@ const TeacherQuestionBanksView = () => import('@/views/TeacherQuestionBanksView.
 const CourseListView = () => import('@/views/CourseListView.vue');
 const CourseEditorView = () => import('@/views/CourseEditorView.vue');
 const LessonEditorView = () => import('@/views/LessonEditorView.vue');
+const TeacherAssignmentEditorView = () => import('@/views/TeacherAssignmentEditorView.vue');
 const PublicLandingView = () => import('@/views/PublicLandingView.vue');
 const PublicCourseDetailView = () => import('@/views/PublicCourseDetailView.vue');
 const PublicCoursesView = () => import('@/views/PublicCoursesView.vue');
@@ -46,6 +47,7 @@ const StudentAssessmentsView = () => import('@/views/StudentAssessmentsView.vue'
 const AssessmentPlayerView = () => import('@/views/AssessmentPlayerView.vue');
 const TeacherAssessmentAttemptsView = () => import('@/views/TeacherAssessmentAttemptsView.vue');
 const TeacherLiveSessionsList = () => import('@/views/teacher/live/LiveSessionsList.vue');
+const TeacherSessionEditor = () => import('@/views/teacher/live/TeacherSessionEditorView.vue');
 const TeacherLiveModerationView = () => import('@/views/teacher/live/LiveModeration.vue');
 const TeacherLivePollsView = () => import('@/views/teacher/live/LivePolls.vue');
 const StudentLiveSessionsList = () => import('@/views/student/live/StudentLiveSessions.vue');
@@ -76,6 +78,7 @@ const StudentLearningView = () => import('@/views/StudentLearningView.vue');
 const StudentAssistantView = () => import('@/views/student/assistant/StudentAssistantView.vue');
 const TeacherAssistantsView = () => import('@/views/teacher/assistants/AssistantsManagementView.vue');
 const AssistantDashboardView = () => import('@/views/assistant/AssistantDashboardView.vue');
+const AssistantLiveSessionsList = () => import('@/views/assistant/LiveSessionsList.vue');
 const TeacherCertificatesView = () => import('@/views/TeacherCertificatesView.vue');
 const PlatformAdminPublicationsView = () => import('@/views/PlatformAdmin/PublicationsModeration.vue');
 const PlatformAdminConsoleView = () => import('@/views/PlatformAdminConsoleView.vue');
@@ -87,7 +90,6 @@ const AdminAnalyticsExportView = () => import('@/views/admin/analytics/AdminAnal
 const AdminPaymentLogsView = () => import('@/views/admin/ops/AdminPaymentLogs.vue');
 const AdminAlertsView = () => import('@/views/admin/ops/AdminAlerts.vue');
 const AdminTeachersView = () => import('@/views/admin/AdminTeachersView.vue');
-const AdminTeacherPaymentsView = () => import('@/views/admin/AdminTeacherPaymentsView.vue');
 const AdminStudentsView = () => import('@/views/admin/AdminStudentsView.vue');
 const AdminPlanBuilder = () => import('@/views/admin/AdminPlanBuilder.vue');
 const SubscriptionPaypalSuccessView = () => import('@/views/subscription/PaypalSuccessView.vue');
@@ -563,6 +565,26 @@ const router = createRouter({
       }
     },
     {
+      path: '/teacher/courses/:courseId/lessons/:lessonId/assignments/new',
+      name: 'teacher-assignment-create',
+      component: TeacherAssignmentEditorView,
+      meta: {
+        requiresAuth: true,
+        roles: ['TEACHER', 'TEACHER_ASSISTANT'],
+        requiresAssistantPermissions: ['courses.manage']
+      }
+    },
+    {
+      path: '/teacher/courses/:courseId/lessons/:lessonId/assignments/:assignmentId/edit',
+      name: 'teacher-assignment-edit',
+      component: TeacherAssignmentEditorView,
+      meta: {
+        requiresAuth: true,
+        roles: ['TEACHER', 'TEACHER_ASSISTANT'],
+        requiresAssistantPermissions: ['courses.manage']
+      }
+    },
+    {
       path: '/teacher/question-banks',
       name: 'teacher-question-banks',
       component: TeacherQuestionBanksView,
@@ -606,6 +628,18 @@ const router = createRouter({
       path: '/teacher/live-sessions',
       name: 'teacher-live-sessions',
       component: TeacherLiveSessionsList,
+      meta: { requiresAuth: true, roles: ['TEACHER'], requiresFeature: FEATURE.liveSessionsCore }
+    },
+    {
+      path: '/teacher/live-sessions/create',
+      name: 'teacher-session-create',
+      component: TeacherSessionEditor,
+      meta: { requiresAuth: true, roles: ['TEACHER'], requiresFeature: FEATURE.liveSessionsCore }
+    },
+    {
+      path: '/teacher/live-sessions/:sessionId/edit',
+      name: 'teacher-session-edit',
+      component: TeacherSessionEditor,
       meta: { requiresAuth: true, roles: ['TEACHER'], requiresFeature: FEATURE.liveSessionsCore }
     },
     {
@@ -691,6 +725,26 @@ const router = createRouter({
       name: 'teacher-learning',
       component: TeacherLearningView,
       meta: { requiresAuth: true, roles: ['TEACHER'] }
+    },
+    {
+      path: '/teacher/learning/assignments/new',
+      name: 'teacher-assignment-create-global',
+      component: TeacherAssignmentEditorView,
+      meta: {
+        requiresAuth: true,
+        roles: ['TEACHER', 'TEACHER_ASSISTANT'],
+        requiresAssistantPermissions: ['courses.manage']
+      }
+    },
+    {
+      path: '/teacher/learning/assignments/:assignmentId/edit',
+      name: 'teacher-assignment-edit-global',
+      component: TeacherAssignmentEditorView,
+      meta: {
+        requiresAuth: true,
+        roles: ['TEACHER', 'TEACHER_ASSISTANT'],
+        requiresAssistantPermissions: ['courses.manage']
+      }
     },
     {
       path: '/teacher/reports',
@@ -822,13 +876,6 @@ const router = createRouter({
       component: AdminTeachersView,
       meta: { requiresAuth: true, roles: ['PLATFORM_ADMIN'] },
       alias: '/platform/teachers/manage'
-    },
-    {
-      path: '/admin/teachers/payments',
-      name: 'admin-teacher-payments',
-      component: AdminTeacherPaymentsView,
-      meta: { requiresAuth: true, roles: ['PLATFORM_ADMIN'] },
-      alias: ['/admin/teachers/payment']
     },
     {
       path: '/admin/students',
@@ -984,6 +1031,16 @@ const router = createRouter({
       beforeEnter: ensureAppTenantHost
     },
     {
+      path: '/assistant/live-sessions',
+      name: 'assistant-live-sessions',
+      component: AssistantLiveSessionsList,
+      meta: {
+        requiresAuth: true,
+        roles: ['TEACHER_ASSISTANT'],
+      },
+      beforeEnter: ensureAppTenantHost
+    },
+    {
       path: '/assistant/courses',
       name: 'assistant-courses',
       component: CourseListView,
@@ -1005,6 +1062,18 @@ const router = createRouter({
       path: '/assistant/courses/:courseId/modules/:moduleId/lessons/:lessonId',
       name: 'assistant-lesson-edit',
       component: LessonEditorView,
+      meta: { requiresAuth: true, roles: ['TEACHER_ASSISTANT'], requiresAssistantPermissions: ['courses.manage'] }
+    },
+    {
+      path: '/assistant/courses/:courseId/lessons/:lessonId/assignments/new',
+      name: 'assistant-assignment-create',
+      component: TeacherAssignmentEditorView,
+      meta: { requiresAuth: true, roles: ['TEACHER_ASSISTANT'], requiresAssistantPermissions: ['courses.manage'] }
+    },
+    {
+      path: '/assistant/courses/:courseId/lessons/:lessonId/assignments/:assignmentId/edit',
+      name: 'assistant-assignment-edit',
+      component: TeacherAssignmentEditorView,
       meta: { requiresAuth: true, roles: ['TEACHER_ASSISTANT'], requiresAssistantPermissions: ['courses.manage'] }
     },
     {

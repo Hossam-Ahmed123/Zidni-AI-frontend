@@ -1,7 +1,7 @@
 <template>
   <ThemePage :title="t('learning.teacher.nav')" :subtitle="t('learning.teacher.manageResources')">
     <template #actions>
-      <div class="teacher-learning__toolbar">
+      <div class="teacher-learning__toolbar flex flex-wrap items-center justify-between gap-4">
         <UiSelect
           :model-value="selectedCourseId"
           :label="t('learning.teacher.courseFilter')"
@@ -11,8 +11,8 @@
           <option value="">{{ t('learning.teacher.courseFilter') }}</option>
           <option v-for="course in courseOptions" :key="course.id" :value="course.id">{{ course.title }}</option>
         </UiSelect>
-        <div class="teacher-learning__toolbar-actions">
-          <UiButton color="primary" prepend-icon="PlusOutlined" @click="openAssignmentDialog">
+        <div class="teacher-learning__toolbar-actions inline-flex flex-wrap gap-3">
+          <UiButton color="primary" prepend-icon="PlusOutlined" @click="goToCreateAssignment">
             {{ t('learning.teacher.newAssignment') }}
           </UiButton>
           <UiButton color="secondary" variant="outline" prepend-icon="MessageOutlined" @click="tab = 'discussions'">
@@ -36,7 +36,7 @@
 
     <UiTabs v-model="tab" :tabs="tabItems" />
 
-    <section v-if="tab === 'assignments'" class="teacher-learning__grid">
+    <section v-if="tab === 'assignments'" class="teacher-learning__grid grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
       <UiCard :title="t('learning.teacher.assignmentsTitle')" hover>
         <template v-if="!filteredAssignments.length">
           <UiAlert color="info" variant="soft">{{ t('learning.teacher.noAssignments') }}</UiAlert>
@@ -44,25 +44,50 @@
         <template v-else>
           <UiTable :headers="assignmentHeaders" :items="filteredAssignments" density="comfortable">
             <template #item.title="{ item }">
-              <div class="teacher-learning__table-title">
+              <div class="teacher-learning__table-title flex flex-col gap-1">
                 <strong>{{ item.title }}</strong>
-                <span class="teacher-learning__table-subtitle">{{ item.lessonTitle }}</span>
+                <span class="teacher-learning__table-subtitle text-content-tertiary text-[0.85rem]">{{ item.lessonTitle }}</span>
               </div>
             </template>
             <template #item.dueAt="{ item }">
               <span v-if="item.dueAt">{{ formatDateTime(item.dueAt) }}</span>
-              <span v-else class="teacher-learning__empty">—</span>
+              <span v-else class="teacher-learning__empty text-content-tertiary">—</span>
+            </template>
+            <template #item.maxScore="{ item }">
+              <span>{{ item.maxScore }}</span>
+            </template>
+            <template #item.attachments="{ item }">
+              <span v-if="!item.attachments?.length" class="text-content-tertiary">—</span>
+              <ul v-else class="list-none p-0 m-0 flex flex-col gap-1">
+                <li v-for="attachment in item.attachments" :key="attachment.fileKey">
+                  <a
+                    :href="attachment.fileUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-[0.85rem] inline-flex items-center gap-1"
+                  >
+                    <UiIcon name="PaperClipOutlined" :size="12" />
+                    <span>{{ attachment.fileName }}</span>
+                    <span class="text-content-tertiary">({{ formatAttachmentSize(attachment.fileSizeBytes) }})</span>
+                  </a>
+                </li>
+              </ul>
             </template>
             <template #item.actions="{ item }">
-              <div class="teacher-learning__table-actions">
-                <UiButton variant="link" color="primary" prepend-icon="EyeOutlined" @click="selectAssignment(item.id)">
-                  {{ t('learning.teacher.viewSubmissions') }}
+              <div class="teacher-learning__table-actions flex flex-wrap gap-2">
+                <UiButton
+                  variant="link"
+                  color="primary"
+                  prepend-icon="EyeOutlined"
+                  @click="openSubmissions(item)"
+                >
+                  {{ t('teacher.assignments.viewSubmissions') }}
                 </UiButton>
                 <UiButton
                   variant="link"
                   color="secondary"
                   prepend-icon="EditOutlined"
-                  @click="openAssignmentDialog(item)"
+                  @click="goToAssignmentEditor(item)"
                 >
                   {{ t('common.edit') }}
                 </UiButton>
@@ -80,49 +105,19 @@
           </UiTable>
         </template>
       </UiCard>
-
-      <UiCard :title="t('learning.teacher.submissionsTitle')" hover>
-        <template v-if="!selectedAssignmentId">
-          <UiAlert color="info" variant="soft">{{ t('learning.teacher.noAssignmentSelected') }}</UiAlert>
-        </template>
-        <template v-else>
-          <UiTable :headers="submissionHeaders" :items="learning.assignmentSubmissions" density="comfortable">
-            <template #item.studentName="{ item }">
-              <div class="teacher-learning__table-title">
-                <strong>{{ item.studentName }}</strong>
-                <span class="teacher-learning__table-subtitle">{{ item.studentEmail }}</span>
-              </div>
-            </template>
-            <template #item.score="{ item }">
-              <span v-if="item.score !== undefined">{{ item.score }}</span>
-              <span v-else class="teacher-learning__empty">—</span>
-            </template>
-            <template #item.status="{ item }">
-              <UiTag :color="submissionStatusColor(item.status)" size="sm">
-                {{ t(`learning.submissionStatus.${item.status}`) }}
-              </UiTag>
-            </template>
-            <template #item.actions="{ item }">
-              <UiButton variant="link" color="primary" prepend-icon="EditOutlined" @click="openGradeDialog(item)">
-                {{ t('learning.teacher.gradeSubmission') }}
-              </UiButton>
-            </template>
-          </UiTable>
-        </template>
-      </UiCard>
     </section>
 
-    <section v-else-if="tab === 'discussions'" class="teacher-learning__discussions">
+    <section v-else-if="tab === 'discussions'" class="teacher-learning__discussions flex flex-col gap-5">
       <UiAlert v-if="!discussionsEnabled" color="info" variant="soft">
         {{ t('discussions.flags.disabled') }}
       </UiAlert>
       <UiAlert v-else-if="!selectedCourseId" color="info" variant="soft">
         {{ t('discussions.threads.pickCourse') }}
       </UiAlert>
-      <div v-else class="teacher-learning__discussions-grid">
+      <div v-else class="teacher-learning__discussions-grid grid gap-5 [grid-template-columns:minmax(0,22rem)_minmax(0,1fr)]">
         <ThreadsList
           ref="threadsListRef"
-          class="teacher-learning__discussions-list"
+          class="teacher-learning__discussions-list w-full"
           v-model="selectedThreadId"
           :course-id="selectedCourseId"
           :lesson-options="lessonOptions"
@@ -130,7 +125,7 @@
           @created="onThreadCreated"
         />
         <ThreadView
-          class="teacher-learning__discussions-view"
+          class="teacher-learning__discussions-view w-full"
           :thread="activeDiscussionThread"
           :disabled="formSubmitting"
           @message-sent="onMessageSent"
@@ -138,21 +133,21 @@
       </div>
     </section>
 
-    <section v-else-if="tab === 'reviews'" class="teacher-learning__reviews">
+    <section v-else-if="tab === 'reviews'" class="teacher-learning__reviews flex flex-col gap-5">
       <UiAlert v-if="!reviewsEnabled" color="info" variant="soft">
         {{ t('reviews.flags.disabled') }}
       </UiAlert>
       <UiAlert v-else-if="!selectedCourseId" color="info" variant="soft">
         {{ t('reviews.shared.selectCourse') }}
       </UiAlert>
-      <div v-else class="teacher-learning__reviews-grid">
-        <UiCard class="teacher-learning__reviews-card" :title="t('learning.teacher.reviewsSummaryTitle')" hover>
-          <div v-if="reviewsSummary.count" class="teacher-learning__reviews-summary">
+      <div v-else class="teacher-learning__reviews-grid grid gap-5 [grid-template-columns:minmax(0,24rem)_minmax(0,1fr)]">
+        <UiCard class="teacher-learning__reviews-card w-full" :title="t('learning.teacher.reviewsSummaryTitle')" hover>
+          <div v-if="reviewsSummary.count" class="teacher-learning__reviews-summary flex flex-col gap-3">
             <div class="teacher-learning__reviews-average">
               <UiIcon name="StarFilled" />
               <strong>{{ reviewsSummary.average?.toFixed(1) ?? '0.0' }}</strong>
             </div>
-            <p class="teacher-learning__reviews-meta">
+            <p class="teacher-learning__reviews-meta m-0 text-content-tertiary">
               {{ t('learning.teacher.reviewsSummaryMeta', { count: reviewsSummary.count }) }}
             </p>
           </div>
@@ -161,7 +156,7 @@
           </UiAlert>
         </UiCard>
         <CourseReviewsList
-          class="teacher-learning__reviews-list"
+          class="teacher-learning__reviews-list w-full"
           :course-id="selectedCourseId"
           :show-summary="false"
           @summary="onTeacherReviewsSummary"
@@ -171,13 +166,13 @@
 
     </section>
 
-    <section v-else class="teacher-learning__grid">
+    <section v-else class="teacher-learning__grid grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
       <UiAlert v-if="resourcesRestricted" color="warning" variant="soft">
         {{ t('learning.teacher.resourceRestricted') }}
       </UiAlert>
       <template v-else>
         <UiCard :title="t('learning.teacher.resourceFormTitle')" hover>
-          <form class="teacher-learning__form" @submit.prevent="createResource">
+          <form class="teacher-learning__form grid gap-4" @submit.prevent="createResource">
             <UiInput v-model="newResource.title" :label="t('learning.teacher.resourceTitle')" required />
             <UiTextarea
               v-model="newResource.description"
@@ -206,7 +201,7 @@
               :label="t('learning.teacher.resourceUrl')"
               :required="!isFileResource"
             />
-            <p v-if="isEmbedResource" class="teacher-learning__resource-hint">
+            <p v-if="isEmbedResource" class="teacher-learning__resource-hint -mt-2 mb-0 text-content-tertiary text-[0.9rem]">
               {{ t('learning.teacher.resourceEmbedHint') }}
             </p>
             <UiFileUpload
@@ -229,11 +224,11 @@
             <UiAlert color="info" variant="soft">{{ t('learning.teacher.noResources') }}</UiAlert>
           </template>
           <template v-else>
-            <ul class="teacher-learning__resources">
-              <li v-for="resource in filteredResources" :key="resource.id" class="teacher-learning__resource">
-                <div class="teacher-learning__resource-info">
-                  <span class="teacher-learning__resource-title">{{ resource.title }}</span>
-                  <span class="teacher-learning__resource-meta">
+            <ul class="teacher-learning__resources list-none p-0 m-0 flex flex-col gap-3">
+              <li v-for="resource in filteredResources" :key="resource.id" class="teacher-learning__resource flex justify-between items-center gap-3">
+                <div class="teacher-learning__resource-info flex flex-col gap-1">
+                  <span class="teacher-learning__resource-title font-semibold">{{ resource.title }}</span>
+                  <span class="teacher-learning__resource-meta text-[0.85rem] text-content-tertiary">
                     {{ resource.lessonTitle || resource.courseTitle }} · {{ t(`learning.resourceType.${resource.resourceType}`) }}
                   </span>
                 </div>
@@ -253,68 +248,18 @@
       </template>
     </section>
 
-    <UiDialog v-model="assignmentDialog" :title="assignmentDialogTitle" width="520px">
-      <form class="teacher-learning__form" @submit.prevent="saveAssignment">
-        <UiSelect
-          :model-value="assignmentForm.lessonId"
-          :label="t('learning.teacher.assignmentLesson')"
-          required
-          @update:model-value="onAssignmentLessonChange"
-        >
-          <option value="">{{ t('learning.teacher.assignmentLesson') }}</option>
-          <option v-for="lesson in lessonOptions" :key="lesson.value" :value="lesson.value">{{ lesson.label }}</option>
-        </UiSelect>
-        <UiInput v-model="assignmentForm.title" :label="t('learning.teacher.assignmentTitle')" required />
-        <UiTextarea v-model="assignmentForm.description" :label="t('learning.teacher.assignmentDescription')" :rows="3" />
-        <UiInput v-model="assignmentForm.dueAt" type="datetime-local" :label="t('learning.teacher.assignmentDue')" />
-        <UiInput
-          :model-value="assignmentForm.maxScore"
-          type="number"
-          min="0"
-          :label="t('learning.teacher.assignmentMaxScore')"
-          @update:model-value="onAssignmentScoreChange"
-        />
-        <UiInput v-model="assignmentForm.attachmentUrl" :label="t('learning.teacher.assignmentAttachment')" />
-        <div class="teacher-learning__dialog-actions">
-          <UiButton variant="link" color="secondary" @click="closeAssignmentDialog">{{ t('common.close') }}</UiButton>
-          <UiButton button-type="submit" color="primary" :loading="formSubmitting">
-            {{ isEditingAssignment ? t('common.save') : t('common.create') }}
-          </UiButton>
-        </div>
-      </form>
-    </UiDialog>
-
-    <UiDialog v-model="gradeDialog" :title="gradeDialogTitle" width="480px">
-      <template v-if="selectedSubmission">
-        <form class="teacher-learning__form" @submit.prevent="submitGrade">
-          <UiSelect
-            :model-value="gradeForm.status"
-            :label="t('learning.teacher.gradeStatus')"
-            @update:model-value="onGradeStatusChange"
-          >
-            <option v-for="status in gradeStatuses" :key="status.value" :value="status.value">{{ status.label }}</option>
-          </UiSelect>
-          <UiInput
-            :model-value="gradeForm.score"
-            type="number"
-            min="0"
-            :label="t('learning.teacher.gradeScore')"
-            @update:model-value="onGradeScoreChange"
-          />
-          <UiTextarea v-model="gradeForm.feedback" :label="t('learning.teacher.gradeFeedback')" :rows="3" />
-          <div class="teacher-learning__dialog-actions">
-            <UiButton variant="link" color="secondary" @click="closeGradeDialog">{{ t('common.close') }}</UiButton>
-            <UiButton button-type="submit" color="primary" :loading="formSubmitting">{{ t('common.save') }}</UiButton>
-          </div>
-        </form>
-      </template>
-    </UiDialog>
+    <TeacherSubmissionsDialog
+      v-model="submissionsDialogOpen"
+      :assignment="selectedAssignment"
+    />
   </ThemePage>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import TeacherSubmissionsDialog from '@/components/teacher/assignments/TeacherSubmissionsDialog.vue';
 import { useLearningStore } from '@/stores/learning';
 import { useCoursesStore } from '@/stores/courses';
 import { useTenantStore } from '@/stores/tenant';
@@ -322,18 +267,16 @@ import { useFeaturesStore } from '@/stores/features';
 import { FEATURE } from '@/constants/featureCatalog';
 import type {
   Assignment,
-  AssignmentRequestPayload,
-  AssignmentSubmission,
   CourseResourcePayload,
   ResourceType
 } from '@/services/learning';
+import { formatFileSize } from '@/utils/formatters';
 import type { DiscussionThread } from '@/api/discussions';
 import { useToast } from '@/composables/useToast';
 import UiTabs from '@/components/ui/UiTabs.vue';
 import UiSelect from '@/components/ui/UiSelect.vue';
 import UiInput from '@/components/ui/UiInput.vue';
 import UiTextarea from '@/components/ui/UiTextarea.vue';
-import UiDialog from '@/components/ui/UiDialog.vue';
 import UiTag from '@/components/ui/UiTag.vue';
 import UiFileUpload from '@/components/ui/UiFileUpload.vue';
 import ThreadsList from '@/views/shared/discussions/ThreadsList.vue';
@@ -346,17 +289,33 @@ const courses = useCoursesStore();
 const tenantStore = useTenantStore();
 const featuresStore = useFeaturesStore();
 const toast = useToast();
+const router = useRouter();
+
+const submissionsDialogOpen = ref(false);
+const selectedAssignment = ref<Assignment | null>(null);
+
+function openSubmissions(assignment: Assignment) {
+  selectedAssignment.value = assignment;
+  submissionsDialogOpen.value = true;
+}
+
+function goToAssignmentEditor(assignment: Assignment) {
+  router.push({
+    name: 'teacher-assignment-edit-global',
+    params: { assignmentId: String(assignment.id) }
+  });
+}
+
+function goToCreateAssignment() {
+  router.push({ name: 'teacher-assignment-create-global' });
+}
 
 const tab = ref<'assignments' | 'discussions' | 'reviews' | 'resources'>('assignments');
 const selectedCourseId = ref<number | null>(null);
-const selectedAssignmentId = ref<number | null>(null);
 const selectedThreadId = ref<number | null>(null);
-const assignmentDialog = ref(false);
-const gradeDialog = ref(false);
 const formSubmitting = ref(false);
 const threadsListRef = ref<InstanceType<typeof ThreadsList> | null>(null);
 const activeDiscussionThread = ref<DiscussionThread | null>(null);
-const editingAssignmentId = ref<number | null>(null);
 const deletingAssignmentId = ref<number | null>(null);
 const resourcesRestricted = ref(false);
 
@@ -399,21 +358,6 @@ watch(
   { immediate: true }
 );
 
-const assignmentForm = reactive({
-  lessonId: null as number | null,
-  title: '',
-  description: '',
-  dueAt: '',
-  maxScore: null as number | null,
-  attachmentUrl: ''
-});
-
-const gradeForm = reactive({
-  status: 'graded',
-  score: null as number | null,
-  feedback: ''
-});
-
 const newResource = reactive({
   title: '',
   description: '',
@@ -433,22 +377,12 @@ const resourceTypes = [
   { value: 'embed', label: t('learning.resourceType.embed') }
 ];
 
-const gradeStatuses = [
-  { value: 'graded', label: t('learning.submissionStatus.graded') },
-  { value: 'resubmission_requested', label: t('learning.submissionStatus.resubmission_requested') },
-  { value: 'submitted', label: t('learning.submissionStatus.submitted') }
-];
-
 const assignmentHeaders = [
   { title: t('learning.teacher.assignmentTitleHeader'), key: 'title' },
+  { title: t('teacher.assignments.columns.course'), key: 'courseTitle' },
   { title: t('learning.teacher.assignmentDueHeader'), key: 'dueAt' },
-  { title: t('common.actions'), key: 'actions', sortable: false }
-];
-
-const submissionHeaders = [
-  { title: t('learning.teacher.submissionStudent'), key: 'studentName' },
-  { title: t('learning.teacher.submissionStatus'), key: 'status' },
-  { title: t('learning.teacher.submissionScore'), key: 'score' },
+  { title: t('teacher.assignments.columns.maxScore'), key: 'maxScore' },
+  { title: t('teacher.assignments.columns.attachments'), key: 'attachments' },
   { title: t('common.actions'), key: 'actions', sortable: false }
 ];
 
@@ -476,21 +410,6 @@ const filteredResources = computed(() => {
   if (!selectedCourseId.value) return learning.courseResources;
   return learning.courseResources.filter((resource) => resource.courseId === selectedCourseId.value);
 });
-
-const selectedSubmission = ref<AssignmentSubmission | null>(null);
-const gradeFormSubmissionId = ref<number | null>(null);
-
-const gradeDialogTitle = computed(() =>
-  selectedSubmission.value
-    ? t('learning.teacher.gradeDialogTitle', { name: selectedSubmission.value.studentName })
-    : t('learning.teacher.gradeDialogTitle', { name: t('learning.teacher.submissionStudent') })
-);
-
-const isEditingAssignment = computed(() => editingAssignmentId.value !== null);
-
-const assignmentDialogTitle = computed(() =>
-  isEditingAssignment.value ? t('learning.teacher.editAssignment') : t('learning.teacher.newAssignment')
-);
 
 const showToast = (message: string, tone: 'success' | 'error' | 'warning' = 'success') => {
   if (tone === 'error') {
@@ -536,119 +455,10 @@ const onResourceFileRemoved = (_file: File, _index: number) => {
   newResource.file = null;
 };
 
-const onAssignmentLessonChange = (value: string | number | null) => {
-  assignmentForm.lessonId = value === null || value === '' ? null : Number(value);
-};
-
-const onAssignmentScoreChange = (value: string | number | null) => {
-  const parsed = Number(value);
-  assignmentForm.maxScore = Number.isNaN(parsed) ? null : Math.max(0, parsed);
-};
-
-const onGradeStatusChange = (value: string | number | null) => {
-  gradeForm.status = typeof value === 'string' ? value : String(value ?? 'graded');
-};
-
-const onGradeScoreChange = (value: string | number | null) => {
-  const parsed = Number(value);
-  gradeForm.score = Number.isNaN(parsed) ? null : Math.max(0, parsed);
-};
-
 const formatDateTime = (value: string) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 
-const submissionStatusColor = (status: string) => {
-  if (status === 'graded') return 'success';
-  if (status === 'resubmission_requested') return 'warning';
-  return 'info';
-};
-
-const clearAssignmentForm = () => {
-  assignmentForm.lessonId = lessonOptions.value[0]?.value ?? null;
-  assignmentForm.title = '';
-  assignmentForm.description = '';
-  assignmentForm.dueAt = '';
-  assignmentForm.maxScore = null;
-  assignmentForm.attachmentUrl = '';
-};
-
-const formatDateTimeForInput = (value: string) => {
-  const date = new Date(value);
-  const tzOffset = date.getTimezoneOffset();
-  const localDate = new Date(date.getTime() - tzOffset * 60000);
-  return localDate.toISOString().slice(0, 16);
-};
-
-const openAssignmentDialog = (assignment?: Assignment) => {
-  if (assignment) {
-    editingAssignmentId.value = assignment.id;
-    assignmentForm.lessonId = assignment.lessonId;
-    assignmentForm.title = assignment.title;
-    assignmentForm.description = assignment.description || '';
-    assignmentForm.dueAt = assignment.dueAt ? formatDateTimeForInput(assignment.dueAt) : '';
-    assignmentForm.maxScore = assignment.maxScore ?? null;
-    assignmentForm.attachmentUrl = assignment.attachmentUrl || '';
-  } else {
-    editingAssignmentId.value = null;
-    clearAssignmentForm();
-  }
-  assignmentDialog.value = true;
-};
-
-const closeAssignmentDialog = () => {
-  assignmentDialog.value = false;
-};
-
-watch(assignmentDialog, (open) => {
-  if (!open) {
-    editingAssignmentId.value = null;
-    clearAssignmentForm();
-  }
-});
-
-const saveAssignment = async () => {
-  if (!assignmentForm.lessonId) {
-    showToast(t('learning.teacher.assignmentValidation'), 'warning');
-    return;
-  }
-  formSubmitting.value = true;
-  try {
-    const payload: AssignmentRequestPayload = {
-      lessonId: assignmentForm.lessonId,
-      title: assignmentForm.title,
-      description: assignmentForm.description || undefined,
-      dueAt: assignmentForm.dueAt ? new Date(assignmentForm.dueAt).toISOString() : undefined,
-      maxScore: assignmentForm.maxScore ?? undefined,
-      attachmentUrl: assignmentForm.attachmentUrl || undefined
-    };
-    if (isEditingAssignment.value && editingAssignmentId.value) {
-      await learning.updateAssignment(editingAssignmentId.value, payload);
-    } else {
-      await learning.createAssignment(payload);
-    }
-    if (selectedCourseId.value) {
-      await learning.loadTeacherAssignments(selectedCourseId.value);
-    } else {
-      await learning.loadTeacherAssignments();
-    }
-    assignmentDialog.value = false;
-    showToast(
-      isEditingAssignment.value
-        ? t('learning.teacher.assignmentUpdated')
-        : t('learning.teacher.assignmentCreated')
-    );
-  } catch (error) {
-    console.error(error);
-    showToast(
-      isEditingAssignment.value
-        ? t('learning.teacher.assignmentUpdateFailed')
-        : t('learning.teacher.assignmentCreateFailed'),
-      'error'
-    );
-  } finally {
-    formSubmitting.value = false;
-  }
-};
+const formatAttachmentSize = (bytes: number) => formatFileSize(bytes);
 
 const confirmDeleteAssignment = async (assignment: Assignment) => {
   if (!window.confirm(t('learning.teacher.assignmentDeleteConfirm', { title: assignment.title }))) {
@@ -662,8 +472,9 @@ const confirmDeleteAssignment = async (assignment: Assignment) => {
     } else {
       await learning.loadTeacherAssignments();
     }
-    if (selectedAssignmentId.value === assignment.id) {
-      selectedAssignmentId.value = null;
+    if (selectedAssignment.value?.id === assignment.id) {
+      selectedAssignment.value = null;
+      submissionsDialogOpen.value = false;
       learning.clearAssignmentSubmissions();
     }
     showToast(t('learning.teacher.assignmentDeleted'));
@@ -672,42 +483,6 @@ const confirmDeleteAssignment = async (assignment: Assignment) => {
     showToast(t('learning.teacher.assignmentDeleteFailed'), 'error');
   } finally {
     deletingAssignmentId.value = null;
-  }
-};
-
-const selectAssignment = async (assignmentId: number) => {
-  selectedAssignmentId.value = assignmentId;
-  await learning.loadAssignmentSubmissions(assignmentId);
-};
-
-const openGradeDialog = (submission: AssignmentSubmission) => {
-  gradeFormSubmissionId.value = submission.id;
-  gradeForm.status = submission.status;
-  gradeForm.score = submission.score ?? null;
-  gradeForm.feedback = submission.feedback || '';
-  selectedSubmission.value = submission;
-  gradeDialog.value = true;
-};
-
-const submitGrade = async () => {
-  if (!gradeFormSubmissionId.value) return;
-  formSubmitting.value = true;
-  try {
-    await learning.gradeAssignment(gradeFormSubmissionId.value, {
-      status: gradeForm.status as any,
-      score: gradeForm.score ?? undefined,
-      feedback: gradeForm.feedback || undefined
-    });
-    if (selectedAssignmentId.value) {
-      await learning.loadAssignmentSubmissions(selectedAssignmentId.value);
-    }
-    showToast(t('learning.teacher.gradeSaved'));
-    closeGradeDialog();
-  } catch (error) {
-    console.error(error);
-    showToast(t('learning.teacher.gradeFailed'), 'error');
-  } finally {
-    formSubmitting.value = false;
   }
 };
 
@@ -785,15 +560,8 @@ const createResource = async () => {
   }
 };
 
-const closeGradeDialog = () => {
-  gradeDialog.value = false;
-  selectedSubmission.value = null;
-  gradeFormSubmissionId.value = null;
-};
-
 watch(selectedCourseId, async (courseId) => {
   if (!courseId) {
-    selectedAssignmentId.value = null;
     selectedThreadId.value = null;
     activeDiscussionThread.value = null;
     courses.current = null;
@@ -808,7 +576,6 @@ watch(selectedCourseId, async (courseId) => {
     learning.loadResources(courseId, 'teacher')
   ]);
   resourcesRestricted.value = resourceError === 'forbidden';
-  selectedAssignmentId.value = null;
   selectedThreadId.value = null;
   activeDiscussionThread.value = null;
 });
@@ -827,103 +594,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.teacher-learning__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sakai-space-4);
-}
-
-.teacher-learning__toolbar-actions {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: var(--sakai-space-3);
-}
-
-.teacher-learning__grid {
-  display: grid;
-  gap: var(--sakai-space-5);
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.teacher-learning__table-title {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-1);
-}
-
-.teacher-learning__table-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sakai-space-2);
-}
-
-.teacher-learning__table-subtitle {
-  color: var(--sakai-text-color-tertiary);
-  font-size: 0.85rem;
-}
-
-.teacher-learning__empty {
-  color: var(--sakai-text-color-tertiary);
-}
-
-.teacher-learning__form {
-  display: grid;
-  gap: var(--sakai-space-4);
-}
-
-.teacher-learning__resource-hint {
-  margin: -0.5rem 0 0;
-  color: var(--sakai-text-color-tertiary);
-  font-size: 0.9rem;
-}
-
-.teacher-learning__dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--sakai-space-3);
-}
-
-.teacher-learning__discussions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-5);
-}
-
-.teacher-learning__discussions-grid {
-  display: grid;
-  gap: var(--sakai-space-5);
-  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
-}
-
-.teacher-learning__discussions-list,
-.teacher-learning__discussions-view {
-  width: 100%;
-}
-
-.teacher-learning__reviews {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-5);
-}
-
-.teacher-learning__reviews-grid {
-  display: grid;
-  gap: var(--sakai-space-5);
-  grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
-}
-
-.teacher-learning__reviews-card {
-  width: 100%;
-}
-
-.teacher-learning__reviews-summary {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-3);
-}
-
 .teacher-learning__reviews-average {
   display: inline-flex;
   align-items: center;
@@ -937,47 +607,6 @@ onMounted(async () => {
   height: 1.5rem;
 }
 
-.teacher-learning__reviews-meta {
-  margin: 0;
-  color: var(--sakai-text-color-tertiary);
-}
-
-.teacher-learning__reviews-list {
-
-  width: 100%;
-}
-
-.teacher-learning__resources {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-3);
-}
-
-.teacher-learning__resource {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--sakai-space-3);
-}
-
-.teacher-learning__resource-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-1);
-}
-
-.teacher-learning__resource-title {
-  font-weight: var(--sakai-font-weight-semibold);
-}
-
-.teacher-learning__resource-meta {
-  font-size: 0.85rem;
-  color: var(--sakai-text-color-tertiary);
-}
-
 @media (max-width: 960px) {
   .teacher-learning__toolbar {
     flex-direction: column;
@@ -989,7 +618,6 @@ onMounted(async () => {
   }
 
   .teacher-learning__reviews-grid {
-
     grid-template-columns: 1fr;
   }
 }

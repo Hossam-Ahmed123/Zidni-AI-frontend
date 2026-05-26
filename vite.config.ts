@@ -10,10 +10,7 @@ export default defineConfig(() => ({
 
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      primevue: fileURLToPath(new URL('./src/vendor/primevue/index.ts', import.meta.url)),
-      'primevue/': fileURLToPath(new URL('./src/vendor/primevue/', import.meta.url)),
-      'primeicons/': fileURLToPath(new URL('./src/vendor/primeicons/', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
 
@@ -36,7 +33,8 @@ export default defineConfig(() => ({
     allowedHosts: [
       '127.0.0.1.nip.io',
       'app.127.0.0.1.nip.io',
-      'app-test.72.61.18.248.nip.io'
+      'app-test.72.61.18.248.nip.io',
+      '.72.61.18.248.nip.io'
     ],
         proxy: {
       '/api': {

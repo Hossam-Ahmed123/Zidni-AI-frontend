@@ -555,11 +555,11 @@
                 <div class="profile-pic mb-0">
                   <div>
                     <a href="userprofile.html" class="text-dark"
-                      ><h4 class="mt-3 mb-1 font-weight-semibold">
+                      ><h4 class="mt-3 mb-1 font-semibold">
                         {{ course?.instructor }}
                       </h4></a
                     >
-                    <span class="text-muted">Member Since November 2008</span>
+                    <span class="text-content-muted">Member Since November 2008</span>
                   </div>
                   <h6 class="mt-2 mb-0 statusBtns">
                     <a href="profile.html" class="btn btn-primary btn-sm m-1"
@@ -1276,11 +1276,6 @@ const videoPlayer = ref(null);
 let heroObserver: IntersectionObserver | null = null;
 let stickyMediaQuery: MediaQueryList | null = null;
 let removeMediaListener: (() => void) | null = null;
-
-function isDisabledTenantError(error: unknown) {
-  const status = (error as { response?: { status?: number } })?.response?.status;
-  return status === 403 || status === 404;
-}
 let mediaQueryChangeListener: ((event: MediaQueryListEvent) => void) | null =
   null;
 const assistantLinkAvailable = computed(() => Boolean(slug.value.trim()));
@@ -2288,9 +2283,9 @@ async function loadCourse() {
   } catch (err: any) {
     console.warn("Failed to load public course", err);
     response.value = null;
-    if (isDisabledTenantError(err)) {
-      await router.replace({ name: "not-found" });
-      return;
+    if (err?.response?.status === 404) {
+      notFound.value = true;
+      error.value = false;
     } else {
       error.value = true;
     }

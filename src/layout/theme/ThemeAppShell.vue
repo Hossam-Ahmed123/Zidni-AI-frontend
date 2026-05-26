@@ -1,4 +1,4 @@
-﻿<!--
+<!--
   ThemeAppShell.vue builds the primary authenticated layout, including the
   sidebar navigation, global top bar, and responsive drawer behavior. Props: none.
   It derives navigation items from user role/feature flags and exposes slots for
@@ -12,7 +12,7 @@
     @keydown.enter.prevent="focusMainContent"
     @keydown.space.prevent="focusMainContent"
   >
-    {{ t('nav.skipToContent') }}
+    {{ t("nav.skipToContent") }}
   </a>
   <div class="theme-app-shell" :class="shellClasses" :dir="direction">
     <aside
@@ -34,7 +34,9 @@
         <div class="theme-app-shell__brand-mark">{{ brandInitials }}</div>
         <div class="theme-app-shell__brand-copy" v-if="!collapsed || isMobile">
           <span class="theme-app-shell__brand-name">{{ brandName }}</span>
-          <span v-if="brandTagline" class="theme-app-shell__brand-tagline">{{ brandTagline }}</span>
+          <span v-if="brandTagline" class="theme-app-shell__brand-tagline">{{
+            brandTagline
+          }}</span>
         </div>
       </div>
       <div class="theme-app-shell__sidebar-scroll">
@@ -52,20 +54,26 @@
           >
             <UiIcon name="CloseOutlined" :size="12" />
           </button>
-          <p class="theme-app-shell__sidebar-alert-title">{{ t('nav.teacherDowngradeTitle') }}</p>
-          <p class="theme-app-shell__sidebar-alert-body">{{ t('nav.teacherDowngradeBody') }}</p>
+          <p class="theme-app-shell__sidebar-alert-title">
+            {{ t("nav.teacherDowngradeTitle") }}
+          </p>
+          <p class="theme-app-shell__sidebar-alert-body">
+            {{ t("nav.teacherDowngradeBody") }}
+          </p>
           <p
             v-if="teacherDowngradeLabels.length"
             class="theme-app-shell__sidebar-alert-caption"
           >
-            {{ t('nav.teacherDowngradeModules') }}
+            {{ t("nav.teacherDowngradeModules") }}
           </p>
           <ul
             v-if="teacherDowngradeLabels.length"
             class="theme-app-shell__sidebar-alert-list"
             role="list"
           >
-            <li v-for="label in teacherDowngradeLabels" :key="label">{{ label }}</li>
+            <li v-for="label in teacherDowngradeLabels" :key="label">
+              {{ label }}
+            </li>
           </ul>
         </div>
         <nav class="theme-app-shell__nav" :aria-label="t('nav.mainNavigation')">
@@ -76,13 +84,15 @@
             variant="soft"
           >
             <p class="theme-app-shell__nav-alert-title">
-              {{ t('assistant.nav.featuresDisabledTitle') }}
+              {{ t("assistant.nav.featuresDisabledTitle") }}
             </p>
             <p class="theme-app-shell__nav-alert-body">
-              {{ t('assistant.nav.featuresDisabledDescription') }}
+              {{ t("assistant.nav.featuresDisabledDescription") }}
             </p>
             <ul class="theme-app-shell__nav-alert-list" role="list">
-              <li v-for="item in assistantSuppressedNavItems" :key="item.id">{{ item.label }}</li>
+              <li v-for="item in assistantSuppressedNavItems" :key="item.id">
+                {{ item.label }}
+              </li>
             </ul>
           </UiAlert>
           <template v-for="item in navItems" :key="navItemKey(item)">
@@ -100,7 +110,11 @@
                 <UiIcon :name="item.icon" :size="18" />
               </span>
               <span v-if="!collapsed || isMobile">{{ item.label }}</span>
-              <span v-if="item.badge && (!collapsed || isMobile)" class="theme-app-shell__badge">{{ item.badge }}</span>
+              <span
+                v-if="item.badge && (!collapsed || isMobile)"
+                class="theme-app-shell__badge"
+                >{{ item.badge }}</span
+              >
             </RouterLink>
             <a
               v-else-if="item.href"
@@ -116,7 +130,11 @@
                 <UiIcon :name="item.icon" :size="18" />
               </span>
               <span v-if="!collapsed || isMobile">{{ item.label }}</span>
-              <span v-if="item.badge && (!collapsed || isMobile)" class="theme-app-shell__badge">{{ item.badge }}</span>
+              <span
+                v-if="item.badge && (!collapsed || isMobile)"
+                class="theme-app-shell__badge"
+                >{{ item.badge }}</span
+              >
             </a>
             <button
               v-else
@@ -130,7 +148,11 @@
                 <UiIcon :name="item.icon" :size="18" />
               </span>
               <span v-if="!collapsed || isMobile">{{ item.label }}</span>
-              <span v-if="item.badge && (!collapsed || isMobile)" class="theme-app-shell__badge">{{ item.badge }}</span>
+              <span
+                v-if="item.badge && (!collapsed || isMobile)"
+                class="theme-app-shell__badge"
+                >{{ item.badge }}</span
+              >
             </button>
           </template>
         </nav>
@@ -140,25 +162,11 @@
         v-if="auth.isTeacher && teacherPlanUpgradeEnabled"
         class="theme-app-shell__sidebar-upgrade"
       >
-        <RouterLink
-          :to="{ name: 'teacher-plan-upgrade' }"
-          class="theme-app-shell__upgrade-button"
-          :class="{ 'is-collapsed': collapsed && !isMobile }"
-          :title="t('nav.teacherUpgradePlan')"
-          :aria-label="t('nav.teacherUpgradePlan')"
+        <SidebarUpgradeCard
+          :collapsed="collapsed && !isMobile"
+          :plan-label="t('nav.teacherCurrentPlan', { plan: teacherPlanDisplay })"
           @click="handleNavigate"
-        >
-          <span class="theme-app-shell__nav-icon">
-            <UiIcon name="ArrowUpOutlined" :size="18" />
-          </span>
-          <span v-if="!collapsed || isMobile">{{ t('nav.teacherUpgradePlan') }}</span>
-        </RouterLink>
-        <p
-          v-if="!collapsed || isMobile"
-          class="theme-app-shell__plan-label"
-        >
-          {{ t('nav.teacherCurrentPlan', { plan: teacherPlanDisplay }) }}
-        </p>
+        />
       </div>
     </aside>
 
@@ -168,7 +176,7 @@
           <button
             v-if="isMobile"
             ref="drawerToggle"
-            class="theme-icon-button"
+            class="theme-icon-button theme-icon-button--square"
             type="button"
             :aria-label="t('nav.toggleSidebar')"
             aria-haspopup="true"
@@ -180,7 +188,7 @@
           </button>
           <button
             v-else
-            class="theme-icon-button"
+            class="theme-icon-button theme-icon-button--square"
             type="button"
             :aria-label="t('nav.toggleSidebar')"
             :title="sidebarToggleTitle"
@@ -191,7 +199,11 @@
             <UiIcon :name="sidebarToggleIcon" />
           </button>
           <div class="theme-topbar__heading">
-            <nav v-if="breadcrumbs.length" class="theme-app-shell__breadcrumbs" aria-label="breadcrumbs">
+            <nav
+              v-if="breadcrumbs.length"
+              class="theme-app-shell__breadcrumbs"
+              aria-label="breadcrumbs"
+            >
               <RouterLink
                 v-for="(crumb, index) in breadcrumbs"
                 :key="`${crumb.title}-${index}`"
@@ -199,7 +211,11 @@
                 :class="{ 'is-active': index === breadcrumbs.length - 1 }"
               >
                 <span>{{ crumb.title }}</span>
-                <UiIcon v-if="index < breadcrumbs.length - 1" name="RightOutlined" :size="14" />
+                <UiIcon
+                  v-if="index < breadcrumbs.length - 1"
+                  :name="breadcrumbSeparatorIcon"
+                  :size="14"
+                />
               </RouterLink>
             </nav>
             <!-- <p v-if="userSubtitle" class="theme-topbar__subtitle">{{ userSubtitle }}</p> -->
@@ -207,7 +223,6 @@
         </div>
 
         <div class="theme-topbar__search" role="search">
-          <UiIcon name="SearchOutlined" :size="18" />
           <input
             v-model="searchQuery"
             class="theme-topbar__search-input"
@@ -215,6 +230,7 @@
             :placeholder="t('nav.searchPlaceholder')"
             :aria-label="t('nav.searchPlaceholder')"
           />
+          <UiIcon name="SearchOutlined" :size="18" />
         </div>
 
         <div class="theme-topbar__actions">
@@ -229,11 +245,11 @@
             :title="languageToggleTitle"
             @click="toggleLanguage"
           >
-            <UiIcon name="GlobalOutlined" />
             <span>{{ languageLabel }}</span>
+            <UiIcon name="GlobalOutlined" />
           </button>
           <button
-            class="theme-icon-button"
+            class="theme-icon-button theme-icon-button--square"
             type="button"
             :aria-label="themeToggleTitle"
             :title="themeToggleTitle"
@@ -241,28 +257,44 @@
             @click="themeStore.toggleTheme()"
           >
             <UiIcon :name="themeToggleIcon" />
-            <span>{{ themeToggleNextLabel }}</span>
           </button>
           <RouterLink
-            v-if="notificationsUnifiedEnabled && (auth.isTeacher || auth.isStudent)"
-            class="theme-icon-button theme-icon-button--notification"
-            :to="auth.isTeacher ? '/teacher/notifications' : '/student/notifications'"
-            :aria-label="t('notifications.historyTitle')"
+            v-if="
+              notificationsUnifiedEnabled && (auth.isTeacher || auth.isStudent)
+            "
+            class="theme-icon-button theme-icon-button--square"
+            :to="
+              auth.isTeacher
+                ? '/teacher/notifications'
+                : '/student/notifications'
+            "
+            :aria-label="notificationsAriaLabel"
+            :title="notificationsAriaLabel"
           >
+            <UiIcon name="BellOutlined" />
             <span
               v-if="showNotificationsBadge"
-              class="theme-icon-badge"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {{ notificationsBadgeLabel }}
-            </span>
-            <UiIcon name="BellOutlined" />
+              class="theme-icon-dot theme-icon-dot--red"
+              aria-hidden="true"
+            ></span>
+          </RouterLink>
+          <RouterLink
+            v-if="auth.isTeacher"
+            class="theme-icon-button theme-icon-button--square"
+            to="/teacher/landing/messages"
+            :aria-label="landingInquiriesAriaLabel"
+            :title="landingInquiriesAriaLabel"
+          >
+            <UiIcon name="MailOutlined" />
+            <span
+              v-if="showLandingInquiriesBadge"
+              class="theme-icon-dot theme-icon-dot--blue"
+              aria-hidden="true"
+            ></span>
           </RouterLink>
           <button
             v-if="canAccessTeacherLandingContent"
-            class="theme-icon-button"
+            class="theme-icon-button theme-icon-button--square"
             type="button"
             :aria-label="t('nav.settings')"
             :title="t('nav.settings')"
@@ -281,18 +313,17 @@
               @click="toggleUserMenu"
               @keydown.escape.stop.prevent="closeUserMenu"
             >
-              <div class="theme-topbar__avatar">{{ brandInitials }}</div>
-              <div class="theme-topbar__user-meta">
-                <span class="theme-topbar__user-name">{{ headerUserName }}</span>
-                <span class="theme-topbar__user-role">{{ authRoleLabel }}</span>
-              </div>
+              <span class="theme-topbar__avatar">{{ brandInitials }}</span>
+              <span class="theme-topbar__user-name">{{ headerUserName }}</span>
+              <UiIcon
+                name="DownOutlined"
+                :size="12"
+                class="theme-topbar__user-caret"
+              />
             </button>
             <div v-else class="theme-topbar__user-display">
-              <div class="theme-topbar__avatar">{{ brandInitials }}</div>
-              <div class="theme-topbar__user-meta">
-                <span class="theme-topbar__user-name">{{ headerUserName }}</span>
-                <span class="theme-topbar__user-role">{{ authRoleLabel }}</span>
-              </div>
+              <span class="theme-topbar__avatar">{{ brandInitials }}</span>
+              <span class="theme-topbar__user-name">{{ headerUserName }}</span>
             </div>
             <transition name="theme-topbar__user-menu">
               <div
@@ -300,6 +331,14 @@
                 class="theme-topbar__user-menu"
                 role="menu"
               >
+                <div class="theme-topbar__user-menu-header" role="presentation">
+                  <span class="theme-topbar__user-menu-name">{{
+                    headerUserName
+                  }}</span>
+                  <span class="theme-topbar__user-menu-role">{{
+                    authRoleLabel
+                  }}</span>
+                </div>
                 <ul class="theme-topbar__user-menu-list">
                   <li v-for="item in userMenuItems" :key="item.id">
                     <RouterLink
@@ -331,7 +370,7 @@
       <main
         id="main-content"
         ref="mainContentRef"
-        class="theme-app-shell__content"
+        class="theme-app-shell__content max-w-7xl mx-auto w-full"
         tabindex="-1"
       >
         <slot />
@@ -340,8 +379,12 @@
       <footer class="theme-app-shell__footer">
         <!-- <span class="theme-app-shell__footer-copy">&copy; {{ currentYear }} {{ brandName }}</span> -->
         <div v-if="auth.isTeacher" class="theme-topbar__footer-links">
-          <UiButton variant="link" color="secondary" @click="handleNavAction('open-teacher-terms')">
-            {{ t('nav.teacherTerms') }}
+          <UiButton
+            variant="link"
+            color="secondary"
+            @click="handleNavAction('open-teacher-terms')"
+          >
+            {{ t("nav.teacherTerms") }}
           </UiButton>
         </div>
         <div class="theme-app-shell__footer-powered">
@@ -356,11 +399,19 @@
       </footer>
     </div>
 
-    <div v-if="drawer && isMobile" class="theme-app-shell__overlay" @click="closeDrawer"></div>
-    <UiDialog v-model="termsDialogOpen" :title="t('teacher.terms.title')" width="780px">
+    <div
+      v-if="drawer && isMobile"
+      class="theme-app-shell__overlay"
+      @click="closeDrawer"
+    ></div>
+    <UiDialog
+      v-model="termsDialogOpen"
+      :title="t('teacher.terms.title')"
+      width="780px"
+    >
       <div class="teacher-terms">
-        <p class="teacher-terms__welcome">{{ t('teacher.terms.welcome') }}</p>
-        <p class="teacher-terms__intro">{{ t('teacher.terms.intro') }}</p>
+        <p class="teacher-terms__welcome">{{ t("teacher.terms.welcome") }}</p>
+        <p class="teacher-terms__intro">{{ t("teacher.terms.intro") }}</p>
         <div class="teacher-terms__sections">
           <section
             v-for="section in termsSections"
@@ -368,16 +419,25 @@
             class="teacher-terms__section"
           >
             <h4 class="teacher-terms__section-title">{{ section.title }}</h4>
-            <p v-if="section.body" class="teacher-terms__section-body">{{ section.body }}</p>
-            <ul v-if="section.items?.length" class="teacher-terms__section-list">
+            <p v-if="section.body" class="teacher-terms__section-body">
+              {{ section.body }}
+            </p>
+            <ul
+              v-if="section.items?.length"
+              class="teacher-terms__section-list"
+            >
               <li v-for="item in section.items" :key="item">{{ item }}</li>
             </ul>
           </section>
         </div>
-        <p class="teacher-terms__closing">{{ t('teacher.terms.closing') }}</p>
+        <p class="teacher-terms__closing">{{ t("teacher.terms.closing") }}</p>
         <div class="teacher-terms__actions">
-          <UiButton variant="link" color="secondary" @click="termsDialogOpen = false">
-            {{ t('common.close') }}
+          <UiButton
+            variant="link"
+            color="secondary"
+            @click="termsDialogOpen = false"
+          >
+            {{ t("common.close") }}
           </UiButton>
         </div>
       </div>
@@ -387,35 +447,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { isNavigationFailure, useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { useTenantStore } from '@/stores/tenant';
-import { useAuthStore } from '@/stores/auth';
-import { useNotificationStore } from '@/stores/notifications';
-import { useLandingInquiriesStore } from '@/stores/landingInquiries';
-import { useFeaturesStore } from '@/stores/features';
-import { useFeatureSyncStore } from '@/stores/featureSync';
-import { useTeacherProfileStore } from '@/stores/teacherProfile';
-import { useStudentStore } from '@/stores/student';
-import { useSubscriptionStore } from '@/stores/subscription';
-import { useSubscriptionUpdatesStore } from '@/stores/subscriptionUpdates';
-import { FEATURE } from '@/constants/featureCatalog';
-import UiIcon from '@/components/ui/UiIcon.vue';
-import UiAlert from '@/components/ui/UiAlert.vue';
-import UiButton from '@/components/ui/UiButton.vue';
-import UiDialog from '@/components/ui/UiDialog.vue';
-import StudentTenantSwitcher from '@/components/student/StudentTenantSwitcher.vue';
-import { LOCALE_STORAGE_KEY, loadLocaleMessages } from '@/plugins/i18n';
-import { useTheme } from 'vuetify';
-import { useThemeStore } from '@/stores/theme';
-import type { SupportedLocale } from '@/plugins/i18n';
-import type { FeatureCode } from '@/constants/featureCatalog';
-import type { RouteLocationRaw } from 'vue-router';
-import { buildTeacherNavModel, type NavItem, type TeacherNavSuppressedItem } from './buildTeacherNavItems';
-import AdminAlertOverlay from '@/components/admin/AdminAlertOverlay.vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
+import { isNavigationFailure, useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { useTenantStore } from "@/stores/tenant";
+import { useAuthStore } from "@/stores/auth";
+import { useNotificationStore } from "@/stores/notifications";
+import { useLandingInquiriesStore } from "@/stores/landingInquiries";
+import { useFeaturesStore } from "@/stores/features";
+import { useFeatureSyncStore } from "@/stores/featureSync";
+import { useTeacherProfileStore } from "@/stores/teacherProfile";
+import { useStudentStore } from "@/stores/student";
+import { useSubscriptionStore } from "@/stores/subscription";
+import { useSubscriptionUpdatesStore } from "@/stores/subscriptionUpdates";
+import { FEATURE } from "@/constants/featureCatalog";
+import UiIcon from "@/components/ui/UiIcon.vue";
+import UiAlert from "@/components/ui/UiAlert.vue";
+import UiButton from "@/components/ui/UiButton.vue";
+import UiDialog from "@/components/ui/UiDialog.vue";
+import StudentTenantSwitcher from "@/components/student/StudentTenantSwitcher.vue";
+import { LOCALE_STORAGE_KEY, loadLocaleMessages } from "@/plugins/i18n";
+import { useTheme } from "vuetify";
+import { useThemeStore } from "@/stores/theme";
+import type { SupportedLocale } from "@/plugins/i18n";
+import type { FeatureCode } from "@/constants/featureCatalog";
+import type { RouteLocationRaw } from "vue-router";
+import {
+  buildTeacherNavModel,
+  type NavItem,
+  type TeacherNavSuppressedItem,
+} from "./buildTeacherNavItems";
+import AdminAlertOverlay from "@/components/admin/AdminAlertOverlay.vue";
+import SidebarUpgradeCard from "@/components/dashboard/SidebarUpgradeCard.vue";
 
-const SUPPORTED_LOCALES: SupportedLocale[] = ['ar', 'en'];
+const SUPPORTED_LOCALES: SupportedLocale[] = ["ar", "en"];
 
 /**
  * Normalizes a stored locale value against the supported locales list.
@@ -424,8 +496,10 @@ const SUPPORTED_LOCALES: SupportedLocale[] = ['ar', 'en'];
  * @returns A supported locale when the value matches, otherwise undefined.
  */
 const resolveLocale = (value: unknown): SupportedLocale | undefined => {
-  if (typeof value === 'string') {
-    return SUPPORTED_LOCALES.find((item) => item === value) as SupportedLocale | undefined;
+  if (typeof value === "string") {
+    return SUPPORTED_LOCALES.find((item) => item === value) as
+      | SupportedLocale
+      | undefined;
   }
   return undefined;
 };
@@ -438,7 +512,7 @@ const teacherProfileStore = useTeacherProfileStore();
 const studentStore = useStudentStore();
 const route = useRoute();
 const router = useRouter();
-const { t, tm, locale } = useI18n();
+const { t, te, tm, locale } = useI18n();
 const featuresStore = useFeaturesStore();
 const featureSync = useFeatureSyncStore();
 const subscriptionStore = useSubscriptionStore();
@@ -465,7 +539,7 @@ const userMenuOpen = ref(false);
 const navigateTo = (target: RouteLocationRaw) => {
   router.push(target).catch((error) => {
     if (!isNavigationFailure(error)) {
-      console.warn('[theme] failed to navigate', error);
+      console.warn("[theme] failed to navigate", error);
     }
   });
 };
@@ -477,45 +551,48 @@ const handleSettingsClick = () => {
   if (!canAccessTeacherLandingContent.value) {
     return;
   }
-  navigateTo({ name: 'teacher-landing-content' });
+  navigateTo({ name: "teacher-landing-content" });
 };
 
 const buildLogoutAction = async () => {
+  const target: RouteLocationRaw = auth.isStudent
+    ? { name: "login-student" }
+    : auth.isAssistant
+      ? { name: "assistant-login" }
+      : { name: "login-teacher" };
   await auth.logout();
-  const target = { name: 'login-teacher' } as const;
   try {
     await router.replace(target);
   } catch (error) {
     if (!isNavigationFailure(error)) {
-      console.warn('[theme] failed to redirect after logout', error);
+      console.warn("[theme] failed to redirect after logout", error);
     }
   }
 };
 
 const userMenuItems = computed<UserMenuItem[]>(() => {
-  if (!teacherPaymentSettingsAvailable.value) {
-    return [];
+  const items: UserMenuItem[] = [];
+
+  if (teacherPaymentSettingsAvailable.value) {
+    items.push({
+      id: "payments",
+      label: t("nav.teacherPaymentSettings"),
+      to: { name: "teacher-payment-settings" },
+    });
+    items.push({
+      id: "landing",
+      label: t("nav.teacherLandingContent"),
+      to: { name: "teacher-landing-content" },
+    });
   }
 
-  const items: UserMenuItem[] = [
-    {
-      id: 'payments',
-      label: t('nav.teacherPaymentSettings'),
-      to: { name: 'teacher-payment-settings' }
-    }
-  ];
-
-  items.push({
-    id: 'landing',
-    label: t('nav.teacherLandingContent'),
-    to: { name: 'teacher-landing-content' }
-  });
-
-  items.push({
-    id: 'logout',
-    label: t('nav.logout'),
-    action: buildLogoutAction
-  });
+  if (auth.isAuthenticated) {
+    items.push({
+      id: "logout",
+      label: t("nav.logout"),
+      action: buildLogoutAction,
+    });
+  }
 
   return items;
 });
@@ -523,7 +600,9 @@ const userMenuItems = computed<UserMenuItem[]>(() => {
 const hasUserMenu = computed(() => userMenuItems.value.length > 0);
 
 const termsDialogOpen = ref(false);
-const termsSections = computed(() => tm('teacher.terms.sections') as TermsSection[]);
+const termsSections = computed(
+  () => tm("teacher.terms.sections") as TermsSection[],
+);
 
 const closeUserMenu = () => {
   userMenuOpen.value = false;
@@ -547,11 +626,11 @@ const handleUserMenuAction = (item: UserMenuItem) => {
   closeUserMenu();
 };
 
-const handleNavAction = (action?: NavItem['action']) => {
+const handleNavAction = (action?: NavItem["action"]) => {
   if (!action) {
     return;
   }
-  if (action === 'open-teacher-terms') {
+  if (action === "open-teacher-terms") {
     termsDialogOpen.value = true;
     handleNavigate();
   }
@@ -568,29 +647,29 @@ const handleDocumentClick = (event: MouseEvent) => {
 };
 
 const handleDocumentKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') {
+  if (event.key === "Escape") {
     closeUserMenu();
   }
 };
 
 onMounted(() => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
-  document.addEventListener('click', handleDocumentClick);
-  document.addEventListener('keydown', handleDocumentKeydown);
+  document.addEventListener("click", handleDocumentClick);
+  document.addEventListener("keydown", handleDocumentKeydown);
 });
 
 onBeforeUnmount(() => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
-  document.removeEventListener('click', handleDocumentClick);
-  document.removeEventListener('keydown', handleDocumentKeydown);
+  document.removeEventListener("click", handleDocumentClick);
+  document.removeEventListener("keydown", handleDocumentKeydown);
 });
 
 const applyVuetifyTheme = (name: string) => {
-  if ('change' in vuetifyTheme && typeof vuetifyTheme.change === 'function') {
+  if ("change" in vuetifyTheme && typeof vuetifyTheme.change === "function") {
     vuetifyTheme.change(name);
     return;
   }
@@ -602,13 +681,15 @@ watch(
   (name) => {
     applyVuetifyTheme(name);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const storedLocale =
-  typeof window !== 'undefined' ? window.localStorage.getItem(LOCALE_STORAGE_KEY) : null;
+  typeof window !== "undefined"
+    ? window.localStorage.getItem(LOCALE_STORAGE_KEY)
+    : null;
 const normalizedStoredLocale = resolveLocale(storedLocale);
- 
+
 const hasStoredLocale = ref(Boolean(normalizedStoredLocale));
 if (normalizedStoredLocale && locale.value !== normalizedStoredLocale) {
   void loadLocaleMessages(normalizedStoredLocale).then(() => {
@@ -616,24 +697,24 @@ if (normalizedStoredLocale && locale.value !== normalizedStoredLocale) {
   });
 }
 
-const SIDEBAR_STORAGE_KEY = 'edtech:sidebar-collapsed';
+const SIDEBAR_STORAGE_KEY = "edtech:sidebar-collapsed";
 
 const readStoredSidebarState = (): boolean | null => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return null;
   }
   const value = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
-  if (value === 'true') {
+  if (value === "true") {
     return true;
   }
-  if (value === 'false') {
+  if (value === "false") {
     return false;
   }
   return null;
 };
 
 const persistSidebarState = (value: boolean) => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(value));
@@ -646,20 +727,23 @@ const sidebarRef = ref<HTMLElement | null>(null);
 const drawerToggle = ref<HTMLButtonElement | null>(null);
 const mainContentRef = ref<HTMLElement | null>(null);
 const initialDirection =
-  typeof document !== 'undefined'
-    ? (document.documentElement.dir || document.body.getAttribute('dir') || 'ltr')
-    : 'ltr';
-const direction = ref<'ltr' | 'rtl'>(initialDirection === 'rtl' ? 'rtl' : 'ltr');
- 
-const isRtl = computed(() => direction.value === 'rtl');
+  typeof document !== "undefined"
+    ? document.documentElement.dir || document.body.getAttribute("dir") || "ltr"
+    : "ltr";
+const direction = ref<"ltr" | "rtl">(
+  initialDirection === "rtl" ? "rtl" : "ltr",
+);
+
+const isRtl = computed(() => direction.value === "rtl");
 const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const shellClasses = computed(() => ({
-  'is-sidebar-open': drawer.value && isMobile.value,
-  'is-sidebar-collapsed': collapsed.value && !isMobile.value,
-  'is-rtl': isRtl.value
+  "is-sidebar-open": drawer.value && isMobile.value,
+  "is-sidebar-collapsed": collapsed.value && !isMobile.value,
+  "is-rtl": isRtl.value,
 }));
-const searchQuery = ref('');
+const searchQuery = ref("");
 
 const toggleSidebar = () => {
   if (isMobile.value) {
@@ -671,23 +755,25 @@ const toggleSidebar = () => {
 
 const sidebarToggleIcon = computed(() => {
   if (collapsed.value) {
-    return isRtl.value ? 'DoubleLeftOutlined' : 'DoubleRightOutlined';
+    return isRtl.value ? "DoubleLeftOutlined" : "DoubleRightOutlined";
   }
-  return isRtl.value ? 'DoubleRightOutlined' : 'DoubleLeftOutlined';
+  return isRtl.value ? "DoubleRightOutlined" : "DoubleLeftOutlined";
 });
 
 const sidebarToggleTitle = computed(() =>
-  collapsed.value ? t('nav.expandSidebar') : t('nav.collapseSidebar')
+  collapsed.value ? t("nav.expandSidebar") : t("nav.collapseSidebar"),
 );
 
-const languageToggleTitle = computed(() => t('nav.toggleLanguage'));
+const languageToggleTitle = computed(() => t("nav.toggleLanguage"));
 
-const themeToggleIcon = computed(() => (themeStore.isDark ? 'SunOutlined' : 'MoonOutlined'));
+const themeToggleIcon = computed(() =>
+  themeStore.isDark ? "SunOutlined" : "MoonOutlined",
+);
 const themeToggleTitle = computed(() =>
-  themeStore.isDark ? t('nav.switchToLight') : t('nav.switchToDark')
+  themeStore.isDark ? t("nav.switchToLight") : t("nav.switchToDark"),
 );
 const themeToggleNextLabel = computed(() =>
-  themeStore.isDark ? t('nav.lightModeLabel') : t('nav.darkModeLabel')
+  themeStore.isDark ? t("nav.lightModeLabel") : t("nav.darkModeLabel"),
 );
 
 /**
@@ -707,9 +793,9 @@ const focusMainContent = () => {
       return;
     }
     element.focus({ preventScroll: true });
-    if (typeof element.scrollIntoView === 'function') {
-      const behavior = prefersReducedMotion() ? 'auto' : 'smooth';
-      element.scrollIntoView({ behavior, block: 'start', inline: 'nearest' });
+    if (typeof element.scrollIntoView === "function") {
+      const behavior = prefersReducedMotion() ? "auto" : "smooth";
+      element.scrollIntoView({ behavior, block: "start", inline: "nearest" });
     }
   });
 };
@@ -719,7 +805,7 @@ const focusMainContent = () => {
  * technologies do not keep the sidebar in the tab order when it is hidden.
  */
 const resetSidebarFocus = () => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
   const activeElement = document.activeElement as HTMLElement | null;
@@ -759,7 +845,10 @@ const toggleDrawer = () => {
   }
 };
 
-const mediaQuery = typeof window !== 'undefined' ? window.matchMedia('(max-width: 991px)') : null;
+const mediaQuery =
+  typeof window !== "undefined"
+    ? window.matchMedia("(max-width: 991px)")
+    : null;
 
 let previousBodyOverflow: string | null = null;
 
@@ -773,11 +862,13 @@ const getFocusableElements = (root: HTMLElement | null) => {
     return [] as HTMLElement[];
   }
 
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter(
     (element) =>
-      !element.hasAttribute('disabled') &&
-      element.getAttribute('tabindex') !== '-1' &&
-      element.offsetParent !== null
+      !element.hasAttribute("disabled") &&
+      element.getAttribute("tabindex") !== "-1" &&
+      element.offsetParent !== null,
   );
 };
 
@@ -786,7 +877,7 @@ const setupDrawerFocusTrap = () => {
     return;
   }
 
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
 
@@ -796,7 +887,7 @@ const setupDrawerFocusTrap = () => {
   }
 
   const handleKeydown = (event: KeyboardEvent) => {
-    if (event.key !== 'Tab') {
+    if (event.key !== "Tab") {
       return;
     }
 
@@ -823,10 +914,10 @@ const setupDrawerFocusTrap = () => {
     }
   };
 
-  container.addEventListener('keydown', handleKeydown);
+  container.addEventListener("keydown", handleKeydown);
 
   drawerFocusCleanup = () => {
-    container.removeEventListener('keydown', handleKeydown);
+    container.removeEventListener("keydown", handleKeydown);
   };
 
   nextTick(() => {
@@ -838,7 +929,7 @@ const setupDrawerFocusTrap = () => {
 };
 
 const lockBodyScroll = () => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
   const body = document.body;
@@ -846,13 +937,13 @@ const lockBodyScroll = () => {
     return;
   }
   if (previousBodyOverflow === null) {
-    previousBodyOverflow = body.style.overflow || '';
+    previousBodyOverflow = body.style.overflow || "";
   }
-  body.style.overflow = 'hidden';
+  body.style.overflow = "hidden";
 };
 
 const unlockBodyScroll = () => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
   const body = document.body;
@@ -866,7 +957,7 @@ const unlockBodyScroll = () => {
 };
 
 const handleGlobalKeydown = (event: KeyboardEvent) => {
-  if ((event.key === 'Escape' || event.key === 'Esc') && drawer.value) {
+  if ((event.key === "Escape" || event.key === "Esc") && drawer.value) {
     event.preventDefault();
     closeDrawer();
   }
@@ -887,16 +978,16 @@ const updateBreakpoint = () => {
  * @param lang Locale code that determines the direction metadata.
  */
 const applyDirection = (lang: string) => {
-  const nextDir: 'rtl' | 'ltr' = lang === 'ar' ? 'rtl' : 'ltr';
+  const nextDir: "rtl" | "ltr" = lang === "ar" ? "rtl" : "ltr";
 
-  if (typeof document !== 'undefined') {
+  if (typeof document !== "undefined") {
     document.documentElement.lang = lang;
     document.documentElement.dir = nextDir;
     const body = document.body;
     if (body) {
-      body.setAttribute('dir', nextDir);
-      body.setAttribute('lang', lang);
-      body.classList.toggle('is-rtl', nextDir === 'rtl');
+      body.setAttribute("dir", nextDir);
+      body.setAttribute("lang", lang);
+      body.classList.toggle("is-rtl", nextDir === "rtl");
     }
   }
   direction.value = nextDir;
@@ -909,7 +1000,7 @@ const applyDirection = (lang: string) => {
  * @param value Locale code to store.
  */
 const persistLocale = (value: string) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     window.localStorage.setItem(LOCALE_STORAGE_KEY, value);
   }
   hasStoredLocale.value = true;
@@ -919,16 +1010,16 @@ let hasInitializedLocaleWatch = false;
 
 onMounted(() => {
   updateBreakpoint();
-  mediaQuery?.addEventListener('change', updateBreakpoint);
-  if (typeof document !== 'undefined') {
-    document.addEventListener('keydown', handleGlobalKeydown);
+  mediaQuery?.addEventListener("change", updateBreakpoint);
+  if (typeof document !== "undefined") {
+    document.addEventListener("keydown", handleGlobalKeydown);
   }
 });
 
 onBeforeUnmount(() => {
-  mediaQuery?.removeEventListener('change', updateBreakpoint);
-  if (typeof document !== 'undefined') {
-    document.removeEventListener('keydown', handleGlobalKeydown);
+  mediaQuery?.removeEventListener("change", updateBreakpoint);
+  if (typeof document !== "undefined") {
+    document.removeEventListener("keydown", handleGlobalKeydown);
   }
   featureSync.disconnect();
   subscriptionUpdates.disconnect();
@@ -953,32 +1044,34 @@ watch(
       unlockBodyScroll();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
-watch(
-  collapsed,
-  (value) => {
-    if (!isMobile.value) {
-      persistSidebarState(value);
-    }
+watch(collapsed, (value) => {
+  if (!isMobile.value) {
+    persistSidebarState(value);
   }
-);
+});
 
 watch(
   () => auth.role,
   (role) => {
-    if (role === 'TEACHER') {
+    if (role === "TEACHER") {
       void teacherProfileStore.load();
       return;
     }
-    if (role === 'STUDENT' && !studentStore.profile) {
+    if (role === "STUDENT" && !studentStore.profile) {
       void studentStore
         .fetchProfile()
-        .catch((error) => console.warn('[theme] unable to load student profile for header', error));
+        .catch((error) =>
+          console.warn(
+            "[theme] unable to load student profile for header",
+            error,
+          ),
+        );
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const currentBrand = computed(() => tenantStore.branding);
@@ -990,7 +1083,9 @@ const currentBrand = computed(() => tenantStore.branding);
  * @returns True when the feature is available.
  */
 const hasFeature = (code: string) => featuresStore.hasFeature(code);
-const featuresUnauthorized = computed(() => featuresStore.error === 'features.errors.unauthorized');
+const featuresUnauthorized = computed(
+  () => featuresStore.error === "features.errors.unauthorized",
+);
 const assistantPermissionSet = computed<Set<string> | null>(() => {
   if (!auth.isAssistant) {
     return null;
@@ -1015,40 +1110,69 @@ const assistantCanBypassFeature = (permission?: string) => {
   return permissions.has(permission);
 };
 
-const teacherRosterEnabled = computed(() =>
-  assistantCanBypassFeature('students.view') || hasFeature(FEATURE.teacherRosterGroups)
+const teacherRosterEnabled = computed(
+  () =>
+    assistantCanBypassFeature("students.view") ||
+    hasFeature(FEATURE.teacherRosterGroups),
 );
-const liveSessionsCoreEnabled = computed(() => hasFeature(FEATURE.liveSessionsCore));
-const liveSessionsChatEnabled = computed(() => hasFeature(FEATURE.liveSessionsChat));
-const liveSessionsPollsEnabled = computed(() => hasFeature(FEATURE.liveSessionsPolls));
-const teacherAssistantsEnabled = computed(() => hasFeature(FEATURE.teacherAssistants));
+const liveSessionsCoreEnabled = computed(() =>
+  hasFeature(FEATURE.liveSessionsCore),
+);
+const liveSessionsChatEnabled = computed(() =>
+  hasFeature(FEATURE.liveSessionsChat),
+);
+const liveSessionsPollsEnabled = computed(() =>
+  hasFeature(FEATURE.liveSessionsPolls),
+);
+const teacherAssistantsEnabled = computed(() =>
+  hasFeature(FEATURE.teacherAssistants),
+);
 const teacherRegsPaymentsEnabled = computed(
-  () => assistantCanBypassFeature('registrations.manage') || hasFeature(FEATURE.teacherRegsPayments)
+  () =>
+    assistantCanBypassFeature("registrations.manage") ||
+    hasFeature(FEATURE.teacherRegsPayments),
 );
-const teacherPlanUpgradeEnabled = computed(() => hasFeature(FEATURE.teacherSubscriptions));
+const teacherPlanUpgradeEnabled = computed(() =>
+  hasFeature(FEATURE.teacherSubscriptions),
+);
 const teacherReportsEnabled = computed(
-  () => assistantCanBypassFeature('reports.view') || hasFeature(FEATURE.reportsTeacher)
+  () =>
+    assistantCanBypassFeature("reports.view") ||
+    hasFeature(FEATURE.reportsTeacher),
 );
-const studentReportsEnabled = computed(() => hasFeature(FEATURE.reportsStudent));
-const platformSyndicationEnabled = computed(() => hasFeature(FEATURE.platformSyndication));
-const adminModerationEnabled = computed(() => hasFeature(FEATURE.adminModeration));
+const studentReportsEnabled = computed(() =>
+  hasFeature(FEATURE.reportsStudent),
+);
+const platformSyndicationEnabled = computed(() =>
+  hasFeature(FEATURE.platformSyndication),
+);
+const adminModerationEnabled = computed(() =>
+  hasFeature(FEATURE.adminModeration),
+);
 const adminOpsEnabled = computed(() => hasFeature(FEATURE.adminOps));
-const analyticsPlatformEnabled = computed(() => hasFeature(FEATURE.analyticsPlatform));
+const analyticsPlatformEnabled = computed(() =>
+  hasFeature(FEATURE.analyticsPlatform),
+);
 const englishLabEnabled = computed(() => hasFeature(FEATURE.englishLab));
 
 const offersEnabled = computed(() => hasFeature(FEATURE.offers));
 const examWorkflowsEnabled = computed(() => hasFeature(FEATURE.examWorkflows));
 
-const multiTeacherStudentEnabled = computed(() => hasFeature(FEATURE.multiTeacherStudent));
+const multiTeacherStudentEnabled = computed(() =>
+  hasFeature(FEATURE.multiTeacherStudent),
+);
 const showStudentTenantSwitcher = computed(
-  () => multiTeacherStudentEnabled.value && auth.isStudent
+  () => multiTeacherStudentEnabled.value && auth.isStudent,
 );
 
 const notificationsUnifiedEnabled = computed(
-  () => assistantCanBypassFeature('communications.manage') || hasFeature(FEATURE.notificationsUnified)
+  () =>
+    assistantCanBypassFeature("communications.manage") ||
+    hasFeature(FEATURE.notificationsUnified),
 );
 const badgesEnabled = computed(
-  () => assistantCanBypassFeature('courses.manage') || hasFeature(FEATURE.badges)
+  () =>
+    assistantCanBypassFeature("courses.manage") || hasFeature(FEATURE.badges),
 );
 
 const teacherFeaturesToTrack: FeatureCode[] = [
@@ -1063,22 +1187,25 @@ const teacherFeaturesToTrack: FeatureCode[] = [
   FEATURE.offers,
   FEATURE.notificationsUnified,
   FEATURE.badges,
-  FEATURE.englishLab
+  FEATURE.englishLab,
 ];
 
 const TEACHER_FEATURE_NAV_KEYS: Partial<Record<FeatureCode, string[]>> = {
-  [FEATURE.teacherRosterGroups]: ['nav.teacherStudents'],
-  [FEATURE.teacherAssistants]: ['nav.teacherAssistants'],
-  [FEATURE.teacherRegsPayments]: ['nav.teacherRegistrations', 'nav.teacherPayments'],
-  [FEATURE.teacherSubscriptions]: ['nav.teacherUpgradePlan'],
-  [FEATURE.liveSessionsCore]: ['nav.teacherLiveSessions'],
-  [FEATURE.liveSessionsChat]: ['nav.teacherLiveModeration'],
-  [FEATURE.liveSessionsPolls]: ['nav.teacherLivePolls'],
-  [FEATURE.reportsTeacher]: ['nav.teacherReports'],
-  [FEATURE.offers]: ['nav.teacherOffers'],
-  [FEATURE.notificationsUnified]: ['nav.teacherNotifications'],
-  [FEATURE.badges]: ['nav.teacherBadges'],
-  [FEATURE.englishLab]: ['nav.teacherEnglishLab']
+  [FEATURE.teacherRosterGroups]: ["nav.teacherStudents"],
+  [FEATURE.teacherAssistants]: ["nav.teacherAssistants"],
+  [FEATURE.teacherRegsPayments]: [
+    "nav.teacherRegistrations",
+    "nav.teacherPayments",
+  ],
+  [FEATURE.teacherSubscriptions]: ["nav.teacherUpgradePlan"],
+  [FEATURE.liveSessionsCore]: ["nav.teacherLiveSessions"],
+  [FEATURE.liveSessionsChat]: ["nav.teacherLiveModeration"],
+  [FEATURE.liveSessionsPolls]: ["nav.teacherLivePolls"],
+  [FEATURE.reportsTeacher]: ["nav.teacherReports"],
+  [FEATURE.offers]: ["nav.teacherOffers"],
+  [FEATURE.notificationsUnified]: ["nav.teacherNotifications"],
+  [FEATURE.badges]: ["nav.teacherBadges"],
+  [FEATURE.englishLab]: ["nav.teacherEnglishLab"],
 };
 
 const teacherFeatureSnapshot = new Map<FeatureCode, boolean>();
@@ -1089,7 +1216,7 @@ const teacherDowngradeVisible = ref(false);
 watch(
   () => teacherFeaturesToTrack.map((code) => featuresStore.hasFeature(code)),
   () => {
-    if (featuresStore.audience !== 'secure') {
+    if (featuresStore.audience !== "secure") {
       if (
         hasSeededTeacherFeatures ||
         teacherFeatureSnapshot.size > 0 ||
@@ -1149,19 +1276,19 @@ watch(
       teacherDowngradeVisible.value = false;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
   () => featuresStore.audience,
   (audience) => {
-    if (audience !== 'secure') {
+    if (audience !== "secure") {
       teacherFeatureSnapshot.clear();
       lostTeacherFeatureCodes.value = [];
       teacherDowngradeVisible.value = false;
       hasSeededTeacherFeatures = false;
     }
-  }
+  },
 );
 
 watch(
@@ -1177,19 +1304,19 @@ watch(
     if (isTeacher) {
       void landingInquiries.refreshUnreadCount();
     }
-  }
+  },
 );
 
 const notificationsCount = computed(() =>
-  notificationsUnifiedEnabled.value ? notifications.unreadCount : 0
+  notificationsUnifiedEnabled.value ? notifications.unreadCount : 0,
 );
 const showNotificationsBadge = computed(() => notificationsCount.value > 0);
 const notificationsBadgeLabel = computed(() => {
   if (!showNotificationsBadge.value) {
-    return '';
+    return "";
   }
   const count = notificationsCount.value;
-  return count > 99 ? '99+' : String(count);
+  return count > 99 ? "99+" : String(count);
 });
 
 const landingInquiryBadgeLabel = computed(() => {
@@ -1197,7 +1324,25 @@ const landingInquiryBadgeLabel = computed(() => {
   if (count <= 0) {
     return null;
   }
-  return count > 99 ? '99+' : String(count);
+  return count > 99 ? "99+" : String(count);
+});
+
+const notificationsAriaLabel = computed(() => {
+  const base = t("notifications.historyTitle");
+  return showNotificationsBadge.value
+    ? `${base} (${notificationsBadgeLabel.value})`
+    : base;
+});
+
+const showLandingInquiriesBadge = computed(() =>
+  Boolean(landingInquiryBadgeLabel.value),
+);
+
+const landingInquiriesAriaLabel = computed(() => {
+  const base = t("nav.teacherLandingMessages");
+  return showLandingInquiriesBadge.value
+    ? `${base} (${landingInquiryBadgeLabel.value})`
+    : base;
 });
 
 watch(
@@ -1211,7 +1356,7 @@ watch(
       notifications.clear();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -1221,9 +1366,8 @@ watch(
       subscriptionStore.clear();
       subscriptionUpdates.disconnect();
     }
-  }
+  },
 );
-
 
 const tenantSlug = computed(() => {
   if (tenantStore.slug) {
@@ -1232,33 +1376,37 @@ const tenantSlug = computed(() => {
   if (tenantStore.branding?.slug) {
     return tenantStore.branding.slug;
   }
-  return '';
+  return "";
 });
 
 const ensureSidebarFeatureContext = async () => {
-  const slug = (tenantSlug.value || '').trim().toLowerCase();
+  const slug = (tenantSlug.value || "").trim().toLowerCase();
   const tenant = slug || null;
   const role = auth.role ?? undefined;
-  const audience = auth.isAuthenticated ? 'secure' : 'public';
+  const audience = auth.isAuthenticated ? "secure" : "public";
 
   try {
     await featuresStore.ensureLoaded({ tenant, role, audience });
   } catch (error) {
-    console.warn('[theme] unable to ensure feature context for sidebar', error);
+    console.warn("[theme] unable to ensure feature context for sidebar", error);
   }
 };
 
 watch(
   () => [auth.isAuthenticated, auth.role, tenantSlug.value],
   ([authenticated, role, slug]) => {
-    const normalizedSlug = (slug || '').trim().toLowerCase();
-    if (!authenticated || !normalizedSlug || (role !== 'TEACHER' && role !== 'STUDENT')) {
+    const normalizedSlug = (slug || "").trim().toLowerCase();
+    if (
+      !authenticated ||
+      !normalizedSlug ||
+      (role !== "TEACHER" && role !== "STUDENT")
+    ) {
       featureSync.disconnect();
       return;
     }
     featureSync.connect(normalizedSlug);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -1266,14 +1414,17 @@ watch(
   () => {
     void ensureSidebarFeatureContext();
   },
-  { immediate: true }
+  { immediate: true },
 );
-
 
 watch(
   () => [auth.isAuthenticated, auth.teacherId, auth.role, tenantSlug.value],
   ([authenticated, teacherId, role]) => {
-    if (authenticated && teacherId && (role === 'TEACHER' || role === 'TEACHER_ASSISTANT')) {
+    if (
+      authenticated &&
+      teacherId &&
+      (role === "TEACHER" || role === "TEACHER_ASSISTANT")
+    ) {
       subscriptionUpdates.connect();
       if (!subscriptionStore.summary) {
         void subscriptionStore.loadSubscription();
@@ -1282,35 +1433,35 @@ watch(
       subscriptionUpdates.disconnect();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const buildSubscriptionSignature = () => {
   const summary = subscriptionStore.summary;
   if (!summary) {
-    return '';
+    return "";
   }
   const current = summary.currentSubscription;
   const currentSignature = current
     ? [
-        current.planCode ?? '',
-        current.status ?? '',
-        current.cancelAt ?? '',
-        current.endsAt ?? '',
-        current.startsAt ?? ''
-      ].join('|')
-    : 'none';
+        current.planCode ?? "",
+        current.status ?? "",
+        current.cancelAt ?? "",
+        current.endsAt ?? "",
+        current.startsAt ?? "",
+      ].join("|")
+    : "none";
   const pendingSignature = (summary.pendingRequests || [])
     .map((request) =>
       [
         request.id ?? 0,
-        request.planCode ?? '',
-        request.status ?? '',
-        request.updatedAt ?? '',
-        request.captureStatus ?? ''
-      ].join('|')
+        request.planCode ?? "",
+        request.status ?? "",
+        request.updatedAt ?? "",
+        request.captureStatus ?? "",
+      ].join("|"),
     )
-    .join(';');
+    .join(";");
   return `${currentSignature}::${pendingSignature}`;
 };
 
@@ -1328,16 +1479,22 @@ const refreshTeacherSubscriptionContext = async () => {
         try {
           await featuresStore.refresh();
         } catch (error) {
-          console.warn('[theme] failed to refresh features after subscription update', error);
+          console.warn(
+            "[theme] failed to refresh features after subscription update",
+            error,
+          );
         }
       })(),
       (async () => {
         try {
           await teacherProfileStore.load(true);
         } catch (error) {
-          console.warn('[theme] failed to refresh teacher profile after subscription update', error);
+          console.warn(
+            "[theme] failed to refresh teacher profile after subscription update",
+            error,
+          );
         }
-      })()
+      })(),
     ]);
   } finally {
     isRefreshingTeacherSubscriptionContext.value = false;
@@ -1345,7 +1502,10 @@ const refreshTeacherSubscriptionContext = async () => {
 };
 
 watch(
-  () => [auth.isTeacher || auth.isAssistant, subscriptionContextSignature.value],
+  () => [
+    auth.isTeacher || auth.isAssistant,
+    subscriptionContextSignature.value,
+  ],
   ([isTeacherOrAssistant, signature], previous) => {
     const previousSignature = Array.isArray(previous) ? previous[1] : undefined;
     if (!isTeacherOrAssistant) {
@@ -1356,9 +1516,8 @@ watch(
     }
     void refreshTeacherSubscriptionContext();
   },
-  { immediate: false }
+  { immediate: false },
 );
-
 
 /**
  * Builds the public teacher landing page URL when the authenticated user is a
@@ -1368,11 +1527,11 @@ watch(
  */
 const teacherLandingUrl = computed(() => {
   if (!auth.isTeacher) {
-    return '';
+    return "";
   }
   const slug = tenantSlug.value;
   if (!slug) {
-    return '';
+    return "";
   }
   return `/teacher/${slug}`;
 });
@@ -1384,19 +1543,21 @@ const teacherLandingUrl = computed(() => {
  */
 const homeDestination = computed(() => {
   if (auth.isTeacher) {
-    return '/teacher';
+    return "/teacher";
   }
   if (auth.isAssistant) {
-    return '/assistant';
+    return "/assistant";
   }
   if (auth.isStudent) {
-    return '/student/learning';
+    return "/student/learning";
   }
-  return '/';
+  return "/";
 });
 
 const teacherPlanCode = computed(() => {
-  const subscriptionPlan = (subscriptionStore.currentSubscription?.planCode || '')
+  const subscriptionPlan = (
+    subscriptionStore.currentSubscription?.planCode || ""
+  )
     .toString()
     .toLowerCase()
     .trim();
@@ -1404,17 +1565,19 @@ const teacherPlanCode = computed(() => {
     return subscriptionPlan;
   }
 
-  const profilePlan = (teacherProfileStore.profile?.plan || '').toLowerCase().trim();
+  const profilePlan = (teacherProfileStore.profile?.plan || "")
+    .toLowerCase()
+    .trim();
   if (profilePlan) {
     return profilePlan;
   }
 
-  const featurePlan = (featuresStore.plan || '').toLowerCase().trim();
+  const featurePlan = (featuresStore.plan || "").toLowerCase().trim();
   if (featurePlan) {
     return featurePlan;
   }
 
-  return '';
+  return "";
 });
 const teacherNavModel = computed(() =>
   buildTeacherNavModel({
@@ -1439,8 +1602,8 @@ const teacherNavModel = computed(() =>
     notificationsUnifiedEnabled: notificationsUnifiedEnabled.value,
     examWorkflowsEnabled: examWorkflowsEnabled.value,
     notificationsBadgeLabel: notificationsBadgeLabel.value,
-    landingInquiryBadgeLabel: landingInquiryBadgeLabel.value
-  })
+    landingInquiryBadgeLabel: landingInquiryBadgeLabel.value,
+  }),
 );
 
 const teacherNavItems = computed<NavItem[]>(() => teacherNavModel.value.items);
@@ -1449,17 +1612,19 @@ const assistantSuppressedNavItems = computed<TeacherNavSuppressedItem[]>(() => {
   if (!auth.isAssistant) {
     return [];
   }
-  return teacherNavModel.value.suppressed.filter((entry) => entry.reason === 'feature-disabled');
+  return teacherNavModel.value.suppressed.filter(
+    (entry) => entry.reason === "feature-disabled",
+  );
 });
 
 const teacherPlanDisplay = computed(() => {
   if (!teacherPlanCode.value) {
-    return t('nav.teacherPlanUnknown');
+    return t("nav.teacherPlanUnknown");
   }
   const normalized = teacherPlanCode.value;
   const key = `teacher.plan${normalized.charAt(0).toUpperCase()}${normalized.slice(1)}`;
   const localized = t(key as any);
-  return localized === key ? featuresStore.plan ?? normalized : localized;
+  return localized === key ? (featuresStore.plan ?? normalized) : localized;
 });
 
 /**
@@ -1473,32 +1638,79 @@ const adminNavItems = computed<NavItem[]>(() => {
   }
 
   const items: NavItem[] = [
-    { label: t('nav.platformPlansWorkspace'), to: '/admin/plans', icon: 'SettingOutlined' },
-    { label: t('nav.adminTeachers'), to: '/admin/teachers', icon: 'IdcardOutlined' },
-    { label: t('adminTeachers.actions.payments'), to: '/admin/teachers/payments', icon: 'CreditCardOutlined' },
-    { label: t('nav.adminStudents'), to: '/admin/students', icon: 'TeamOutlined' },
-    { label: t('nav.adminMessages'), to: '/admin/platform-messages', icon: 'MailOutlined' },
-    { label: t('nav.adminFeedback'), to: '/admin/feedback', icon: 'MessageOutlined' }
+    {
+      label: t("nav.platformPlansWorkspace"),
+      to: "/admin/plans",
+      icon: "SettingOutlined",
+    },
+    {
+      label: t("nav.adminTeachers"),
+      to: "/admin/teachers",
+      icon: "IdcardOutlined",
+    },
+    {
+      label: t("nav.adminStudents"),
+      to: "/admin/students",
+      icon: "TeamOutlined",
+    },
+    {
+      label: t("nav.adminMessages"),
+      to: "/admin/platform-messages",
+      icon: "MailOutlined",
+    },
+    {
+      label: t("nav.adminFeedback"),
+      to: "/admin/feedback",
+      icon: "MessageOutlined",
+    },
   ];
 
   if (platformSyndicationEnabled.value) {
-    items.push({ label: t('nav.adminPublications'), to: '/admin/publications', icon: 'PlaySquareOutlined' });
+    items.push({
+      label: t("nav.adminPublications"),
+      to: "/admin/publications",
+      icon: "PlaySquareOutlined",
+    });
   }
 
   if (analyticsPlatformEnabled.value) {
-    items.push({ label: t('nav.adminAnalytics'), to: '/admin/analytics', icon: 'LineChartOutlined' });
+    items.push({
+      label: t("nav.adminAnalytics"),
+      to: "/admin/analytics",
+      icon: "LineChartOutlined",
+    });
   }
 
   if (adminModerationEnabled.value) {
-    items.push({ label: t('nav.adminModeration'), to: '/admin/courses', icon: 'SafetyCertificateOutlined' });
+    items.push({
+      label: t("nav.adminModeration"),
+      to: "/admin/courses",
+      icon: "SafetyCertificateOutlined",
+    });
   }
 
   if (adminOpsEnabled.value) {
     items.push(
-      { label: t('nav.adminOps'), to: '/admin/ops/backups', icon: 'DatabaseOutlined' },
-      { label: t('nav.adminOpsAlerts'), to: '/admin/ops/alerts', icon: 'WarningOutlined' },
-      { label: t('nav.adminOpsPayments'), to: '/admin/ops/payments', icon: 'CreditCardOutlined' },
-      { label: t('nav.adminOpsAudit'), to: '/admin/ops/audit', icon: 'FileSearchOutlined' }
+      {
+        label: t("nav.adminOps"),
+        to: "/admin/ops/backups",
+        icon: "DatabaseOutlined",
+      },
+      {
+        label: t("nav.adminOpsAlerts"),
+        to: "/admin/ops/alerts",
+        icon: "WarningOutlined",
+      },
+      {
+        label: t("nav.adminOpsPayments"),
+        to: "/admin/ops/payments",
+        icon: "CreditCardOutlined",
+      },
+      {
+        label: t("nav.adminOpsAudit"),
+        to: "/admin/ops/audit",
+        icon: "FileSearchOutlined",
+      },
     );
   }
 
@@ -1513,43 +1725,81 @@ const adminNavItems = computed<NavItem[]>(() => {
 const studentNavItems = computed<NavItem[]>(() => {
   if (auth.isStudent) {
     const items: NavItem[] = [
-      { label: t('nav.student'), to: '/student/home', icon: 'SolutionOutlined' },
-      { label: t('nav.studentTeacherCourses'), to: '/student/teacher-courses', icon: 'ReadOutlined' },
-      { label: t('nav.studentAssessments'), to: '/student/assessments', icon: 'AuditOutlined' }
+      {
+        label: t("nav.student"),
+        to: "/student/home",
+        icon: "SolutionOutlined",
+      },
+      {
+        label: t("nav.studentTeacherCourses"),
+        to: "/student/teacher-courses",
+        icon: "ReadOutlined",
+      },
+      {
+        label: t("nav.studentAssessments"),
+        to: "/student/assessments",
+        icon: "AuditOutlined",
+      },
     ];
 
     if (studentReportsEnabled.value) {
-      items.push({ label: t('nav.studentReports'), to: '/student/reports', icon: 'LineChartOutlined' });
+      items.push({
+        label: t("nav.studentReports"),
+        to: "/student/reports",
+        icon: "LineChartOutlined",
+      });
     }
 
     if (badgesEnabled.value) {
-      items.push({ label: t('nav.studentBadges'), to: '/student/badges', icon: 'TrophyOutlined' });
+      items.push({
+        label: t("nav.studentBadges"),
+        to: "/student/badges",
+        icon: "TrophyOutlined",
+      });
     }
 
     if (notificationsUnifiedEnabled.value) {
       items.push({
-        label: t('nav.studentNotifications'),
-        to: '/student/notifications',
-        icon: 'NotificationOutlined',
-        badge: notificationsBadgeLabel.value || undefined
+        label: t("nav.studentNotifications"),
+        to: "/student/notifications",
+        icon: "NotificationOutlined",
+        badge: notificationsBadgeLabel.value || undefined,
       });
     }
 
-    items.push({ label: t('nav.studentFeedback'), to: '/student/feedback', icon: 'CommentOutlined' });
+    items.push({
+      label: t("nav.studentFeedback"),
+      to: "/student/feedback",
+      icon: "CommentOutlined",
+    });
 
     if (englishLabEnabled.value) {
-      items.push({ label: t('nav.studentEnglishLab'), to: '/student/english-lab', icon: 'BookOutlined' });
+      items.push({
+        label: t("nav.studentEnglishLab"),
+        to: "/student/english-lab",
+        icon: "BookOutlined",
+      });
     }
 
     if (offersEnabled.value) {
-      items.push({ label: t('nav.studentCheckout'), to: '/student/checkout', icon: 'ShoppingCartOutlined' });
+      items.push({
+        label: t("nav.studentCheckout"),
+        to: "/student/checkout",
+        icon: "ShoppingCartOutlined",
+      });
     }
 
     return items;
   }
 
   if (!auth.isTeacher) {
-    return [{ label: t('nav.student'), to: '/student/login', icon: 'UserAddOutlined' }];
+    return [
+      {
+        label: t("nav.student"),
+        to: "/student/login",
+        icon: "UserAddOutlined",
+      },
+    ];
   }
 
   return [];
@@ -1562,12 +1812,16 @@ const studentNavItems = computed<NavItem[]>(() => {
  */
 const guestTeacherNavItems = computed<NavItem[]>(() => {
   if (!auth.isTeacher && !auth.isStudent && !auth.isAssistant) {
-    const slug = tenantSlug.value || (import.meta.env.VITE_TENANT_SLUG?.trim() || 'demo');
-    const location: NavItem = { label: t('nav.teacher'), icon: 'UserSwitchOutlined' };
+    const slug =
+      tenantSlug.value || import.meta.env.VITE_TENANT_SLUG?.trim() || "demo";
+    const location: NavItem = {
+      label: t("nav.teacher"),
+      icon: "UserSwitchOutlined",
+    };
     if (slug) {
-      location.to = { name: 'login-teacher', query: { tenant: slug } };
+      location.to = { name: "login-teacher", query: { tenant: slug } };
     } else {
-      location.to = { name: 'login-teacher' };
+      location.to = { name: "login-teacher" };
     }
     return [location];
   }
@@ -1582,24 +1836,28 @@ const guestTeacherNavItems = computed<NavItem[]>(() => {
  */
 const homeLabel = computed(() => {
   if (auth.isTeacher || auth.isPlatformAdmin) {
-    return t('nav.homeTeacher');
+    return t("nav.homeTeacher");
   }
   if (auth.isAssistant) {
-    return t('nav.homeAssistant');
+    return t("nav.homeAssistant");
   }
-  return t('nav.home');
+  return t("nav.home");
 });
 
 const navItems = computed<NavItem[]>(() => {
   const items: NavItem[] = [
-    { label: homeLabel.value, to: homeDestination.value, icon: 'DashboardOutlined' }
+    {
+      label: homeLabel.value,
+      to: homeDestination.value,
+      icon: "DashboardOutlined",
+    },
   ];
 
   items.push(
     ...teacherNavItems.value,
     ...adminNavItems.value,
     ...studentNavItems.value,
-    ...guestTeacherNavItems.value
+    ...guestTeacherNavItems.value,
   );
 
   return items;
@@ -1615,10 +1873,10 @@ const teacherFallbackRoute = computed<RouteLocationRaw>(() => {
       return false;
     }
     const target = resolveNavTarget(item.to);
-    if (!target || typeof target !== 'string') {
+    if (!target || typeof target !== "string") {
       return false;
     }
-    return target === '/teacher' || target.startsWith('/teacher/');
+    return target === "/teacher" || target.startsWith("/teacher/");
   });
 
   return teacherRoute?.to ?? homeDestination.value;
@@ -1635,7 +1893,7 @@ const resolveNavTarget = (target?: RouteLocationRaw) => {
   if (!target) {
     return undefined;
   }
-  if (typeof target === 'string') {
+  if (typeof target === "string") {
     return target;
   }
   const resolved = router.resolve(target);
@@ -1660,7 +1918,7 @@ const navItemKey = (item: NavItem) => {
   return `label:${item.label}`;
 };
 
-const brandName = computed(() => currentBrand.value?.name || 'Zidni AI');
+const brandName = computed(() => currentBrand.value?.name || "Zidni AI");
 
 const teacherDisplayName = computed(() => {
   const profileName = teacherProfileStore.profile?.name?.trim();
@@ -1668,10 +1926,12 @@ const teacherDisplayName = computed(() => {
     return profileName;
   }
 
-  const cachedName = (teacherProfileStore.cachedName || '').trim();
-  return cachedName || '';
+  const cachedName = (teacherProfileStore.cachedName || "").trim();
+  return cachedName || "";
 });
-const studentDisplayName = computed(() => studentStore.profile?.name?.trim() || '');
+const studentDisplayName = computed(
+  () => studentStore.profile?.name?.trim() || "",
+);
 
 const headerUserName = computed(() => {
   if (auth.isTeacher) {
@@ -1688,20 +1948,22 @@ const brandInitials = computed(() => {
   const letters = source
     .split(/\s+/)
     .filter(Boolean)
-    .map((word) => word[0]?.toUpperCase() || '');
-  const initials = letters.slice(0, 2).join('');
-  return initials || 'ZA';
+    .map((word) => word[0]?.toUpperCase() || "");
+  const initials = letters.slice(0, 2).join("");
+  return initials || "ZA";
 });
 
-const brandTagline = computed(() => currentBrand.value?.branding?.tagline as string | undefined);
+const brandTagline = computed(
+  () => currentBrand.value?.branding?.tagline as string | undefined,
+);
 
-const authRole = computed(() => auth.role || '');
+const authRole = computed(() => auth.role || "");
 
 const authRoleLabel = computed(() => {
-  if (authRole.value === 'TEACHER') return t('nav.teacher');
-  if (authRole.value === 'STUDENT') return t('nav.student');
-  if (authRole.value === 'PLATFORM_ADMIN') return t('nav.platformAdmin');
-  return t('nav.profile');
+  if (authRole.value === "TEACHER") return t("nav.teacher");
+  if (authRole.value === "STUDENT") return t("nav.student");
+  if (authRole.value === "PLATFORM_ADMIN") return t("nav.platformAdmin");
+  return t("nav.profile");
 });
 
 /**
@@ -1714,10 +1976,10 @@ const authRoleLabel = computed(() => {
 const normalizePath = (value: RouteLocationRaw) => {
   const resolved = resolveNavTarget(value);
   if (!resolved) {
-    return '';
+    return "";
   }
-  if (resolved === '/') return '/';
-  return resolved.replace(/\/+$/, '');
+  if (resolved === "/") return "/";
+  return resolved.replace(/\/+$/, "");
 };
 
 const navHierarchy = computed(() => {
@@ -1741,17 +2003,17 @@ const navHierarchy = computed(() => {
     }
     entries.push({ item, path: normalized });
 
-    if (normalized === '/') {
+    if (normalized === "/") {
       continue;
     }
 
-    registerDescendant('/', normalized);
+    registerDescendant("/", normalized);
 
     let cursor = normalized;
-    while (cursor.lastIndexOf('/') > 0) {
-      cursor = cursor.slice(0, cursor.lastIndexOf('/')) || '/';
+    while (cursor.lastIndexOf("/") > 0) {
+      cursor = cursor.slice(0, cursor.lastIndexOf("/")) || "/";
       registerDescendant(cursor, normalized);
-      if (cursor === '/') {
+      if (cursor === "/") {
         break;
       }
     }
@@ -1759,7 +2021,7 @@ const navHierarchy = computed(() => {
 
   return {
     entries,
-    descendantMap
+    descendantMap,
   };
 });
 
@@ -1769,7 +2031,7 @@ const ensureRouteAccessible = () => {
   }
 
   const currentPath = normalizePath(route.path);
-  if (!currentPath.startsWith('/teacher')) {
+  if (!currentPath.startsWith("/teacher")) {
     return;
   }
 
@@ -1799,7 +2061,10 @@ const ensureRouteAccessible = () => {
 
   router.replace(fallback).catch((error) => {
     if (!isNavigationFailure(error)) {
-      console.warn('[theme] failed to redirect to a supported teacher route', error);
+      console.warn(
+        "[theme] failed to redirect to a supported teacher route",
+        error,
+      );
     }
   });
 };
@@ -1809,7 +2074,7 @@ watch(
   () => {
     ensureRouteAccessible();
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -1817,24 +2082,21 @@ watch(
   () => {
     ensureRouteAccessible();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
   () => route.fullPath,
   () => {
     closeUserMenu();
-  }
+  },
 );
 
-watch(
-  hasUserMenu,
-  (value) => {
-    if (!value) {
-      closeUserMenu();
-    }
+watch(hasUserMenu, (value) => {
+  if (!value) {
+    closeUserMenu();
   }
-);
+});
 
 /**
  * Determines whether the provided navigation target should be considered
@@ -1854,8 +2116,8 @@ const isNavActive = (target?: RouteLocationRaw) => {
   }
   const currentPath = normalizePath(route.path);
 
-  if (normalizedTarget === '/') {
-    return currentPath === '/';
+  if (normalizedTarget === "/") {
+    return currentPath === "/";
   }
 
   if (currentPath === normalizedTarget) {
@@ -1893,16 +2155,42 @@ const breadcrumbs = computed(() => {
     crumbs.push({ title: homeItem.label, to: homeItem.to });
   }
   const activeNav = navItems.value.find((item) => isNavActive(item.to));
-  const fallbackTitle =
-    (route.meta?.title as string | undefined) ||
-    (typeof route.name === 'string' ? route.name.replace(/[-_]/g, ' ') : undefined);
-  if (activeNav && (!crumbs.length || crumbs[crumbs.length - 1].title !== activeNav.label)) {
+
+  // When activeNav is the home item itself, the home crumb is already in place;
+  // do NOT fall through to the raw-route-name fallback (that was rendering
+  // "teacher dashboard" untranslated on /teacher/home).
+  if (activeNav && activeNav !== homeItem) {
     crumbs.push({ title: activeNav.label, to: activeNav.to });
-  } else if (fallbackTitle) {
-    crumbs.push({ title: fallbackTitle, to: route.fullPath });
+    return crumbs;
+  }
+  if (activeNav === homeItem) {
+    return crumbs;
+  }
+
+  // No nav match — try to translate before showing raw English. Prefer
+  // route.meta.title if set, else derive a `nav.X` key from the route name.
+  // If neither resolves, skip the second crumb entirely (better than English).
+  const metaTitle =
+    typeof route.meta?.title === "string" ? route.meta.title : null;
+  if (metaTitle && te(metaTitle)) {
+    crumbs.push({ title: t(metaTitle), to: route.fullPath });
+    return crumbs;
+  }
+  if (typeof route.name === "string") {
+    const camelKey =
+      "nav." + route.name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    if (te(camelKey)) {
+      crumbs.push({ title: t(camelKey), to: route.fullPath });
+    }
   }
   return crumbs;
 });
+
+// Breadcrumb separator icon: visual direction follows the reading direction
+// (Right chevron in LTR; Left chevron in RTL).
+const breadcrumbSeparatorIcon = computed(() =>
+  locale.value === "ar" ? "LeftOutlined" : "RightOutlined",
+);
 
 /**
  * Resolves the page title to display in the top bar using breadcrumb context
@@ -1919,14 +2207,14 @@ const pageTitle = computed(() => {
 });
 
 const userSubtitle = computed(() => {
-  if (authRole.value === 'TEACHER' || authRole.value === 'STUDENT') {
+  if (authRole.value === "TEACHER" || authRole.value === "STUDENT") {
     const name = headerUserName.value?.trim();
     if (name) {
       return `${authRoleLabel.value} · ${name}`;
     }
     return authRoleLabel.value;
   }
-  return '';
+  return "";
 });
 
 const currentYear = new Date().getFullYear();
@@ -1936,12 +2224,16 @@ const currentYear = new Date().getFullYear();
  * sessions while reapplying direction metadata.
  */
 const toggleLanguage = async () => {
-  const nextLocale = locale.value === 'ar' ? 'en' : 'ar';
+  const nextLocale = locale.value === "ar" ? "en" : "ar";
   await loadLocaleMessages(nextLocale);
   locale.value = nextLocale;
 };
 
-const languageLabel = computed(() => (locale.value === 'ar' ? 'EN' : 'AR'));
+// Shows the CURRENT language's native name (not the toggle target) — clicking
+// still switches; the label tells the user which language they're reading in.
+const languageLabel = computed(() =>
+  locale.value === "ar" ? "العربية" : "English",
+);
 
 watch(
   locale,
@@ -1958,7 +2250,7 @@ watch(
     persistLocale(value);
     applyDirection(value);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 /**
@@ -1969,7 +2261,7 @@ const loadBranding = async () => {
   try {
     await tenantStore.fetchBranding(route.params.slug as string | undefined);
   } catch (error) {
-    console.warn('[theme] unable to load tenant branding for shell', error);
+    console.warn("[theme] unable to load tenant branding for shell", error);
   } finally {
     await ensureSidebarFeatureContext();
   }
@@ -1986,7 +2278,7 @@ watch(
   () => route.params.slug,
   () => {
     void loadBranding();
-  }
+  },
 );
 
 watch(
@@ -2005,27 +2297,37 @@ watch(
       applyDirection(locale.value);
     }
 
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return;
     }
 
-    const colors = (brand?.branding?.colors as Record<string, string> | undefined) || {};
+    const colors =
+      (brand?.branding?.colors as Record<string, string> | undefined) || {};
     const computedStyles = getComputedStyle(document.documentElement);
     const primary =
       colors.primary ||
-      computedStyles.getPropertyValue('--sakai-primary') ||
-      '#6366f1';
+      computedStyles.getPropertyValue("--sakai-primary") ||
+      "#06b6d4";
     const secondary =
       colors.secondary ||
-      computedStyles.getPropertyValue('--sakai-secondary') ||
-      '#06b6d4';
-    document.documentElement.style.setProperty('--sakai-primary', primary.trim());
-    document.documentElement.style.setProperty('--sakai-secondary', secondary.trim());
+      computedStyles.getPropertyValue("--sakai-secondary") ||
+      "#1e3a8a";
+    document.documentElement.style.setProperty(
+      "--sakai-primary",
+      primary.trim(),
+    );
+    document.documentElement.style.setProperty(
+      "--sakai-secondary",
+      secondary.trim(),
+    );
     if (colors.primaryDark) {
-      document.documentElement.style.setProperty('--sakai-primary-700', colors.primaryDark);
+      document.documentElement.style.setProperty(
+        "--sakai-primary-700",
+        colors.primaryDark,
+      );
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -2034,7 +2336,7 @@ watch(
     if (isMobile.value) {
       closeDrawer();
     }
-  }
+  },
 );
 
 const teacherDowngradeLabelKeys = computed(() => {
@@ -2052,37 +2354,35 @@ const teacherDowngradeLabelKeys = computed(() => {
 });
 
 const teacherDowngradeLabels = computed(() =>
-  teacherDowngradeLabelKeys.value.map((key) => t(key))
+  teacherDowngradeLabelKeys.value.map((key) => t(key)),
 );
 
 const showTeacherDowngradeBanner = computed(
   () =>
     auth.isTeacher &&
     teacherDowngradeVisible.value &&
-    (teacherDowngradeLabels.value.length > 0 || lostTeacherFeatureCodes.value.length > 0)
+    (teacherDowngradeLabels.value.length > 0 ||
+      lostTeacherFeatureCodes.value.length > 0),
 );
 
 const dismissTeacherDowngradeBanner = () => {
   teacherDowngradeVisible.value = false;
 };
 
-watch(
-  drawer,
-  (isOpen, wasOpen) => {
-    if (isMobile.value) {
-      if (isOpen) {
-        lockBodyScroll();
-        setupDrawerFocusTrap();
-      } else {
-        unlockBodyScroll();
-        teardownDrawerFocusTrap();
-      }
-    }
-    if (!isOpen && wasOpen && isMobile.value) {
-      focusDrawerToggle();
+watch(drawer, (isOpen, wasOpen) => {
+  if (isMobile.value) {
+    if (isOpen) {
+      lockBodyScroll();
+      setupDrawerFocusTrap();
+    } else {
+      unlockBodyScroll();
+      teardownDrawerFocusTrap();
     }
   }
-);
+  if (!isOpen && wasOpen && isMobile.value) {
+    focusDrawerToggle();
+  }
+});
 
 /**
  * Handles navigation item clicks by closing the drawer on mobile viewports to
@@ -2111,7 +2411,8 @@ const handleNavigate = () => {
   color: var(--sakai-primary-contrast);
   font-weight: var(--sakai-font-weight-semibold);
   transform: translateY(-200%);
-  transition: transform var(--sakai-transition-duration) var(--sakai-transition-ease);
+  transition: transform var(--sakai-transition-duration)
+    var(--sakai-transition-ease);
 }
 
 .theme-skip-link:focus-visible {
@@ -2121,6 +2422,7 @@ const handleNavigate = () => {
 }
 
 .theme-app-shell__close {
+  display: none;
   align-self: flex-end;
   background: transparent;
   border: none;
@@ -2314,23 +2616,42 @@ const handleNavigate = () => {
   display: flex;
   align-items: center;
   gap: var(--sakai-space-2);
-  background: var(--sakai-surface);
-  border-radius: var(--sakai-border-radius-pill);
-  border: 1px solid var(--sakai-border-color);
-  padding: 0.4rem 1rem;
-  box-shadow: var(--sakai-shadow-sm);
-  flex: 1;
-  max-width: 28rem;
+  /* Use background-color (not the shorthand) so any global `background-image`
+     rule on inputs doesn't override the wrapper fill. */
+  background-color: var(--sakai-surface-muted);
+  border-radius: var(--sakai-border-radius-md);
+  padding: 0.5rem 1rem;
+  flex: 0 1 17.5rem; /* Figma fixed-ish 280px, allows shrink on narrow viewports */
   min-width: 0; /* Help Safari flex */
   margin-inline: var(--sakai-space-2);
+  color: var(--sakai-text-color-tertiary);
 }
 
 .theme-topbar__search-input {
+  /* `appearance: none` strips WebKit's built-in search-input chrome
+     (rounded background + inset shadow) which would otherwise paint
+     over the wrapper's muted fill. Project disables Tailwind preflight,
+     so this reset has to live here. */
+  -webkit-appearance: none;
+  appearance: none;
   border: none;
   outline: none;
   flex: 1;
-  font-size: 0.95rem;
-  background: transparent;
+  font-size: 0.8125rem;
+  background-color: transparent;
+  color: var(--sakai-text-color);
+}
+
+.theme-topbar__search-input::-webkit-search-decoration,
+.theme-topbar__search-input::-webkit-search-cancel-button,
+.theme-topbar__search-input::-webkit-search-results-button,
+.theme-topbar__search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.theme-topbar__search-input::placeholder {
+  color: var(--sakai-text-color-tertiary);
 }
 
 .theme-topbar__actions {
@@ -2357,7 +2678,8 @@ const handleNavigate = () => {
   font-size: 0.85rem;
   font-weight: var(--sakai-font-weight-medium);
   cursor: pointer;
-  transition: background-color var(--sakai-transition-duration) var(--sakai-transition-ease);
+  transition: background-color var(--sakai-transition-duration)
+    var(--sakai-transition-ease);
   text-decoration: none;
 }
 
@@ -2372,36 +2694,55 @@ const handleNavigate = () => {
   box-shadow: none;
 }
 
-.theme-icon-button--notification {
-  padding-right: 1.75rem;
+/* Square icon-only variant (32x32 with 12px radius) — used for drawer toggle,
+   theme toggle, notifications, landing-inquiries, settings. The base
+   .theme-icon-button stays as the pill-with-text style for the language pill. */
+.theme-icon-button--square {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: var(--sakai-border-radius-md);
+  gap: 0;
+  justify-content: center;
 }
 
-.theme-icon-badge {
+/* Notification dot (6x6) anchored to the visual top-right of a square icon
+   button. Notification badges are a VISUAL convention (always top-right, like
+   iOS/Android/Figma) — not a reading-direction convention — so we use
+   physical `right` instead of `inset-inline-end` so RTL doesn't flip it.
+   Pixel values (not rem) keep the dot at exactly 6px even if the root font
+   size gets rescaled. */
+.theme-icon-dot {
   position: absolute;
-  top: 0.2rem;
-  right: 0.45rem;
-  min-width: 1.25rem;
-  height: 1.25rem;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 999px;
-  background: var(--sakai-danger);
-  color: var(--sakai-primary-contrast);
-  font-size: 0.75rem;
-  font-weight: var(--sakai-font-weight-semibold);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0.35rem;
+  border: 1px solid var(--sakai-surface-card);
+  pointer-events: none;
+}
+
+.theme-icon-dot--red {
+  background: var(--sakai-dot-red);
+}
+
+.theme-icon-dot--blue {
+  background: var(--sakai-dot-blue);
 }
 
 .theme-icon-button:hover {
-  background: color-mix(in srgb, var(--sakai-primary) 10%, var(--sakai-surface-alt));
+  background: color-mix(
+    in srgb,
+    var(--sakai-primary) 10%,
+    var(--sakai-surface-alt)
+  );
   color: var(--sakai-primary-600);
 }
 
-.theme-app-shell__content {
+/* .theme-app-shell__content {
   scroll-margin-top: calc(var(--sakai-topbar-height) + var(--sakai-space-4));
-}
-
+} */
 
 .theme-topbar__user {
   position: relative;
@@ -2412,12 +2753,16 @@ const handleNavigate = () => {
   display: inline-flex;
   align-items: center;
   gap: var(--sakai-space-2);
-  padding: 0.35rem 0.65rem;
+  padding: 0.25rem;
+  padding-inline-end: 0.625rem;
   border-radius: var(--sakai-border-radius-pill);
   border: 1px solid var(--sakai-border-color); /* Fallback */
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
   background: var(--sakai-surface-alt);
-  transition: background-color var(--sakai-transition-duration) var(--sakai-transition-ease),
+  transition:
+    background-color var(--sakai-transition-duration)
+      var(--sakai-transition-ease),
     color var(--sakai-transition-duration) var(--sakai-transition-ease);
 }
 
@@ -2436,7 +2781,11 @@ const handleNavigate = () => {
 
 .theme-topbar__user-toggle:hover {
   background: var(--sakai-primary-tint-12, #eee); /* Fallback */
-  background: color-mix(in srgb, var(--sakai-primary) 10%, var(--sakai-surface-alt));
+  background: color-mix(
+    in srgb,
+    var(--sakai-primary) 10%,
+    var(--sakai-surface-alt)
+  );
   color: var(--sakai-primary-600);
 }
 
@@ -2448,7 +2797,8 @@ const handleNavigate = () => {
   padding: 0.35rem 0;
   border-radius: var(--sakai-border-radius-lg);
   border: 1px solid var(--sakai-border-color); /* Fallback */
-  border: 1px solid color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
   background: var(--sakai-surface);
   box-shadow: 0 1.25rem 2.5rem -1.25rem rgba(15, 23, 42, 0.35);
   z-index: 1000;
@@ -2473,7 +2823,9 @@ const handleNavigate = () => {
   font: inherit;
   cursor: pointer;
   text-align: start;
-  transition: background-color var(--sakai-transition-duration) var(--sakai-transition-ease),
+  transition:
+    background-color var(--sakai-transition-duration)
+      var(--sakai-transition-ease),
     color var(--sakai-transition-duration) var(--sakai-transition-ease);
 }
 
@@ -2488,13 +2840,18 @@ const handleNavigate = () => {
 .theme-topbar__user-menu-action:hover,
 .theme-topbar__user-menu-action:focus-visible {
   background: var(--sakai-primary-tint-08, #f5f5f5); /* Fallback */
-  background: color-mix(in srgb, var(--sakai-primary) 12%, var(--sakai-surface));
+  background: color-mix(
+    in srgb,
+    var(--sakai-primary) 12%,
+    var(--sakai-surface)
+  );
   color: var(--sakai-primary-600);
 }
 
 .theme-topbar__user-menu-enter-active,
 .theme-topbar__user-menu-leave-active {
-  transition: opacity var(--sakai-transition-duration) var(--sakai-transition-ease),
+  transition:
+    opacity var(--sakai-transition-duration) var(--sakai-transition-ease),
     transform var(--sakai-transition-duration) var(--sakai-transition-ease);
 }
 
@@ -2515,30 +2872,60 @@ const handleNavigate = () => {
   font-weight: var(--sakai-font-weight-semibold);
 }
 
-.theme-topbar__user-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  font-size: 0.75rem;
+.theme-topbar__user-name {
+  font-size: 0.8125rem;
+  font-weight: var(--sakai-font-weight-semibold);
+  color: var(--sakai-text-color);
+  white-space: nowrap;
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.theme-topbar__user-name {
+.theme-topbar__user-caret {
+  color: var(--sakai-text-color-tertiary);
+  flex-shrink: 0;
+}
+
+/* Header inside the user dropdown — the role label moved here from the pill. */
+.theme-topbar__user-menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.5rem 1rem 0.75rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
+  margin-bottom: 0.25rem;
+}
+
+.theme-topbar__user-menu-name {
+  font-size: 0.875rem;
   font-weight: var(--sakai-font-weight-semibold);
   color: var(--sakai-text-color);
 }
 
-.theme-topbar__user-role {
+.theme-topbar__user-menu-role {
+  font-size: 0.75rem;
   color: var(--sakai-text-color-tertiary);
 }
 
 .theme-app-shell__footer {
+  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sakai-space-4);
   padding: var(--sakai-space-6) var(--sakai-space-8);
   flex-wrap: wrap;
-  border-top: 1px solid color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
+  border-top: 1px solid
+    color-mix(in srgb, var(--sakai-border-color) 60%, transparent);
+}
+
+@media (max-width: 640px) {
+  .theme-app-shell__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .theme-app-shell__footer-copy {
@@ -2641,4 +3028,3 @@ const handleNavigate = () => {
   }
 }
 </style>
-

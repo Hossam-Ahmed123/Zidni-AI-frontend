@@ -1,6 +1,8 @@
 {
   "common": {
     "save": "Save",
+    "done": "Done",
+    "view": "View",
     "delete": "Delete",
     "cancel": "Cancel",
     "apply": "Apply",
@@ -14,6 +16,9 @@
     "confirm": "Confirm",
     "previous": "Previous",
     "next": "Next",
+    "more": "More",
+    "noOptions": "No options",
+    "remove": "Remove",
     "all": "All",
     "actions": "Actions",
     "preview": "Preview",
@@ -21,7 +26,8 @@
     "deleting": "Deleting...",
     "maintenanceNotice": "We're performing maintenance right now. Please try again shortly.",
     "clear": "Clear",
-    "back": "Back"
+    "back": "Back",
+    "select": "Select"
   },
   "auth": {
     "sessionExpired": "Your session has expired. Please log in again.",
@@ -132,6 +138,21 @@
     "testimonials": {
       "title": "What learners are saying",
       "empty": "Testimonials will appear here once they are published."
+    }
+  },
+  "pagination": {
+    "showing": "Showing {from} to {to} of {total} {entity}"
+  },
+  "liveSession": {
+    "editor": {
+      "title": "Live session details",
+      "subtitle": "Set the live session details, scheduling, and broadcast settings.",
+      "basicInfoSection": "Basic information",
+      "schedulingSection": "Scheduling & Recurrence",
+      "broadcastSection": "Broadcast settings",
+      "instructorSection": "Instructor & permissions",
+      "scheduleSession": "Schedule session",
+      "updateSession": "Update session"
     }
   },
   "publicLandingTabs": {
@@ -829,7 +850,8 @@
     "teacherPaymentSettings": "Payment & transfer details",
     "teacherDowngradeTitle": "Your plan just changed",
     "teacherDowngradeBody": "Some tools are no longer available in this workspace. The sidebar now only shows modules your plan supports.",
-    "teacherDowngradeModules": "Removed modules"
+    "teacherDowngradeModules": "Removed modules",
+    "teacherAssignments": "Assignments"
   },
   "feedback": {
     "cardTitle": "Share feedback",
@@ -1897,6 +1919,7 @@
   "offers": {
     "title": "Marketing offers",
     "subtitle": "Create promotional discounts and bundles for your courses.",
+    "offersEntity": "offers",
     "new": "New Offer",
     "createTitle": "Create offer",
     "editTitle": "Edit offer",
@@ -2301,75 +2324,6 @@
       "title": "What students are saying"
     },
     "defaults": {
-      "testimonials": {
-        "omar": {
-          "author": "Omar",
-          "quote": "Clear explanations and a motivating learning style."
-        },
-        "salma": {
-          "author": "Salma",
-          "quote": "Structured lessons that helped me improve quickly."
-        }
-      }
-    },
-    "faqs": {
-      "badge": "FAQs",
-      "title": "Frequently asked questions"
-    },
-    "contact": {
-      "badge": "Let's connect",
-      "title": "Stay connected with {name}",
-      "subtitle": "Reach out, explore the latest lessons, and join the learning community.",
-      "register": "Register now",
-      "login": "Student login",
-      "assistant": "Assistant login",
-      "explore": "Explore lessons",
-      "floating": "Contact the instructor"
-    },
-    "inquiry": {
-      "title": "Course inquiry",
-      "subtitle": "Share your name, phone, and email. We will get back to you soon.",
-      "nameLabel": "Full name",
-      "namePlaceholder": "Enter your full name",
-      "phoneLabel": "Phone number",
-      "phonePlaceholder": "Enter your phone number",
-      "emailLabel": "Email address",
-      "emailPlaceholder": "Enter your email address",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Tell us which course you want to ask about",
-      "submit": "Send inquiry",
-      "submitting": "Sending...",
-      "success": "Your inquiry has been sent. We will contact you soon.",
-      "error": "We could not send your inquiry. Please try again.",
-      "validation": {
-        "nameRequired": "Please enter your name.",
-        "phoneRequired": "Please enter your phone number.",
-        "emailRequired": "Please enter your email address.",
-        "messageRequired": "Please enter a message."
-      }
-    },
-    "social": {
-      "whatsapp": "WhatsApp",
-      "telegram": "Telegram",
-      "youtube": "YouTube",
-      "website": "Website",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "email": "Email"
-    },
-    "footerContact": {
-      "whatsapp": "WhatsApp",
-      "phone": "Phone number",
-      "email": "Email",
-      "website": "Website",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "linkedin": "LinkedIn",
-      "telegram": "Telegram",
-      "empty": "Add contact details from the dashboard to show them here."
-    },
-    "defaults": {
       "teacherName": "Elite Learning Academy",
       "teacherHeadline": "Live STEM tutoring for ambitious students",
       "teacherBio": "Elite Learning Academy delivers interactive classes that blend science, technology, engineering, and mathematics concepts with real-life projects to help students stay ahead.",
@@ -2434,6 +2388,63 @@
         "title": "Elite Learning Academy - Interactive Live Lessons",
         "description": "Join Elite Learning Academy for engaging live STEM sessions led by expert mentors. Build confidence, master exams, and stay inspired."
       }
+    },
+    "faqs": {
+      "badge": "FAQs",
+      "title": "Frequently asked questions"
+    },
+    "contact": {
+      "badge": "Let's connect",
+      "title": "Stay connected with {name}",
+      "subtitle": "Reach out, explore the latest lessons, and join the learning community.",
+      "register": "Register now",
+      "login": "Student login",
+      "assistant": "Assistant login",
+      "explore": "Explore lessons",
+      "floating": "Contact the instructor"
+    },
+    "inquiry": {
+      "title": "Course inquiry",
+      "subtitle": "Share your name, phone, and email. We will get back to you soon.",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Enter your full name",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "Enter your phone number",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email address",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Tell us which course you want to ask about",
+      "submit": "Send inquiry",
+      "submitting": "Sending...",
+      "success": "Your inquiry has been sent. We will contact you soon.",
+      "error": "We could not send your inquiry. Please try again.",
+      "validation": {
+        "nameRequired": "Please enter your name.",
+        "phoneRequired": "Please enter your phone number.",
+        "emailRequired": "Please enter your email address.",
+        "messageRequired": "Please enter a message."
+      }
+    },
+    "social": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "youtube": "YouTube",
+      "website": "Website",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "email": "Email"
+    },
+    "footerContact": {
+      "whatsapp": "WhatsApp",
+      "phone": "Phone number",
+      "email": "Email",
+      "website": "Website",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "telegram": "Telegram",
+      "empty": "Add contact details from the dashboard to show them here."
     },
     "course": {
       "tooltipTitle": "What will you learn?"
@@ -2786,6 +2797,9 @@
     "loginVerificationRequired": "Please verify your email address before signing in. Check your inbox for the activation link.",
     "dashboard": "Instructor dashboard",
     "welcome": "Welcome {name}",
+    "welcomeBack": "Welcome back, {name}!",
+    "welcomeBackAnonymous": "Welcome back!",
+    "welcomeTagline": "Here's an overview of your platform performance today.",
     "profileCompleteness": "Profile completeness",
     "profileCompletenessHint": "Complete your bio, subject, and photo to build trust with students.",
     "planUsageTitle": "Plan usage",
@@ -2815,6 +2829,17 @@
     "planUsageWarning": "{label} usage is approaching the limit ({percent} used)",
     "planUsageMinuteShort": "min",
     "planUsageHourShort": "h",
+    "viewsCardTitle": "Profile & course views",
+    "viewsCardSubtitle": "Realtime view activity from the last 30 days.",
+    "viewsTotalLabel": "Total views",
+    "viewsLandingLabel": "Landing",
+    "viewsProfileLabel": "Profile",
+    "viewsCourseLabel": "Course pages",
+    "viewsTopCoursesTitle": "Top courses",
+    "viewsEmpty": "No views yet.",
+    "viewsUnauthorized": "Sign in again to see your view analytics.",
+    "viewsLoadError": "We couldn't load view analytics. Try again.",
+    "viewsRetry": "Retry",
     "subjectFocus": "Subject focus",
     "subjectUnset": "Subject not set",
     "subjectSetHint": "Share your specialisation so students know what you teach.",
@@ -3022,6 +3047,7 @@
     "paymentsResetFilters": "Reset filters",
     "paymentsExportCsv": "Export CSV",
     "paymentsDisabled": "Payments are disabled for this tenant.",
+    "paymentRejectDialogTitle": "Reject payment",
     "paymentsManualTab": "Manual payments",
     "paymentsTutoringTab": "Tutoring payments",
     "paymentsCourse": "Course",
@@ -3037,7 +3063,12 @@
     "paymentsReviewedAt": "Reviewed at",
     "paymentsSubmittedAt": "Submitted at",
     "paymentsViewProof": "View proof",
-    "paymentRejectDialogTitle": "Reject payment",
+    "paymentApproveDialogTitle": "Approve payment",
+    "paymentApproveDialogPrompt": "Please confirm the access type for this student.",
+    "accessTypeModules": "Specific Modules",
+    "accessTypeFullCourse": "Full Course",
+    "selectModules": "Select Modules to Grant Access",
+    "paymentApproveDialogNotesLabel": "Notes (Optional)",
     "paymentRejectDialogPrompt": "Tell the student why this payment proof was rejected and what needs to be changed.",
     "paymentRejectDialogReasonLabel": "Rejection reason",
     "paymentRejectReasonRequired": "Please provide a rejection reason before sending.",
@@ -3339,6 +3370,9 @@
           "email": "Email",
           "username": "Username",
           "password": "Password",
+          "phone": "Phone number (optional)",
+          "bio": "Bio (optional)",
+          "avatar": "Avatar (optional)",
           "role": "Role",
           "rolePlaceholder": "Select a role",
           "requiredError": "Name, email, and username are required.",
@@ -3366,7 +3400,121 @@
         }
       }
     },
-    "emailInvalid": "Enter a valid email address."
+    "emailInvalid": "Enter a valid email address.",
+    "assignments": {
+      "title": "Assignments",
+      "titleForLesson": "Assignments for: {lesson}",
+      "subtitle": "Manage homework, grading, and student submissions across your courses.",
+      "add": "Add assignment",
+      "edit": "Edit assignment",
+      "delete": "Delete assignment",
+      "empty": "No assignments for this lesson yet.",
+      "emptyCrossCourse": "You have not created any assignments yet.",
+      "confirmDelete": "Delete \"{title}\"? This will also remove all submissions.",
+      "backToCourse": "Back to course",
+      "viewSubmissions": "View submissions",
+      "submissionsCount": "{count} submission | {count} submissions",
+      "attachmentsCount": "no attachments | 1 attachment | {count} attachments",
+      "dueAt": "Due {date}",
+      "noDueDate": "No due date",
+      "maxScoreShort": "Max {score}",
+      "columns": {
+        "title": "Title",
+        "lesson": "Lesson",
+        "course": "Course",
+        "dueAt": "Due date",
+        "maxScore": "Max score",
+        "attachments": "Attachments",
+        "createdAt": "Created",
+        "actions": "Actions"
+      },
+      "fields": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. Chapter 3 — Worksheet",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the task, expected output, and rubric...",
+        "dueAt": "Due date",
+        "maxScore": "Max score",
+        "attachments": "Attachments",
+        "course": "Course",
+        "coursePlaceholder": "Select a course",
+        "lesson": "Lesson",
+        "lessonPlaceholder": "Select a lesson",
+        "lessonLoading": "Loading lessons...",
+        "lessonPickCourseFirst": "Pick a course first"
+      },
+      "editor": {
+        "createTitle": "Create assignment",
+        "editTitle": "Edit assignment",
+        "save": "Save assignment",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "detailsSectionTitle": "Assignment details",
+        "contextSectionTitle": "Course & lesson",
+        "lessonHeading": "Assignment for lesson: {lesson}"
+      },
+      "validation": {
+        "titleRequired": "Please enter a title.",
+        "descriptionRequired": "Please write a description.",
+        "dueAtRequired": "Please pick a due date.",
+        "maxScoreRequired": "Please enter a max score greater than zero."
+      },
+      "upload": {
+        "label": "Attachments",
+        "dropHint": "Drag files here or click to upload",
+        "browse": "Select files",
+        "uploading": "Uploading {name}...",
+        "success": "Attachment uploaded.",
+        "failed": "Could not upload {name}. Try again.",
+        "remove": "Remove",
+        "empty": "No files attached yet.",
+        "sizeHint": "Each file is uploaded immediately. You can remove files before saving."
+      },
+      "submissions": {
+        "title": "Submissions",
+        "titleFor": "Submissions — {assignment}",
+        "empty": "No submissions yet.",
+        "studentName": "Student",
+        "status": "Status",
+        "submittedAt": "Submitted",
+        "score": "Score",
+        "grade": "Grade",
+        "attachments": "Attachments",
+        "attachmentsNone": "No files submitted",
+        "loadFailed": "Could not load submissions."
+      },
+      "status": {
+        "submitted": "Submitted",
+        "resubmissionRequested": "Resubmission requested",
+        "graded": "Graded",
+        "notSubmitted": "Not submitted"
+      },
+      "grade": {
+        "title": "Grade submission",
+        "titleFor": "Grade {student}",
+        "status": "Status",
+        "score": "Score",
+        "scoreHint": "Out of {max}",
+        "feedback": "Feedback",
+        "feedbackPlaceholder": "Share notes, corrections, or next steps...",
+        "save": "Save grade"
+      },
+      "toast": {
+        "created": "Assignment created.",
+        "updated": "Assignment updated.",
+        "deleted": "Assignment deleted.",
+        "graded": "Submission graded.",
+        "uploadFailed": "Could not upload the file. Please try again.",
+        "loadFailed": "Could not load assignments."
+      },
+      "errors": {
+        "generic": "Something went wrong. Please try again.",
+        "notFound": "We could not find this assignment.",
+        "permissionDenied": "You do not have permission to do that.",
+        "conflict": "This assignment was updated by someone else. Please reload and try again."
+      },
+      "backToList": "Back to assignments"
+    }
   },
   "assistant": {
     "login": "Assistant Login",
@@ -3669,7 +3817,63 @@
     "paymentBankName": "Bank name",
     "paymentBankDetails": "Bank details or branch information",
     "paymentInstaPayMobile": "InstaPay mobile number",
-    "paymentInstaPayLink": "InstaPay link"
+    "paymentInstaPayLink": "InstaPay link",
+    "assignments": {
+      "title": "Assignments",
+      "empty": "No assignments for this course yet.",
+      "loadFailed": "Could not load assignments. Try again.",
+      "accessDenied": "You do not have access to assignments for this course.",
+      "actions": {
+        "submit": "Submit",
+        "resubmit": "Resubmit"
+      },
+      "status": {
+        "notSubmitted": "Not Submitted",
+        "submitted": "Submitted",
+        "resubmissionRequested": "Resubmission Requested",
+        "graded": "Graded"
+      },
+      "columns": {
+        "title": "Title",
+        "lesson": "Lesson",
+        "dueAt": "Due date",
+        "maxScore": "Max score",
+        "status": "Status",
+        "score": "Score",
+        "attachments": "Attachments",
+        "actions": "Actions"
+      },
+      "submit": {
+        "title": "Submit assignment",
+        "resubmitTitle": "Resubmit assignment",
+        "notes": "Notes (optional)",
+        "notesPlaceholder": "Add notes for your teacher...",
+        "attachments": "Your files",
+        "attachmentsRequired": "Please attach at least one file before submitting.",
+        "send": "Send submission",
+        "sending": "Sending...",
+        "cancel": "Cancel",
+        "teacherFeedbackHeading": "Teacher feedback on your previous submission"
+      },
+      "result": {
+        "submittedAt": "Submitted",
+        "feedback": "Teacher feedback"
+      },
+      "due": {
+        "label": "Due {date}",
+        "passed": "Due date has passed",
+        "noDueDate": "No due date"
+      },
+      "toast": {
+        "submitted": "Assignment submitted.",
+        "resubmitted": "Resubmission sent.",
+        "uploadFailed": "Could not upload the file. Try again."
+      },
+      "errors": {
+        "alreadySubmitted": "This assignment has already been submitted or cannot be resubmitted right now.",
+        "generic": "Something went wrong. Try again."
+      }
+    }
   },
   "achievements": {
     "title": "Achievements",
@@ -3758,8 +3962,11 @@
     "Privacy": "Privacy Policy"
   },
   "courses": {
+    "useModulePricingLabel": "Use module-based pricing",
+    "modulePricedLabel": "Module has specific price",
     "title": "My Courses",
     "coursesNav": "Courses",
+    "perLevel": "/ level",
     "aboutNav": "About",
     "contactNav": "Contact",
     "languageNa": "العربية",
@@ -3844,6 +4051,9 @@
     "lessonTitleRequired": "Please enter a lesson title.",
     "lessonDetailsSectionTitle": "Lesson details",
     "lessonMediaSectionTitle": "Lesson media & attachments",
+    "lessonVideoSectionTitle": "Video",
+    "lessonAiAssistantSectionTitle": "AI assistant",
+    "lessonVideoTooLong": "Video duration exceeds your plan's limit",
     "lessonSchedulingSectionTitle": "Publishing & order",
     "lessonProgressHeading": "Lesson readiness",
     "lessonProgressDetails": "Lesson basics",
@@ -3881,6 +4091,8 @@
     "toast": {
       "courseSaved": "Course details saved successfully.",
       "courseSavedHidden": "Course details saved. The course is hidden from students until you publish it.",
+      "coursePublished": "Course published",
+      "draftSaved": "Draft saved",
       "moduleCreated": "Module added successfully.",
       "moduleUpdated": "Module updated successfully.",
       "lessonCreated": "Lesson added successfully.",
@@ -4023,6 +4235,19 @@
     "lessonDurationLabel": "Duration (seconds)",
     "lessonDurationHelp": "Use seconds so students can track progress accurately.",
     "lessonDurationSystemHint": "Duration is set automatically when a video is uploaded.",
+    "basicInfoSection": "Basic Information",
+    "courseTitle": "Course title",
+    "whatYouWillLearnPlaceholder": "e.g. Build and deploy a full web app",
+    "addLearnItem": "Add",
+    "removeLearnItem": "Remove item",
+    "goalsRequirementsSection": "Goals & Requirements",
+    "visualMediaSection": "Visual Media",
+    "courseContentSection": "Course Content & Curriculum",
+    "pricingSection": "Pricing",
+    "additionalSettingsSection": "Additional Settings",
+    "publishCourse": "Publish course",
+    "saveAsDraft": "Save as draft",
+    "cancelConfirmUnsaved": "You have unsaved changes. Leave anyway?",
     "deleteModuleConfirm": "Delete module \"{title}\"? All lessons inside will also be removed.",
     "deleteLessonConfirm": "Delete lesson \"{title}\"? Students will no longer see it.",
     "durationNotSet": "Duration not set",
@@ -4067,7 +4292,8 @@
     "visibilityDraftLabel": "Course hidden",
     "visibilityDraftNotice": "The course is hidden from students. Publish it when you're ready.",
     "visibilityPublishedLabel": "Course published",
-    "visibilityPublishedNotice": "The course is published to students."
+    "visibilityPublishedNotice": "The course is published to students.",
+    "assignmentsCount": "{count} assignments"
   },
   "assessments": {
     "banksTitle": "Question Banks",
@@ -4189,6 +4415,8 @@
     },
     "title": "Assessments",
     "subtitle": "Build quizzes and exams from your banked questions.",
+    "assessmentsEntity": "assessments",
+    "searchPlaceholder": "Search assessments...",
     "createAssessment": "Create assessment",
     "tableName": "Name",
     "tableCourse": "Course",
@@ -4527,6 +4755,7 @@
       "startAt": "Start time",
       "endAt": "End time",
       "timeZone": "Time zone",
+      "isRecurring": "Recurring slot",
       "currencyLabel": "Currency",
       "hourlyRate": "Hourly rate",
       "currencyRequired": "Please select a currency.",
@@ -4543,6 +4772,7 @@
       "durationLabel": "{minutes} min",
       "viewSession": "View details",
       "statusHeader": "Status",
+      "assistantLabel": "Instructor",
       "sessionStudent": "Student",
       "slotHeader": "Slot",
       "paymentsTitle": "Payments",
@@ -4923,7 +5153,6 @@
       "embeddedDialogHint": "The form will load below so you can submit without leaving the platform.",
       "submissionUrl": "Submission URL",
       "submissionKey": "Storage key",
-      "submissionNotes": "Notes",
       "submitAction": "Submit",
       "assignmentSubmitted": "Assignment submitted.",
       "assignmentFailed": "Failed to submit assignment.",
@@ -5419,14 +5648,12 @@
     },
     "actions": {
       "addTeacher": "Add teacher",
-      "payments": "Payments overview",
       "manage": "Manage",
       "delete": "Delete"
     },
     "columns": {
       "teacher": "Teacher",
       "plan": "Plan",
-      "usage": "Usage",
       "status": "Status",
       "actions": "Actions"
     },
@@ -5452,13 +5679,13 @@
       "name": "Display name",
       "subject": "Subject",
       "phoneCountryCode": "Country code",
-        "phoneNumber": "Phone number",
-        "plan": "Plan",
-        "active": "Tenant is active",
-        "studentMultiDeviceLoginEnabled": "Students can log in from multiple devices",
-        "studentMultiDeviceLoginHint": "Disabled keeps the current one-device rule. Enable this to allow this teacher's students to sign in from different devices.",
-        "save": "Save changes",
-        "slug": "Tenant slug",
+      "phoneNumber": "Phone number",
+      "plan": "Plan",
+      "active": "Tenant is active",
+      "studentMultiDeviceLoginEnabled": "Students can log in from multiple devices",
+      "studentMultiDeviceLoginHint": "Disabled keeps the current one-device rule. Enable this to allow this teacher's students to sign in from different devices.",
+      "save": "Save changes",
+      "slug": "Tenant slug",
       "updateSlug": "Update slug",
       "joined": "Joined",
       "studentCount": "Students",
@@ -5466,81 +5693,6 @@
       "deviceCount": "Devices",
       "deleteTeacher": "Delete teacher",
       "empty": "Select a teacher to view details."
-    },
-    "usage": {
-      "title": "Usage",
-      "subtitle": "Current video storage and streaming usage for this teacher.",
-      "error": "We couldn't load usage for this teacher right now.",
-      "empty": "No usage data is available yet."
-    },
-    "payments": {
-      "title": "Teacher payments overview",
-      "subtitle": "Review manual course payments across teachers with teacher, course, and date filters.",
-      "filtersTitle": "Filters",
-      "filtersSubtitle": "Narrow results by teacher, course, payment method, status, and date range.",
-      "tableTitle": "Manual payments",
-      "tableSubtitle": "{count} rows loaded from {total} matching payments.",
-      "empty": "No teacher payments match the current filters.",
-      "unknownTeacher": "Unknown teacher",
-      "viewProof": "View proof",
-      "emptyValue": "Not available",
-      "zeroAmount": "EGP 0.00",
-      "proofDialogTitle": "Payment proof #{id}",
-      "proofDialogFallback": "Payment proof",
-      "filters": {
-        "teacher": "Teacher",
-        "teacherAll": "All teachers",
-        "course": "Course",
-        "courseAll": "All courses",
-        "status": "Status",
-        "statusAll": "All statuses",
-        "method": "Method",
-        "methodAll": "All methods",
-        "search": "Search",
-        "searchPlaceholder": "Student name or email",
-        "dateFrom": "From date",
-        "dateTo": "To date",
-        "reset": "Reset",
-        "apply": "Apply filters",
-        "none": "No active filters"
-      },
-      "stats": {
-        "totalRows": "Matching payments",
-        "visibleAmount": "Visible amount",
-        "visibleTeachers": "Visible teachers",
-        "visibleCourses": "Visible courses",
-        "pendingRows": "Pending",
-        "approvedRows": "Approved",
-        "rejectedRows": "Rejected"
-      },
-      "columns": {
-        "teacher": "Teacher",
-        "student": "Student",
-        "course": "Course",
-        "amount": "Amount",
-        "method": "Method",
-        "status": "Status",
-        "createdAt": "Created",
-        "reviewedAt": "Reviewed",
-        "proof": "Proof"
-      },
-      "actions": {
-        "export": "Export CSV",
-        "previewProof": "Preview",
-        "openProofNewTab": "Open in new tab"
-      },
-      "pagination": {
-        "summary": "Showing {from}–{to} of {total}",
-        "prev": "Previous",
-        "next": "Next",
-        "page": "Page {current} of {total}",
-        "pageSize": "Rows"
-      },
-      "errors": {
-        "load": "We couldn't load teacher payments right now.",
-        "init": "We couldn't initialize the teacher payments page.",
-        "export": "We couldn't export teacher payments right now."
-      }
     },
     "overrides": {
       "title": "Usage overrides",
@@ -5841,33 +5993,22 @@
     "alerts": {
       "title": "Manual teacher alerts",
       "subtitle": "Send urgent announcements that take over the teacher workspace.",
-        "form": {
-          "title": "Compose alert",
-          "subtitle": "Write the alert message and choose who should receive it.",
-          "messageLabel": "Alert message",
-          "messagePlaceholder": "Describe the urgent issue or update",
-          "sendToAll": "Send to all active teachers",
-          "recipientsLabel": "Specific teachers",
-          "filterLabel": "Filter teachers",
-          "filterPlaceholder": "Search by name, slug, subject, or plan",
-          "recipientsPlaceholder": "Select one or more teachers",
-          "recipientsHint": "Choose which teachers should see this alert.",
-          "allTeachersHint": "Will notify all {count} active teachers.",
-          "noTeachers": "No active teachers are available to receive alerts.",
-          "noFilteredTeachers": "No active teachers match this filter.",
-          "filteredCount": "{count} active teachers",
-          "noSubject": "No subject",
-          "selectedHint": "Selected {count} teachers.",
-          "messageRequired": "Write a message before sending the alert.",
-          "recipientsRequired": "Select at least one teacher or send to all.",
-          "selectedTitle": "Selected teachers ({count})",
-          "columns": {
-            "select": "Select",
-            "teacher": "Teacher",
-            "subject": "Subject",
-            "plan": "Plan"
-          }
-        },
+      "form": {
+        "title": "Compose alert",
+        "subtitle": "Write the alert message and choose who should receive it.",
+        "messageLabel": "Alert message",
+        "messagePlaceholder": "Describe the urgent issue or update",
+        "sendToAll": "Send to all active teachers",
+        "recipientsLabel": "Specific teachers",
+        "recipientsPlaceholder": "Select one or more teachers",
+        "recipientsHint": "Choose which teachers should see this alert.",
+        "allTeachersHint": "Will notify all {count} active teachers.",
+        "noTeachers": "No active teachers are available to receive alerts.",
+        "selectedHint": "Selected {count} teachers.",
+        "messageRequired": "Write a message before sending the alert.",
+        "recipientsRequired": "Select at least one teacher or send to all.",
+        "selectedTitle": "Selected teachers ({count})"
+      },
       "actions": {
         "send": "Send alert",
         "reset": "Reset"
@@ -5959,6 +6100,27 @@
     "PLAN_QUOTA_COURSES": "Course limit reached for this plan ({limit} courses max)."
   },
   "live": {
+    "calendar": {
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "fiveDays": "5 Days",
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "details": {
+      "course": "Course",
+      "instructor": "Instructor",
+      "module": "Module",
+      "students": "Students",
+      "duration": "Duration",
+      "durationMins": "mins",
+      "provider": "Provider",
+      "status": "Status",
+      "joinLink": "Join Link",
+      "close": "Close"
+    },
     "teacher": {
       "titlePage": "Live sessions",
       "subtitle": "Schedule live classes, manage registrations and attendance.",
@@ -5969,16 +6131,46 @@
       "scheduledAt": "Scheduled at",
       "status": "Status",
       "registered": "Registered",
+      "assignedStudents": "Assigned students",
+      "repeatSource": "Source",
+      "repeatedCopy": "Copy",
+      "assignedInstructor": "Assigned instructor",
       "unscheduled": "To be determined",
       "viewRegistrations": "View registrations",
       "summarizeAttendance": "Summarize attendance",
       "emptyState": "No live sessions yet. Schedule one to get started.",
       "loadError": "Unable to load live sessions. Please try again later.",
       "newSession": "Schedule session",
+      "searchPlaceholder": "Search for a session...",
+      "filterStatus": "Session status",
+      "allStatuses": "All statuses",
+      "duplicateCopyTooltip": "Duplicated copy",
+      "repeatSourceTooltip": "Source session with duplicates",
+      "studentsPlaceholder": "Select students",
+      "sessionsEntity": "sessions",
       "createTitle": "Schedule live session",
       "editTitle": "Edit live session",
       "courseLabel": "Course",
       "selectCourse": "Select a course",
+      "createSuccess": "Live session scheduled successfully.",
+      "updateSuccess": "Live session updated successfully.",
+      "createError": "Could not schedule the session.",
+      "updateError": "Could not update the session.",
+      "deleteSuccess": "Live session deleted.",
+      "deleteError": "Could not delete the session.",
+      "deleteConfirm": "Delete the session \"{title}\"?",
+      "summarizeSuccess": "Attendance summary updated.",
+      "summarizeError": "Could not summarize attendance.",
+      "openModeration": "Moderate & chat",
+      "moduleId": "Module ID (optional)",
+      "repeatEnabled": "Repeat this session",
+      "repeatCount": "Number of occurrences",
+      "repeatInterval": "Repeat interval",
+      "repeatDaily": "Daily",
+      "repeatWeekly": "Weekly",
+      "repeatMonthly": "Monthly",
+      "studentRequired": "At least one student must be selected.",
+      "instructorRequired": "An instructor must be selected.",
       "title": "Title",
       "description": "Description",
       "scheduledAtLabel": "Scheduled at",
@@ -5989,15 +6181,6 @@
       "zoomPasscode": "Zoom passcode",
       "meetCode": "Google Meet code",
       "meetEventId": "Google Calendar event ID",
-      "createSuccess": "Live session scheduled successfully.",
-      "createError": "Could not schedule the session.",
-      "updateSuccess": "Live session updated successfully.",
-      "updateError": "Could not update the session.",
-      "deleteConfirm": "Delete the session \"{title}\"?",
-      "deleteSuccess": "Live session deleted.",
-      "deleteError": "Could not delete the session.",
-      "summarizeSuccess": "Attendance summary updated.",
-      "summarizeError": "Could not summarize attendance.",
       "registeredCount": "Registered ({count})",
       "student": "Student",
       "email": "Email",
@@ -6007,7 +6190,6 @@
       "attendedNo": "Not attended",
       "registrationsTitle": "Session registrations",
       "loadRegistrationsError": "Unable to load registrations.",
-      "openModeration": "Moderate & chat",
       "statusLabel": {
         "scheduled": "Scheduled",
         "live": "Live",

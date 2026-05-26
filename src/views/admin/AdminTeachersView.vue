@@ -1,21 +1,15 @@
 <template>
-  <ThemePage :title="t('adminTeachers.title')" :subtitle="t('adminTeachers.subtitle')">
-    <template #actions>
-      <UiButton to="/admin/teachers/payments" variant="outline">
-        {{ t('adminTeachers.actions.payments') }}
-      </UiButton>
-    </template>
-
-    <section class="admin-teachers">
+  <ThemePage class="theme-page--admin" :title="t('adminTeachers.title')" :subtitle="t('adminTeachers.subtitle')">
+    <section class="admin-teachers flex flex-col gap-6">
       <UiCard hover>
         <template #title>{{ t('adminTeachers.tableTitle') }}</template>
         <template #subtitle>{{ t('adminTeachers.tableSubtitle') }}</template>
 
-        <UiAlert v-if="store.error" color="danger" variant="soft" class="admin-teachers__alert">
+        <UiAlert v-if="store.error" color="danger" variant="soft" class="admin-teachers__alert mb-4">
           {{ translateError(store.error) }}
         </UiAlert>
 
-        <div class="admin-teachers__toolbar">
+        <div class="admin-teachers__toolbar grid gap-4 items-end mb-5 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
           <UiInput
             v-model="filters.search"
             :label="t('adminTeachers.filters.search')"
@@ -61,55 +55,11 @@
           :empty-text="t('adminTeachers.empty')"
         >
           <template #item.teacher="{ item }">
-            <div class="admin-teachers__teacher">
-              <span class="admin-teachers__teacher-name">{{ (item as any).name }}</span>
-              <small class="admin-teachers__teacher-meta">
+            <div class="admin-teachers__teacher flex flex-col gap-[0.125rem]">
+              <span class="admin-teachers__teacher-name font-semibold text-content">{{ (item as any).name }}</span>
+              <small class="admin-teachers__teacher-meta text-content-secondary">
                 {{ (item as any).slug }} · {{ (item as any).plan.toUpperCase() }}
                 <template v-if="(item as any).subject"> · {{ (item as any).subject }}</template>
-              </small>
-            </div>
-          </template>
-
-          <template #item.usage="{ item }">
-            <div class="admin-teachers__usage-summary">
-              <template v-if="teacherUsageLoading[(item as any).id]">
-                <small class="admin-teachers__usage-summary-text">{{ t('common.loading') }}</small>
-              </template>
-              <template v-else-if="teacherUsageMap[(item as any).id]">
-                <div class="admin-teachers__usage-summary-tags">
-                  <UiTag
-                    size="sm"
-                    :color="usageToneForStorage(teacherUsageMap[(item as any).id]!)"
-                  >
-                    {{ t('teacher.planUsageVideoStorage') }} {{ formatPercent(storagePercentForSummary(teacherUsageMap[(item as any).id]!)) }}
-                  </UiTag>
-                  <UiTag
-                    size="sm"
-                    :color="usageToneForStreaming(teacherUsageMap[(item as any).id]!)"
-                  >
-                    {{ t('teacher.planUsageStreamingMinutes') }} {{ formatPercent(streamingPercentForSummary(teacherUsageMap[(item as any).id]!)) }}
-                  </UiTag>
-                </div>
-                <small class="admin-teachers__usage-summary-text admin-teachers__usage-summary-text--muted">
-                  {{ formatCompactDuration(teacherUsageMap[(item as any).id]!.storageSecondsUsed) }}
-                  /
-                  {{
-                    teacherUsageMap[(item as any).id]!.storageSecondsLimit !== null
-                      ? formatCompactDuration(teacherUsageMap[(item as any).id]!.storageSecondsLimit!)
-                      : t('teacher.planUsageUnlimited')
-                  }}
-                  ·
-                  {{ formatCompactMinutes(teacherUsageMap[(item as any).id]!.streamingMinutesUsed) }}
-                  /
-                  {{
-                    teacherUsageMap[(item as any).id]!.streamingMinutesLimit !== null
-                      ? formatCompactMinutes(teacherUsageMap[(item as any).id]!.streamingMinutesLimit!)
-                      : t('teacher.planUsageUnlimited')
-                  }}
-                </small>
-              </template>
-              <small v-else class="admin-teachers__usage-summary-text admin-teachers__usage-summary-text--muted">
-                {{ t('adminTeachers.usage.empty') }}
               </small>
             </div>
           </template>
@@ -121,7 +71,7 @@
           </template>
 
           <template #item.actions="{ item }">
-            <div class="admin-teachers__actions">
+            <div class="admin-teachers__actions flex gap-2 justify-end">
               <UiButton size="sm" variant="link" @click="openDetail((item as any).id)">
                 {{ t('adminTeachers.actions.manage') }}
               </UiButton>
@@ -135,7 +85,7 @@
     </section>
 
     <UiDialog v-model="createDialog.open" :title="t('adminTeachers.create.title')" width="640px">
-      <form class="admin-teachers__form" @submit.prevent="submitCreate">
+      <form class="admin-teachers__form grid gap-4" @submit.prevent="submitCreate">
         <UiInput
           v-model="createDialog.form.slug"
           :label="t('adminTeachers.create.slug')"
@@ -167,7 +117,7 @@
         <UiInput v-model="createDialog.form.email" type="email" :label="t('adminTeachers.create.email')" required />
         <UiInput v-model="createDialog.form.password" type="password" :label="t('adminTeachers.create.password')" required />
 
-        <div class="admin-teachers__dialog-actions">
+        <div class="admin-teachers__dialog-actions flex justify-end gap-3 mt-4">
           <UiButton type="button" variant="link" @click="closeCreateDialog">
             {{ t('common.cancel') }}
           </UiButton>
@@ -184,22 +134,22 @@
       width="760px"
       @hide="closeDetail"
     >
-      <div v-if="store.loadingTeacherDetail" class="admin-teachers__loading">
+      <div v-if="store.loadingTeacherDetail" class="admin-teachers__loading grid gap-3 p-6">
         <UiSkeleton v-for="n in 4" :key="n" height="32px" />
       </div>
       <div v-else-if="selectedTeacher" class="admin-teachers__detail">
-        <UiAlert v-if="store.error" color="danger" variant="soft" class="admin-teachers__alert">
+        <UiAlert v-if="store.error" color="danger" variant="soft" class="admin-teachers__alert mb-4">
           {{ translateError(store.error) }}
         </UiAlert>
 
-        <section class="admin-teachers__section">
-          <header class="admin-teachers__section-header">
+        <section class="admin-teachers__section flex flex-col gap-4 mb-6">
+          <header class="admin-teachers__section-header flex items-center justify-between gap-3 mb-2">
             <h3>{{ t('adminTeachers.detail.overview') }}</h3>
             <UiTag :color="teacherForm.active ? 'success' : 'danger'">
               {{ teacherForm.active ? t('adminTeachers.status.active') : t('adminTeachers.status.disabled') }}
             </UiTag>
           </header>
-          <form class="admin-teachers__form" @submit.prevent="submitUpdateTeacher">
+          <form class="admin-teachers__form grid gap-4" @submit.prevent="submitUpdateTeacher">
             <UiInput v-model="teacherForm.name" :label="t('adminTeachers.detail.name')" required />
             <UiInput v-model="teacherForm.subject" :label="t('adminTeachers.detail.subject')" />
             <UiSelect v-model="teacherForm.phoneCountryCode" :label="t('adminTeachers.detail.phoneCountryCode')" required>
@@ -226,7 +176,7 @@
               :hint="t('adminTeachers.detail.studentMultiDeviceLoginHint')"
             />
 
-            <div class="admin-teachers__dialog-actions">
+            <div class="admin-teachers__dialog-actions flex justify-end gap-3 mt-4">
               <UiButton type="submit" color="primary" :loading="detailDialog.submitting">
                 {{ t('adminTeachers.detail.save') }}
               </UiButton>
@@ -248,7 +198,7 @@
             </UiButton>
           </form>
 
-          <dl class="admin-teachers__meta">
+          <dl class="admin-teachers__meta grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
             <div>
               <dt>{{ t('adminTeachers.detail.joined') }}</dt>
               <dd>{{ formatDate(selectedTeacher.joinDate) }}</dd>
@@ -268,99 +218,15 @@
           </dl>
         </section>
 
-        <section class="admin-teachers__section">
-          <header class="admin-teachers__section-header admin-teachers__section-header--stacked">
-            <h3>{{ t('adminTeachers.usage.title') }}</h3>
-            <p class="admin-teachers__section-subtitle">{{ t('adminTeachers.usage.subtitle') }}</p>
-          </header>
-          <UiAlert v-if="usageError" color="warning" variant="soft">
-            {{ t('adminTeachers.usage.error') }}
-          </UiAlert>
-          <div v-else-if="usageLoading" class="admin-teachers__usage-skeleton">
-            <UiSkeleton v-for="n in 3" :key="`usage-${n}`" height="72px" />
-          </div>
-          <div v-else-if="usageSummary" class="admin-teachers__usage">
-            <div class="admin-teachers__usage-header">
-              <span class="admin-teachers__usage-plan">
-                {{ usageSummary.planName || usageSummary.planCode || t('teacher.planUsagePlanFallback') }}
-              </span>
-              <span class="admin-teachers__usage-meta">
-                {{ t('teacher.planUsageMaxResolution') }}
-                {{ usageSummary.maxResolutionHeight ? `${usageSummary.maxResolutionHeight}p` : t('teacher.planUsageUnlimited') }}
-              </span>
-              <span class="admin-teachers__usage-meta">
-                {{ t('teacher.planUsageMaxDuration') }}
-                {{
-                  usageSummary.maxVideoDurationMinutes
-                    ? formatMinutes(usageSummary.maxVideoDurationMinutes)
-                    : t('teacher.planUsageDefault')
-                }}
-              </span>
-            </div>
-
-            <div class="admin-teachers__usage-item">
-              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageVideoStorage') }}</div>
-              <UiProgressBar :value="storageUsagePercent" color="primary">
-                <div class="admin-teachers__usage-progress">
-                  <span>{{ formatDurationSeconds(usageSummary.storageSecondsUsed) }}</span>
-                  <span>
-                    /
-                    {{
-                      usageSummary.storageSecondsLimit !== null
-                        ? formatDurationSeconds(usageSummary.storageSecondsLimit)
-                        : t('teacher.planUsageUnlimited')
-                    }}
-                  </span>
-                </div>
-              </UiProgressBar>
-            </div>
-
-            <div class="admin-teachers__usage-item">
-              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageVideoStorageSize') }}</div>
-              <UiProgressBar :value="storageSizeUsagePercent" color="secondary">
-                <div class="admin-teachers__usage-progress">
-                  <span>{{ formatBytes(usageSummary.storageBytesUsed) }}</span>
-                  <span>
-                    /
-                    {{
-                      usageSummary.storageBytesLimit !== null
-                        ? formatBytes(usageSummary.storageBytesLimit)
-                        : t('teacher.planUsageUnlimited')
-                    }}
-                  </span>
-                </div>
-              </UiProgressBar>
-            </div>
-
-            <div class="admin-teachers__usage-item">
-              <div class="admin-teachers__usage-label">{{ t('teacher.planUsageStreamingMinutes') }}</div>
-              <UiProgressBar :value="streamingUsagePercent" color="info">
-                <div class="admin-teachers__usage-progress">
-                  <span>{{ formatMinutes(usageSummary.streamingMinutesUsed) }}</span>
-                  <span>
-                    /
-                    {{
-                      usageSummary.streamingMinutesLimit !== null
-                        ? formatMinutes(usageSummary.streamingMinutesLimit)
-                        : t('teacher.planUsageUnlimited')
-                    }}
-                  </span>
-                </div>
-              </UiProgressBar>
-            </div>
-          </div>
-          <p v-else class="admin-teachers__help">{{ t('adminTeachers.usage.empty') }}</p>
-        </section>
-
-        <section class="admin-teachers__section">
-          <header class="admin-teachers__section-header">
+        <section class="admin-teachers__section flex flex-col gap-4 mb-6">
+          <header class="admin-teachers__section-header flex items-center justify-between gap-3 mb-2">
             <h3>{{ t('adminTeachers.overrides.title') }}</h3>
             <UiSwitch v-model="usageOverridesEnabled" :label="t('adminTeachers.overrides.switch')" />
           </header>
           <UiAlert color="info" variant="soft">
             {{ t('adminTeachers.overrides.alert') }}
           </UiAlert>
-          <div v-if="usageOverridesEnabled" class="admin-teachers__form admin-teachers__usage-overrides">
+          <div v-if="usageOverridesEnabled" class="admin-teachers__form grid gap-4 admin-teachers__usage-overrides [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
             <UiInput
               v-model.number="usageOverridesForm.storageWarningPercent"
               type="number"
@@ -410,11 +276,11 @@
               placeholder="e.g. 7"
             />
           </div>
-          <p v-else class="admin-teachers__help">{{ t('adminTeachers.overrides.help') }}</p>
+          <p v-else class="admin-teachers__help m-0 text-sm text-content-tertiary">{{ t('adminTeachers.overrides.help') }}</p>
         </section>
 
-        <section class="admin-teachers__section">
-          <header class="admin-teachers__section-header">
+        <section class="admin-teachers__section flex flex-col gap-4 mb-6">
+          <header class="admin-teachers__section-header flex items-center justify-between gap-3 mb-2">
             <h3>{{ t('adminTeachers.accounts.title') }}</h3>
             <UiButton
               v-if="!selectedTeacher.accounts || selectedTeacher.accounts.length === 0"
@@ -425,13 +291,13 @@
               {{ t('adminTeachers.accounts.add') }}
             </UiButton>
           </header>
-          <div v-if="selectedTeacher.accounts && selectedTeacher.accounts.length" class="admin-teachers__accounts">
+          <div v-if="selectedTeacher.accounts && selectedTeacher.accounts.length" class="admin-teachers__accounts flex flex-col gap-3">
             <article v-for="account in selectedTeacher.accounts" :key="account.id" class="admin-teachers__account">
               <div class="admin-teachers__account-info">
                 <h4>{{ account.email }}</h4>
                 <small>{{ lastActivity(account) }}</small>
               </div>
-              <div class="admin-teachers__account-actions">
+              <div class="admin-teachers__account-actions flex items-center gap-3 flex-wrap justify-end">
                 <UiSwitch
                   :model-value="account.enabled"
                   :label="account.enabled ? t('adminTeachers.accounts.enabled') : t('adminTeachers.accounts.disabled')"
@@ -456,22 +322,22 @@
 
         <AdminTeacherAssistantsPanel :teacher-id="selectedTeacher.id" />
 
-        <footer class="admin-teachers__danger-zone">
+        <footer class="admin-teachers__danger-zone flex justify-end pt-5 [border-top:1px_solid_var(--sakai-border-color)]">
           <UiButton color="danger" variant="outline" @click="confirmDeleteTeacher(selectedTeacher.id, selectedTeacher.name)">
             {{ t('adminTeachers.detail.deleteTeacher') }}
           </UiButton>
         </footer>
       </div>
-      <div v-else class="admin-teachers__empty-detail">
+      <div v-else class="admin-teachers__empty-detail text-content-tertiary text-center p-[3rem] italic">
         {{ t('adminTeachers.detail.empty') }}
       </div>
     </UiDialog>
 
     <UiDialog v-model="accountCreateDialog.open" :title="t('adminTeachers.accounts.addTitle')" width="480px">
-      <form class="admin-teachers__form" @submit.prevent="submitCreateAccount">
+      <form class="admin-teachers__form grid gap-4" @submit.prevent="submitCreateAccount">
         <UiInput v-model="accountCreateDialog.email" type="email" :label="t('adminTeachers.accounts.email')" required />
         <UiInput v-model="accountCreateDialog.password" type="password" :label="t('adminTeachers.accounts.password')" required />
-        <div class="admin-teachers__dialog-actions">
+        <div class="admin-teachers__dialog-actions flex justify-end gap-3 mt-4">
           <UiButton type="button" variant="link" @click="closeAccountCreate">
             {{ t('common.cancel') }}
           </UiButton>
@@ -483,11 +349,11 @@
     </UiDialog>
 
     <UiDialog v-model="accountEditDialog.open" :title="t('adminTeachers.accounts.editTitle')" width="480px">
-      <form class="admin-teachers__form" @submit.prevent="submitAccountEdit">
+      <form class="admin-teachers__form grid gap-4" @submit.prevent="submitAccountEdit">
         <UiInput v-model="accountEditDialog.email" type="email" :label="t('adminTeachers.accounts.email')" required />
         <UiInput v-model="accountEditDialog.password" type="password" :label="t('adminTeachers.accounts.newPassword')" />
-        <p class="admin-teachers__help">{{ t('adminTeachers.accounts.passwordHelp') }}</p>
-        <div class="admin-teachers__dialog-actions">
+        <p class="admin-teachers__help m-0 text-sm text-content-tertiary">{{ t('adminTeachers.accounts.passwordHelp') }}</p>
+        <div class="admin-teachers__dialog-actions flex justify-end gap-3 mt-4">
           <UiButton type="button" variant="link" @click="closeAccountEdit">
             {{ t('common.cancel') }}
           </UiButton>
@@ -503,7 +369,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
 import { useAdminStore } from '@/stores/admin';
 import { useToast } from '@/composables/useToast';
 import UiCard from '@/components/ui/UiCard.vue';
@@ -516,18 +381,13 @@ import UiDialog from '@/components/ui/UiDialog.vue';
 import UiSkeleton from '@/components/ui/UiSkeleton.vue';
 import UiAlert from '@/components/ui/UiAlert.vue';
 import UiSwitch from '@/components/ui/UiSwitch.vue';
-import UiProgressBar from '@/components/ui/UiProgressBar.vue';
 import AdminTeacherAssistantsPanel from '@/components/admin/AdminTeacherAssistantsPanel.vue';
 import { formatDateTime } from '@/utils/formatters';
-import { fetchTeacherVideoUsageSummary } from '@/services/admin';
 import type { TeacherAccount, TeacherUsageOverrides } from '@/services/admin';
-import type { TeacherVideoUsageSummary } from '@/services/teacherUsage';
 import { PHONE_COUNTRY_CODES } from '@/constants/countryCodes';
 import { normalizePhoneInput, PhoneNumberValidationError } from '@/utils/phoneNumber';
 
 const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
 const store = useAdminStore();
 const toast = useToast();
 
@@ -549,7 +409,6 @@ const filters = reactive({
 const headers = computed<UiTableHeader[]>(() => [
   { key: 'teacher', title: t('adminTeachers.columns.teacher') },
   { key: 'plan', title: t('adminTeachers.columns.plan') },
-  { key: 'usage', title: t('adminTeachers.columns.usage'), sortable: false },
   { key: 'status', title: t('adminTeachers.columns.status') },
   { key: 'actions', title: t('adminTeachers.columns.actions'), sortable: false, align: 'end' }
 ]);
@@ -626,11 +485,6 @@ const usageOverridesForm = reactive({
   storageGraceDays: null as number | null,
   streamingGraceDays: null as number | null
 });
-const usageSummary = ref<TeacherVideoUsageSummary | null>(null);
-const usageLoading = ref(false);
-const usageError = ref(false);
-const teacherUsageMap = reactive<Record<number, TeacherVideoUsageSummary>>({});
-const teacherUsageLoading = reactive<Record<number, boolean>>({});
 
 const selectedTeacher = computed(() => store.selectedTeacher);
 const detailTitle = computed(() => selectedTeacher.value?.name || t('adminTeachers.detail.title'));
@@ -670,9 +524,6 @@ watch(selectedTeacher, (teacher) => {
     slugForm.value = '';
     usageOverridesEnabled.value = false;
     resetUsageOverridesForm();
-    usageSummary.value = null;
-    usageError.value = false;
-    usageLoading.value = false;
     return;
   }
   teacherForm.name = teacher.name ?? '';
@@ -686,21 +537,7 @@ watch(selectedTeacher, (teacher) => {
   const overrides = teacher.usageOverrides ?? null;
   usageOverridesEnabled.value = hasUsageOverrides(overrides);
   applyUsageOverridesForm(overrides);
-  void loadTeacherUsage(teacher.id);
 });
-
-watch(
-  () => store.teachers.map((teacher) => teacher.id),
-  (teacherIds) => {
-    for (const teacherId of teacherIds) {
-      if (teacherUsageMap[teacherId] || teacherUsageLoading[teacherId]) {
-        continue;
-      }
-      void loadTeacherUsageSummaryForTable(teacherId);
-    }
-  },
-  { immediate: true }
-);
 
 onMounted(async () => {
   if (!store.teachers.length) {
@@ -708,25 +545,7 @@ onMounted(async () => {
       /* ignore */
     });
   }
-  const teacherId = typeof route.query.teacherId === 'string' ? Number(route.query.teacherId) : 0;
-  if (teacherId > 0) {
-    await openDetail(teacherId);
-  }
 });
-
-watch(
-  () => route.query.teacherId,
-  async (value) => {
-    const teacherId = typeof value === 'string' ? Number(value) : 0;
-    if (teacherId <= 0 || !Number.isFinite(teacherId)) {
-      return;
-    }
-    if (detailDialog.open && store.selectedTeacher?.id === teacherId) {
-      return;
-    }
-    await openDetail(teacherId);
-  }
-);
 
 async function applyFilters() {
   await store
@@ -826,10 +645,6 @@ async function submitCreate() {
 }
 
 async function openDetail(id: number) {
-  await router.replace({
-    name: 'admin-teachers',
-    query: { ...route.query, teacherId: String(id) }
-  });
   detailDialog.open = true;
   detailDialog.submitting = false;
   detailDialog.slugSubmitting = false;
@@ -839,14 +654,8 @@ async function openDetail(id: number) {
 }
 
 function closeDetail() {
-  const nextQuery = { ...route.query } as Record<string, unknown>;
-  delete nextQuery.teacherId;
-  void router.replace({ name: 'admin-teachers', query: nextQuery });
   detailDialog.open = false;
   store.selectedTeacher = null;
-  usageSummary.value = null;
-  usageError.value = false;
-  usageLoading.value = false;
 }
 
 async function submitUpdateTeacher() {
@@ -916,139 +725,6 @@ function formatDate(value?: string | null) {
   }
   return formatDateTime(value);
 }
-
-async function loadTeacherUsage(teacherId: number) {
-  usageLoading.value = true;
-  usageError.value = false;
-  try {
-    const summary = await fetchTeacherVideoUsageSummary(teacherId);
-    usageSummary.value = summary;
-    teacherUsageMap[teacherId] = summary;
-  } catch {
-    usageSummary.value = null;
-    usageError.value = true;
-  } finally {
-    usageLoading.value = false;
-  }
-}
-
-async function loadTeacherUsageSummaryForTable(teacherId: number) {
-  teacherUsageLoading[teacherId] = true;
-  try {
-    teacherUsageMap[teacherId] = await fetchTeacherVideoUsageSummary(teacherId);
-  } catch {
-    delete teacherUsageMap[teacherId];
-  } finally {
-    teacherUsageLoading[teacherId] = false;
-  }
-}
-
-const formatNumber = (value: number) => new Intl.NumberFormat().format(Math.max(0, Math.round(value)));
-
-const formatMinutes = (value: number) => `${formatNumber(value)} ${t('teacher.planUsageMinuteShort')}`;
-
-const formatCompactMinutes = (value: number) => `${formatNumber(value)} ${t('teacher.planUsageMinuteShort')}`;
-
-const formatDurationSeconds = (seconds: number) => {
-  const safe = Math.max(0, Math.round(seconds));
-  const totalMinutes = Math.round(safe / 60);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours > 0) {
-    return `${formatNumber(hours)}${t('teacher.planUsageHourShort')} ${formatNumber(minutes)}${t('teacher.planUsageMinuteShort')}`;
-  }
-  return `${formatNumber(minutes)}${t('teacher.planUsageMinuteShort')}`;
-};
-
-const formatCompactDuration = (seconds: number) => {
-  const safe = Math.max(0, Math.round(seconds));
-  const totalMinutes = Math.round(safe / 60);
-  const hours = Math.floor(totalMinutes / 60);
-  if (hours > 0) {
-    return `${formatNumber(hours)}${t('teacher.planUsageHourShort')}`;
-  }
-  return `${formatNumber(totalMinutes)}${t('teacher.planUsageMinuteShort')}`;
-};
-
-const formatBytes = (bytes: number) => {
-  const safe = Math.max(0, bytes);
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let value = safe;
-  let index = 0;
-  while (value >= 1024 && index < units.length - 1) {
-    value /= 1024;
-    index += 1;
-  }
-  const rounded = value >= 10 || index === 0 ? Math.round(value) : Math.round(value * 10) / 10;
-  return `${new Intl.NumberFormat().format(rounded)} ${units[index]}`;
-};
-
-function calculateUsagePercent(used: number, limit: number | null | undefined) {
-  if (limit == null || limit <= 0) {
-    return 0;
-  }
-  return Math.max(0, Math.min(100, (used / limit) * 100));
-}
-
-function resolveThreshold(value: number | null | undefined, fallback: number) {
-  if (value == null || Number.isNaN(value)) {
-    return fallback;
-  }
-  return Math.max(0, Math.min(100, Math.round(value)));
-}
-
-function formatPercent(value: number) {
-  return `${Math.round(Math.max(0, Math.min(100, value)))}%`;
-}
-
-function usageTone(percent: number, warningThreshold: number, criticalThreshold: number) {
-  if (percent >= 100) {
-    return 'danger' as const;
-  }
-  if (percent >= criticalThreshold) {
-    return 'danger' as const;
-  }
-  if (percent >= warningThreshold) {
-    return 'warning' as const;
-  }
-  return 'success' as const;
-}
-
-function storagePercentForSummary(summary: TeacherVideoUsageSummary) {
-  return calculateUsagePercent(summary.storageSecondsUsed, summary.storageSecondsLimit);
-}
-
-function streamingPercentForSummary(summary: TeacherVideoUsageSummary) {
-  return calculateUsagePercent(summary.streamingMinutesUsed, summary.streamingMinutesLimit);
-}
-
-function usageToneForStorage(summary: TeacherVideoUsageSummary) {
-  return usageTone(
-    storagePercentForSummary(summary),
-    resolveThreshold(summary.storageWarningPercent, 80),
-    resolveThreshold(summary.storageCriticalPercent, 90)
-  );
-}
-
-function usageToneForStreaming(summary: TeacherVideoUsageSummary) {
-  return usageTone(
-    streamingPercentForSummary(summary),
-    resolveThreshold(summary.streamingWarningPercent, 80),
-    resolveThreshold(summary.streamingCriticalPercent, 90)
-  );
-}
-
-const storageUsagePercent = computed(() =>
-  usageSummary.value ? calculateUsagePercent(usageSummary.value.storageSecondsUsed, usageSummary.value.storageSecondsLimit) : 0
-);
-
-const storageSizeUsagePercent = computed(() =>
-  usageSummary.value ? calculateUsagePercent(usageSummary.value.storageBytesUsed, usageSummary.value.storageBytesLimit) : 0
-);
-
-const streamingUsagePercent = computed(() =>
-  usageSummary.value ? calculateUsagePercent(usageSummary.value.streamingMinutesUsed, usageSummary.value.streamingMinutesLimit) : 0
-);
 
 function lastActivity(account: TeacherAccount) {
   if (!account.lastActivity) {
@@ -1245,115 +921,10 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
 </script>
 
 <style scoped>
-.admin-teachers {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-6);
-}
-
-:deep(.theme-page__title) {
-  font-size: 2.25rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--sakai-primary) 0%, var(--sakai-primary-700) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: var(--sakai-space-1);
-}
-
-.admin-teachers__alert {
-  margin-bottom: var(--sakai-space-4);
-}
-
-.admin-teachers__toolbar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--sakai-space-4);
-  align-items: end;
-  margin-bottom: var(--sakai-space-5);
-}
-
-.admin-teachers__teacher {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.admin-teachers__teacher-name {
-  font-weight: 600;
-  color: var(--sakai-text-color);
-}
-
-.admin-teachers__teacher-meta {
-  color: var(--sakai-text-color-secondary);
-}
-
-.admin-teachers__actions {
-  display: flex;
-  gap: var(--sakai-space-2);
-  justify-content: flex-end;
-}
-
-.admin-teachers__usage-summary {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 12rem;
-}
-
-.admin-teachers__usage-summary-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.admin-teachers__usage-summary-text {
-  color: var(--sakai-text-color);
-  line-height: 1.35;
-}
-
-.admin-teachers__usage-summary-text--muted {
-  color: var(--sakai-text-color-secondary);
-}
-
-.admin-teachers__section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-4);
-  margin-bottom: var(--sakai-space-6);
-}
-
-.admin-teachers__section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sakai-space-3);
-  margin-bottom: var(--sakai-space-2);
-}
-
-.admin-teachers__section-header--stacked {
-  align-items: flex-start;
-  flex-direction: column;
-}
-
 .admin-teachers__section-header h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-}
-
-.admin-teachers__section-subtitle {
-  margin: 0;
-  color: var(--sakai-text-color-secondary);
-  font-size: 0.92rem;
-}
-
-.admin-teachers__form {
-  display: grid;
-  gap: var(--sakai-space-4);
-}
-
-.admin-teachers__usage-overrides {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .admin-teachers__form--inline {
@@ -1361,25 +932,6 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
   grid-template-columns: 1fr auto;
   gap: var(--sakai-space-3);
   align-items: end;
-}
-
-.admin-teachers__dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--sakai-space-3);
-  margin-top: var(--sakai-space-4);
-}
-
-.admin-teachers__loading {
-  display: grid;
-  gap: var(--sakai-space-3);
-  padding: var(--sakai-space-6);
-}
-
-.admin-teachers__meta {
-  display: grid;
-  gap: var(--sakai-space-4);
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .admin-teachers__meta dt {
@@ -1394,49 +946,6 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
   margin: 0.125rem 0 0;
   font-weight: 600;
   color: var(--sakai-text-color);
-}
-
-.admin-teachers__usage-skeleton,
-.admin-teachers__usage {
-  display: grid;
-  gap: var(--sakai-space-4);
-}
-
-.admin-teachers__usage-header {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.admin-teachers__usage-plan {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.admin-teachers__usage-meta {
-  color: var(--sakai-text-color-secondary);
-  font-size: 0.92rem;
-}
-
-.admin-teachers__usage-item {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.admin-teachers__usage-label {
-  font-weight: 600;
-}
-
-.admin-teachers__usage-progress {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--sakai-space-3);
-  width: 100%;
-}
-
-.admin-teachers__accounts {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sakai-space-3);
 }
 
 .admin-teachers__account {
@@ -1461,34 +970,6 @@ function buildUsageOverridesPayload(): TeacherUsageOverrides | null {
 }
 
 .admin-teachers__account-info small {
-  color: var(--sakai-text-color-tertiary);
-}
-
-.admin-teachers__account-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--sakai-space-3);
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.admin-teachers__danger-zone {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: var(--sakai-space-5);
-  border-top: 1px solid var(--sakai-border-color);
-}
-
-.admin-teachers__empty-detail {
-  color: var(--sakai-text-color-tertiary);
-  text-align: center;
-  padding: var(--sakai-space-10);
-  font-style: italic;
-}
-
-.admin-teachers__help {
-  margin: 0;
-  font-size: 0.875rem;
   color: var(--sakai-text-color-tertiary);
 }
 </style>

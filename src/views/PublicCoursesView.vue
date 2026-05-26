@@ -158,11 +158,6 @@ const slug = computed(
 const isPreview = computed(() => isPreviewEnabled(route.query.preview));
 const isRtl = computed(() => locale.value === 'ar');
 
-function isDisabledTenantError(error: unknown) {
-  const status = (error as { response?: { status?: number } })?.response?.status;
-  return status === 403 || status === 404;
-}
-
 const pageTitle = computed(() => {
   const teacher = tenantStore.branding?.name;
   return teacher ? t('publicCourses.titleWithTeacher', { teacher }) : t('publicCourses.title');
@@ -266,9 +261,11 @@ async function loadCourses() {
     featureEnabled.value = true;
     document.title = `${pageTitle.value}`;
   } catch (err: any) {
-    if (isDisabledTenantError(err)) {
-      await router.replace({ name: 'not-found' });
-      return;
+    if (err?.response?.status === 404) {
+      featureEnabled.value = false;
+      courses.value = [];
+      totalPages.value = 0;
+      totalElements.value = 0;
     } else {
       error.value = true;
     }
@@ -280,15 +277,7 @@ async function loadCourses() {
 
 onMounted(async () => {
   if (!tenantStore.branding) {
-    try {
-      await tenantStore.fetchBranding(slug.value);
-    } catch (error) {
-      if (isDisabledTenantError(error)) {
-        await router.replace({ name: 'not-found' });
-        return;
-      }
-      throw error;
-    }
+    await tenantStore.fetchBranding(slug.value);
   }
   syncFiltersFromRoute();
   await loadCourses();

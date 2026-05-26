@@ -2,7 +2,6 @@ import { h } from 'vue';
 import { createVuetify } from 'vuetify';
 import 'vuetify/styles';
 import '@/styles/theme.css';
-import '@/styles/utilities.css';
 
 const LIGHT_SURFACE = '#ffffff';
 const LIGHT_ON_SURFACE = '#1f2937';
@@ -24,13 +23,15 @@ const museTheme = {
   }
 };
 
+// Vuetify needs static hex values at boot — these mirror the brand tokens in
+// src/theme/sakai/tokens.scss. Keep in sync when the brand changes.
 const mathGuruTheme = {
   dark: false,
   colors: {
-    primary: '#FF3EA5',
-    secondary: '#111827',
+    primary: '#1b2fac',   // --sakai-primary-500
+    secondary: '#162a69', // --sakai-brand-deep (= primary-600)
     surface: LIGHT_SURFACE,
-    background: '#0f172a',
+    background: '#ffffff',
     onMedia: '#ffffff',
     'on-surface': LIGHT_ON_SURFACE
   }
@@ -41,12 +42,12 @@ const mathGuruDarkTheme = {
   colors: {
     background: '#0f172a',
     surface: '#111c34',
-    primary: '#FF3EA5',
-    secondary: '#1e293b',
-    info: '#38bdf8',
-    success: '#4ade80',
-    warning: '#facc15',
-    danger: '#fb7185',
+    primary: '#4a5dd6',   // dark --sakai-primary-500 (lifted indigo-400-ish)
+    secondary: '#1b2553', // dark --sakai-brand-deep
+    info: '#60a5fa',      // dark --sakai-info (lifted blue-400)
+    success: '#15ce82',   // dark --sakai-success
+    warning: '#f59e0b',   // --sakai-warning (no dark override)
+    danger: '#ff4d6f',    // dark --sakai-danger
     'on-background': '#e2e8f0',
     'on-surface': '#e2e8f0'
   }
